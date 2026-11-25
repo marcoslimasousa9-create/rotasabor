@@ -4,182 +4,191 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>RotaSabor — Cliente</title>
+  <link rel="manifest" href="/static/manifest.json" />
   <meta name="theme-color" content="#0b1220" />
-  <link rel="manifest" href="/manifest.json" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <style>
-    :root {
-      --bg: #0b1220;
-      --panel: #111b2e;
-      --panel-2: #16233b;
-      --text: #f1f5f9;
-      --muted: #94a3b8;
-      --accent: #38bdf8;
-      --accent-2: #22c55e;
-      --warn: #f59e0b;
-      --border: rgba(148, 163, 184, 0.16);
-    }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
-      background: var(--bg);
-      color: var(--text);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #0b1220;
+      color: #e5e7eb;
       min-height: 100vh;
-      padding-bottom: 48px;
     }
     header {
-      background: rgba(17, 27, 46, 0.95);
-      border-bottom: 1px solid var(--border);
-      padding: 14px 20px;
-      position: sticky;
-      top: 0;
-      z-index: 20;
       display: flex;
+      justify-content: space-between;
+      align-items: center;
       flex-wrap: wrap;
       gap: 12px;
-      align-items: center;
-      justify-content: space-between;
+      padding: 16px 24px;
+      background: #0f172a;
+      border-bottom: 1px solid #1e293b;
     }
-    .brand { display: flex; align-items: center; gap: 10px; }
-    .brand h1 { font-size: 1.15rem; color: var(--accent); }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .brand h1 {
+      font-size: 1.25rem;
+      color: #f8fafc;
+    }
     .badge {
       font-size: 0.75rem;
-      background: var(--panel-2);
-      color: var(--muted);
-      padding: 4px 10px;
+      padding: 3px 8px;
       border-radius: 999px;
-      border: 1px solid var(--border);
+      background: #1e293b;
+      color: #94a3b8;
     }
-    nav { display: flex; gap: 8px; flex-wrap: wrap; }
+    .header-actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
     .btn {
-      background: var(--panel-2);
-      color: var(--text);
-      border: 1px solid var(--border);
-      padding: 8px 14px;
+      border: none;
       border-radius: 8px;
-      font-size: 0.88rem;
+      padding: 9px 14px;
+      font-weight: 600;
       cursor: pointer;
+      font-size: 0.9rem;
       text-decoration: none;
       display: inline-flex;
       align-items: center;
+      justify-content: center;
       gap: 6px;
-      transition: 0.15s;
     }
-    .btn:hover { border-color: var(--accent); }
+    .btn-ghost {
+      background: #1e293b;
+      color: #f8fafc;
+    }
     .btn-primary {
-      background: var(--accent);
-      color: #06101d;
-      font-weight: 700;
-      border: none;
+      background: #2563eb;
+      color: #ffffff;
+      padding: 7px 12px;
+      font-size: 0.85rem;
     }
     .btn-success {
-      background: var(--accent-2);
+      background: #22c55e;
       color: #052e16;
-      font-weight: 700;
-      border: none;
+      width: 100%;
+      padding: 12px;
+      font-size: 1rem;
     }
-    .container {
-      max-width: 1120px;
+    main {
+      max-width: 1200px;
       margin: 24px auto;
-      padding: 0 18px;
+      padding: 0 20px 40px;
       display: grid;
-      grid-template-columns: 1.5fr 1fr;
-      gap: 20px;
+      grid-template-columns: 1.6fr 1fr;
+      gap: 24px;
+      align-items: start;
     }
-    @media (max-width: 860px) {
-      .container { grid-template-columns: 1fr; }
+    @media (max-width: 900px) {
+      main { grid-template-columns: 1fr; }
     }
     .card {
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 18px;
-      margin-bottom: 18px;
+      background: #111827;
+      border: 1px solid #1f2937;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 20px;
     }
     .card h2 {
-      font-size: 1.05rem;
-      margin-bottom: 12px;
-      color: var(--text);
+      font-size: 1.15rem;
+      margin-bottom: 6px;
+      color: #f9fafb;
     }
-    .muted { color: var(--muted); font-size: 0.86rem; }
-    .loja-item {
-      background: var(--panel-2);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 14px;
-      margin-bottom: 14px;
+    .subtitle {
+      font-size: 0.88rem;
+      color: #9ca3af;
+      margin-bottom: 18px;
     }
-    .loja-topo {
+    .store {
+      border: 1px solid #1e293b;
+      background: #0d1526;
+      border-radius: 10px;
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+    .store-header {
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
-      gap: 10px;
+      gap: 12px;
       margin-bottom: 8px;
+    }
+    .store-title { font-weight: 700; font-size: 1rem; color: #f8fafc; }
+    .store-meta { font-size: 0.83rem; color: #94a3b8; margin-top: 2px; }
+    .rating {
+      background: #1e293b;
+      color: #fbbf24;
+      font-size: 0.8rem;
+      font-weight: 700;
+      padding: 4px 8px;
+      border-radius: 6px;
+      white-space: nowrap;
     }
     .promo {
       display: inline-block;
-      margin-top: 6px;
+      background: rgba(245, 158, 11, 0.15);
+      color: #fbbf24;
+      border: 1px solid rgba(245, 158, 11, 0.35);
       font-size: 0.78rem;
-      color: var(--warn);
-      background: rgba(245, 158, 11, 0.12);
+      font-weight: 600;
       padding: 3px 8px;
       border-radius: 6px;
+      margin-bottom: 12px;
     }
     .item-row {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 8px 0;
-      border-top: 1px solid var(--border);
-      gap: 10px;
+      padding: 10px 0;
+      border-top: 1px solid #1e293b;
+      gap: 12px;
     }
-    .preco { font-weight: 700; color: var(--accent-2); margin-right: 8px; }
-    .carrinho-lista { list-style: none; margin: 10px 0 14px; }
-    .carrinho-lista li {
+    .item-name { font-size: 0.92rem; color: #e2e8f0; }
+    .item-right { display: flex; align-items: center; gap: 10px; }
+    .item-price { font-weight: 700; color: #38bdf8; font-size: 0.9rem; white-space: nowrap; }
+    label { display: block; font-size: 0.85rem; color: #cbd5e1; margin-bottom: 6px; }
+    select, input {
+      width: 100%;
+      background: #0b1220;
+      color: #f8fafc;
+      border: 1px solid #334155;
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-size: 0.92rem;
+      margin-bottom: 14px;
+    }
+    .cart-item {
       display: flex;
       justify-content: space-between;
-      padding: 7px 0;
-      border-bottom: 1px solid var(--border);
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px solid #1e293b;
       font-size: 0.9rem;
-    }
-    select, .linha-form {
-      width: 100%;
-      margin-bottom: 12px;
-    }
-    select {
-      background: var(--panel-2);
-      color: var(--text);
-      border: 1px solid var(--border);
-      padding: 9px 12px;
-      border-radius: 8px;
     }
     .total-box {
       display: flex;
       justify-content: space-between;
-      font-size: 1.05rem;
+      align-items: center;
+      margin: 14px 0 18px;
       font-weight: 700;
-      margin: 12px 0;
-      color: var(--accent);
     }
-    .pedido-card {
-      background: var(--panel-2);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 12px;
+    .total-value { color: #38bdf8; font-size: 1.05rem; }
+    .empty-msg { color: #94a3b8; font-size: 0.88rem; }
+    .order-box {
+      border: 1px solid #1e293b;
+      background: #0d1526;
+      border-radius: 8px;
+      padding: 10px 12px;
       margin-top: 10px;
-      font-size: 0.88rem;
-    }
-    .status-pill {
-      font-size: 0.76rem;
-      padding: 2px 8px;
-      border-radius: 999px;
-      background: rgba(34, 197, 94, 0.16);
-      color: #86efac;
-    }
-    .msg {
-      margin-top: 10px;
-      font-size: 0.88rem;
-      color: #86efac;
-      min-height: 20px;
+      font-size: 0.86rem;
     }
   </style>
 </head>
@@ -187,235 +196,237 @@
   <header>
     <div class="brand">
       <h1>RotaSabor</h1>
-      <span class="badge" id="versaoBadge">v{{ build_version or "online" }}</span>
+      <span class="badge">v2026.11.25.133400</span>
     </div>
-    <nav>
-      <a class="btn" href="/app-motoboy">App Motoboy</a>
-      <a class="btn" href="/download/pacote-app">Baixar Pacote</a>
-    </nav>
+    <div class="header-actions">
+      <a class="btn btn-ghost" href="/app-motoboy">App Motoboy</a>
+      <button class="btn btn-ghost" id="btnInstall" type="button" style="display:none;">Instalar App</button>
+    </div>
   </header>
 
-  <main class="container">
-    <section>
-      <div class="card">
-        <h2>Estabelecimentos e Cardápio</h2>
-        <p class="muted" style="margin-bottom: 14px;">{{ build_notes or "Peça direto na plataforma e acompanhe seu pedido." }}</p>
-        <div id="lojasContainer" class="muted">Carregando estabelecimentos...</div>
+  <main>
+    <section class="card">
+      <h2>Estabelecimentos e Cardápio</h2>
+      <p class="subtitle">RotaSabor na nuvem — Tema escuro #0b1220, persistência em JSON, App Cliente, App Motoboy e atalho PWA prontos.</p>
+
+      <div class="store">
+        <div class="store-header">
+          <div>
+            <div class="store-title">Hamburgueria Centro</div>
+            <div class="store-meta">Lanches & Smash • Centro, Catanduva - SP • 25–35 min • Entrega R$ 8,00</div>
+          </div>
+          <span class="rating">★ 4.9</span>
+        </div>
+        <span class="promo">Combo Smash + Fritas com 15% OFF</span>
+
+        <div class="item-row">
+          <span class="item-name">Smash Duplo Bacon</span>
+          <div class="item-right">
+            <span class="item-price">R$ 28,00</span>
+            <button class="btn btn-primary" type="button" onclick="addItem('Hamburgueria Centro', 'Smash Duplo Bacon', 28.00)">+ Add</button>
+          </div>
+        </div>
+
+        <div class="item-row">
+          <span class="item-name">Batata Rustica 300g</span>
+          <div class="item-right">
+            <span class="item-price">R$ 14,00</span>
+            <button class="btn btn-primary" type="button" onclick="addItem('Hamburgueria Centro', 'Batata Rustica 300g', 14.00)">+ Add</button>
+          </div>
+        </div>
+
+        <div class="item-row">
+          <span class="item-name">Refrigerante Lata</span>
+          <div class="item-right">
+            <span class="item-price">R$ 6,00</span>
+            <button class="btn btn-primary" type="button" onclick="addItem('Hamburgueria Centro', 'Refrigerante Lata', 6.00)">+ Add</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="store">
+        <div class="store-header">
+          <div>
+            <div class="store-title">Marmitaria Sabor da Casa</div>
+            <div class="store-meta">Refeicoes Caseiras • Catanduva - SP • 30-45 min • Entrega R$ 7,00</div>
+          </div>
+          <span class="rating">★ 4.8</span>
+        </div>
+        <span class="promo">Marmita Executiva + Sobremesa</span>
+
+        <div class="item-row">
+          <span class="item-name">Marmita Frango Grelhado G</span>
+          <div class="item-right">
+            <span class="item-price">R$ 24,00</span>
+            <button class="btn btn-primary" type="button" onclick="addItem('Marmitaria Sabor da Casa', 'Marmita Frango Grelhado G', 24.00)">+ Add</button>
+          </div>
+        </div>
+
+        <div class="item-row">
+          <span class="item-name">Marmita Contra-File G</span>
+          <div class="item-right">
+            <span class="item-price">R$ 29,00</span>
+            <button class="btn btn-primary" type="button" onclick="addItem('Marmitaria Sabor da Casa', 'Marmita Contra-File G', 29.00)">+ Add</button>
+          </div>
+        </div>
       </div>
     </section>
 
     <aside>
       <div class="card">
         <h2>Seu Carrinho</h2>
-        <div id="lojaSelecionadaInfo" class="muted">Adicione um item do cardápio para começar.</div>
-        <ul id="carrinhoLista" class="carrinho-lista"></ul>
+        <p class="subtitle" id="cartHint">Adicione um item do cardápio para começar.</p>
+        <div id="cartItems"></div>
 
-        <label class="muted" for="pagamentoSelect">Forma de pagamento</label>
-        <select id="pagamentoSelect">
+        <label for="paymentMethod">Forma de pagamento</label>
+        <select id="paymentMethod">
           <option value="Pix">Pix</option>
-          <option value="Cartão na entrega">Cartão na entrega</option>
           <option value="Dinheiro">Dinheiro</option>
+          <option value="Cartao na Entrega">Cartão na Entrega</option>
         </select>
 
         <div class="total-box">
           <span>Total estimado</span>
-          <span id="totalValor">R$ 0,00</span>
+          <span class="total-value" id="cartTotal">R$ 0,00</span>
         </div>
 
-        <button class="btn btn-success" style="width: 100%; justify-content: center;" onclick="enviarPedido()">
-          Finalizar Pedido
-        </button>
-        <div class="msg" id="feedbackMsg"></div>
+        <button class="btn btn-success" type="button" onclick="submitOrder()">Finalizar Pedido</button>
       </div>
 
       <div class="card">
         <h2>Pedidos Recentes</h2>
-        <div id="pedidosContainer" class="muted">Nenhum pedido ainda.</div>
+        <div id="recentOrders"><p class="empty-msg">Nenhum pedido ainda.</p></div>
       </div>
     </aside>
   </main>
 
   <script>
-    let lojas = [];
-    let carrinho = [];
-    let lojaAtual = null;
-    let taxaAtual = 0;
+    let cart = [];
 
-    function fmtBRL(v) {
-      return Number(v || 0).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+    function formatBRL(value) {
+      return "R$ " + Number(value || 0).toFixed(2).replace(".", ",");
     }
 
-    async function carregarLojas() {
-      const el = document.getElementById("lojasContainer");
+    function addItem(store, name, price) {
+      const existing = cart.find((i) => i.store === store && i.name === name);
+      if (existing) {
+        existing.qty += 1;
+      } else {
+        cart.push({ store, name, price, qty: 1 });
+      }
+      renderCart();
+    }
+
+    function removeItem(index) {
+      cart.splice(index, 1);
+      renderCart();
+    }
+
+    function renderCart() {
+      const container = document.getElementById("cartItems");
+      const hint = document.getElementById("cartHint");
+      const totalEl = document.getElementById("cartTotal");
+
+      if (!cart.length) {
+        hint.textContent = "Adicione um item do cardápio para começar.";
+        container.innerHTML = "";
+        totalEl.textContent = "R$ 0,00";
+        return;
+      }
+
+      hint.textContent = `${cart.reduce((acc, i) => acc + i.qty, 0)} item(ns) no carrinho`;
+      let total = 0;
+      container.innerHTML = cart.map((item, idx) => {
+        const sub = item.price * item.qty;
+        total += sub;
+        return `
+          <div class="cart-item">
+            <div>
+              <strong>${item.qty}x ${item.name}</strong><br/>
+              <small style="color:#94a3b8;">${item.store}</small>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <span>${formatBRL(sub)}</span>
+              <button class="btn btn-ghost" style="padding:4px 8px;" type="button" onclick="removeItem(${idx})">✕</button>
+            </div>
+          </div>
+        `;
+      }).join("");
+      totalEl.textContent = formatBRL(total);
+    }
+
+    async function loadOrders() {
       try {
-        const res = await fetch("/api/estabelecimentos");
-        lojas = await res.json();
-        if (!lojas.length) {
-          el.textContent = "Nenhum estabelecimento disponível.";
+        const res = await fetch("/api/orders");
+        if (!res.ok) return;
+        const orders = await res.json();
+        const box = document.getElementById("recentOrders");
+        if (!Array.isArray(orders) || !orders.length) {
+          box.innerHTML = '<p class="empty-msg">Nenhum pedido ainda.</p>';
           return;
         }
-        el.innerHTML = lojas.map(loja => `
-          <div class="loja-item">
-            <div class="loja-topo">
-              <div>
-                <strong>${loja.nome}</strong>
-                <div class="muted">${loja.categoria} • ${loja.tempo} • Entrega ${fmtBRL(loja.taxa_entrega)}</div>
-                ${loja.promo ? `<span class="promo">${loja.promo}</span>` : ""}
-              </div>
-              <span class="badge">★ ${loja.avaliacao}</span>
-            </div>
-            ${(loja.cardapio || []).map(item => `
-              <div class="item-row">
-                <div>
-                  <div>${item.nome}</div>
-                </div>
-                <div>
-                  <span class="preco">${fmtBRL(item.preco)}</span>
-                  <button class="btn btn-primary" onclick='adicionarItem(${JSON.stringify(loja.nome)}, ${Number(loja.taxa_entrega || 0)}, ${JSON.stringify(item.nome)}, ${Number(item.preco)})'>
-                    + Add
-                  </button>
-                </div>
-              </div>
-            `).join("")}
+        box.innerHTML = orders.slice().reverse().slice(0, 5).map((o) => `
+          <div class="order-box">
+            <strong>#${o.id}</strong> • ${o.status || "Pendente"} • <strong>${formatBRL(o.total)}</strong><br/>
+            <small style="color:#94a3b8;">Pagamento: ${o.payment || "Pix"}</small>
           </div>
         `).join("");
-      } catch (e) {
-        el.textContent = "Erro ao carregar estabelecimentos.";
-      }
+      } catch (_) {}
     }
 
-    function adicionarItem(nomeLoja, taxa, nomeItem, preco) {
-      if (lojaAtual && lojaAtual !== nomeLoja) {
-        carrinho = [];
-      }
-      lojaAtual = nomeLoja;
-      taxaAtual = taxa;
-      const existente = carrinho.find(i => i.nome === nomeItem);
-      if (existente) {
-        existente.qtd += 1;
-      } else {
-        carrinho.push({ nome: nomeItem, preco: preco, qtd: 1 });
-      }
-      renderCarrinho();
-    }
-
-    function removerItem(idx) {
-      carrinho.splice(idx, 1);
-      if (!carrinho.length) {
-        lojaAtual = null;
-        taxaAtual = 0;
-      }
-      renderCarrinho();
-    }
-
-    function renderCarrinho() {
-      const info = document.getElementById("lojaSelecionadaInfo");
-      const lista = document.getElementById("carrinhoLista");
-      const totalEl = document.getElementById("totalValor");
-
-      if (!carrinho.length) {
-        info.textContent = "Adicione um item do cardápio para começar.";
-        lista.innerHTML = "";
-        totalEl.textContent = fmtBRL(0);
+    async function submitOrder() {
+      if (!cart.length) {
+        alert("Adicione pelo menos um item ao carrinho.");
         return;
       }
-
-      info.textContent = `Loja: ${lojaAtual} (Taxa: ${fmtBRL(taxaAtual)})`;
-      lista.innerHTML = carrinho.map((item, i) => `
-        <li>
-          <span>${item.qtd}x ${item.nome}</span>
-          <span>
-            ${fmtBRL(item.preco * item.qtd)}
-            <button class="btn" style="padding: 2px 7px; margin-left: 6px;" onclick="removerItem(${i})">x</button>
-          </span>
-        </li>
-      `).join("");
-
-      const subtotal = carrinho.reduce((acc, i) => acc + i.preco * i.qtd, 0);
-      totalEl.textContent = fmtBRL(subtotal + taxaAtual);
-    }
-
-    async function enviarPedido() {
-      const msgEl = document.getElementById("feedbackMsg");
-      if (!carrinho.length) {
-        msgEl.textContent = "Seu carrinho está vazio.";
-        return;
-      }
-      const subtotal = carrinho.reduce((acc, i) => acc + i.preco * i.qtd, 0);
-      const total = subtotal + taxaAtual;
-      const pagamento = document.getElementById("pagamentoSelect").value;
+      const total = cart.reduce((acc, i) => acc + i.price * i.qty, 0);
+      const payment = document.getElementById("paymentMethod").value;
 
       try {
-        const res = await fetch("/api/pedidos", {
+        const res = await fetch("/api/orders", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            loja: lojaAtual,
-            itens: carrinho,
-            pagamento: pagamento,
-            total: total
-          })
+          body: JSON.stringify({ items: cart, total, payment })
         });
-        const data = await res.json();
-        if (data.ok) {
-          carrinho = [];
-          lojaAtual = null;
-          taxaAtual = 0;
-          renderCarrinho();
-          msgEl.textContent = `Pedido #${data.pedido.id} confirmado e enviado para os motoboys!`;
-          carregarPedidos();
-        } else {
-          msgEl.textContent = "Não foi possível enviar o pedido.";
-        }
-      } catch (e) {
-        msgEl.textContent = "Erro de conexão ao enviar pedido.";
+        if (!res.ok) throw new Error("Falha ao enviar pedido");
+        cart = [];
+        renderCart();
+        await loadOrders();
+        alert("Pedido enviado com sucesso!");
+      } catch (err) {
+        alert("Erro ao finalizar pedido: " + err.message);
       }
     }
 
-    async function carregarPedidos() {
-      const el = document.getElementById("pedidosContainer");
-      try {
-        const res = await fetch("/api/pedidos");
-        const pedidos = await res.json();
-        if (!pedidos.length) {
-          el.textContent = "Nenhum pedido ainda.";
-          return;
-        }
-        el.innerHTML = pedidos.slice(0, 6).map(p => `
-          <div class="pedido-card">
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-              <strong>Pedido #${p.id} • ${p.loja}</strong>
-              <span class="status-pill">${p.status}</span>
-            </div>
-            <div class="muted" style="margin-top:4px;">${p.criado_em} • ${p.pagamento}</div>
-            <div style="margin-top:6px; font-weight:700; color:var(--accent-2);">${fmtBRL(p.total)}</div>
-          </div>
-        `).join("");
-      } catch (e) {
-        el.textContent = "Erro ao carregar pedidos.";
-      }
-    }
+    let deferredPrompt = null;
+    window.addEventListener("beforeinstallprompt", (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      const btn = document.getElementById("btnInstall");
+      if (btn) btn.style.display = "inline-flex";
+    });
 
-    async function carregarAtualizacoes() {
-      try {
-        const res = await fetch("/api/atualizacoes");
-        const info = await res.json();
-        if (info.versao) {
-          document.getElementById("versaoBadge").textContent = `v${info.versao}`;
-        }
-      } catch (e) {}
+    const installBtn = document.getElementById("btnInstall");
+    if (installBtn) {
+      installBtn.addEventListener("click", async () => {
+        if (!deferredPrompt) return;
+        deferredPrompt.prompt();
+        await deferredPrompt.userChoice;
+        deferredPrompt = null;
+        installBtn.style.display = "none";
+      });
     }
 
     if ("serviceWorker" in navigator) {
-      fetch("/sw.js").then(r => {
-        if (r.ok) navigator.serviceWorker.register("/sw.js").catch(() => {});
-      }).catch(() => {});
+      window.addEventListener("load", () => {
+        navigator.serviceWorker
+          .register("/static/sw.js", { scope: "/" })
+          .then((reg) => console.log("SW registado:", reg.scope))
+          .catch((err) => console.error("Erro SW:", err));
+      });
     }
 
-    carregarLojas();
-    carregarPedidos();
-    carregarAtualizacoes();
-    setInterval(carregarPedidos, 8000);
+    loadOrders();
   </script>
 </body>
 </html>
