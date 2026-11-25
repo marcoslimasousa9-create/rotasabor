@@ -1,1 +1,420 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RotaSabor — Cliente</title>
+  <meta name="theme-color" content="#0b1220" />
+  <style>
+    :root {
+      --bg: #0b1220;
+      --panel: #111b2e;
+      --panel-2: #16233b;
+      --text: #f1f5f9;
+      --muted: #94a3b8;
+      --accent: #38bdf8;
+      --accent-2: #22c55e;
+      --warn: #f59e0b;
+      --border: rgba(148, 163, 184, 0.16);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding-bottom: 48px;
+    }
+    header {
+      background: rgba(17, 27, 46, 0.95);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 20px;
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .brand { display: flex; align-items: center; gap: 10px; }
+    .brand h1 { font-size: 1.15rem; color: var(--accent); }
+    .badge {
+      font-size: 0.75rem;
+      background: var(--panel-2);
+      color: var(--muted);
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+    }
+    nav { display: flex; gap: 8px; flex-wrap: wrap; }
+    .btn {
+      background: var(--panel-2);
+      color: var(--text);
+      border: 1px solid var(--border);
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 0.88rem;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: 0.15s;
+    }
+    .btn:hover { border-color: var(--accent); }
+    .btn-primary {
+      background: var(--accent);
+      color: #06101d;
+      font-weight: 700;
+      border: none;
+    }
+    .btn-success {
+      background: var(--accent-2);
+      color: #052e16;
+      font-weight: 700;
+      border: none;
+    }
+    .container {
+      max-width: 1120px;
+      margin: 24px auto;
+      padding: 0 18px;
+      display: grid;
+      grid-template-columns: 1.5fr 1fr;
+      gap: 20px;
+    }
+    @media (max-width: 860px) {
+      .container { grid-template-columns: 1fr; }
+    }
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 18px;
+      margin-bottom: 18px;
+    }
+    .card h2 {
+      font-size: 1.05rem;
+      margin-bottom: 12px;
+      color: var(--text);
+    }
+    .muted { color: var(--muted); font-size: 0.86rem; }
+    .loja-item {
+      background: var(--panel-2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px;
+      margin-bottom: 14px;
+    }
+    .loja-topo {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+    .promo {
+      display: inline-block;
+      margin-top: 6px;
+      font-size: 0.78rem;
+      color: var(--warn);
+      background: rgba(245, 158, 11, 0.12);
+      padding: 3px 8px;
+      border-radius: 6px;
+    }
+    .item-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+      border-top: 1px solid var(--border);
+      gap: 10px;
+    }
+    .preco { font-weight: 700; color: var(--accent-2); margin-right: 8px; }
+    .carrinho-lista { list-style: none; margin: 10px 0 14px; }
+    .carrinho-lista li {
+      display: flex;
+      justify-content: space-between;
+      padding: 7px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.9rem;
+    }
+    select, .linha-form {
+      width: 100%;
+      margin-bottom: 12px;
+    }
+    select {
+      background: var(--panel-2);
+      color: var(--text);
+      border: 1px solid var(--border);
+      padding: 9px 12px;
+      border-radius: 8px;
+    }
+    .total-box {
+      display: flex;
+      justify-content: space-between;
+      font-size: 1.05rem;
+      font-weight: 700;
+      margin: 12px 0;
+      color: var(--accent);
+    }
+    .pedido-card {
+      background: var(--panel-2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px;
+      margin-top: 10px;
+      font-size: 0.88rem;
+    }
+    .status-pill {
+      font-size: 0.76rem;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: rgba(34, 197, 94, 0.16);
+      color: #86efac;
+    }
+    .msg {
+      margin-top: 10px;
+      font-size: 0.88rem;
+      color: #86efac;
+      min-height: 20px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <h1>RotaSabor</h1>
+      <span class="badge" id="versaoBadge">v{{ build_version or "online" }}</span>
+    </div>
+    <nav>
+      <a class="btn" href="/app-motoboy">App Motoboy</a>
+      <a class="btn" href="/download/pacote-app">Baixar Pacote</a>
+    </nav>
+  </header>
 
+  <main class="container">
+    <section>
+      <div class="card">
+        <h2>Estabelecimentos e Cardápio</h2>
+        <p class="muted" style="margin-bottom: 14px;">{{ build_notes or "Peça direto na plataforma e acompanhe seu pedido." }}</p>
+        <div id="lojasContainer" class="muted">Carregando estabelecimentos...</div>
+      </div>
+    </section>
+
+    <aside>
+      <div class="card">
+        <h2>Seu Carrinho</h2>
+        <div id="lojaSelecionadaInfo" class="muted">Adicione um item do cardápio para começar.</div>
+        <ul id="carrinhoLista" class="carrinho-lista"></ul>
+
+        <label class="muted" for="pagamentoSelect">Forma de pagamento</label>
+        <select id="pagamentoSelect">
+          <option value="Pix">Pix</option>
+          <option value="Cartão na entrega">Cartão na entrega</option>
+          <option value="Dinheiro">Dinheiro</option>
+        </select>
+
+        <div class="total-box">
+          <span>Total estimado</span>
+          <span id="totalValor">R$ 0,00</span>
+        </div>
+
+        <button class="btn btn-success" style="width: 100%; justify-content: center;" onclick="enviarPedido()">
+          Finalizar Pedido
+        </button>
+        <div class="msg" id="feedbackMsg"></div>
+      </div>
+
+      <div class="card">
+        <h2>Pedidos Recentes</h2>
+        <div id="pedidosContainer" class="muted">Nenhum pedido ainda.</div>
+      </div>
+    </aside>
+  </main>
+
+  <script>
+    let lojas = [];
+    let carrinho = [];
+    let lojaAtual = null;
+    let taxaAtual = 0;
+
+    function fmtBRL(v) {
+      return Number(v || 0).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+    }
+
+    async function carregarLojas() {
+      const el = document.getElementById("lojasContainer");
+      try {
+        const res = await fetch("/api/estabelecimentos");
+        lojas = await res.json();
+        if (!lojas.length) {
+          el.textContent = "Nenhum estabelecimento disponível.";
+          return;
+        }
+        el.innerHTML = lojas.map(loja => `
+          <div class="loja-item">
+            <div class="loja-topo">
+              <div>
+                <strong>${loja.nome}</strong>
+                <div class="muted">${loja.categoria} • ${loja.tempo} • Entrega ${fmtBRL(loja.taxa_entrega)}</div>
+                ${loja.promo ? `<span class="promo">${loja.promo}</span>` : ""}
+              </div>
+              <span class="badge">★ ${loja.avaliacao}</span>
+            </div>
+            ${(loja.cardapio || []).map(item => `
+              <div class="item-row">
+                <div>
+                  <div>${item.nome}</div>
+                </div>
+                <div>
+                  <span class="preco">${fmtBRL(item.preco)}</span>
+                  <button class="btn btn-primary" onclick='adicionarItem(${JSON.stringify(loja.nome)}, ${Number(loja.taxa_entrega || 0)}, ${JSON.stringify(item.nome)}, ${Number(item.preco)})'>
+                    + Add
+                  </button>
+                </div>
+              </div>
+            `).join("")}
+          </div>
+        `).join("");
+      } catch (e) {
+        el.textContent = "Erro ao carregar estabelecimentos.";
+      }
+    }
+
+    function adicionarItem(nomeLoja, taxa, nomeItem, preco) {
+      if (lojaAtual && lojaAtual !== nomeLoja) {
+        carrinho = [];
+      }
+      lojaAtual = nomeLoja;
+      taxaAtual = taxa;
+      const existente = carrinho.find(i => i.nome === nomeItem);
+      if (existente) {
+        existente.qtd += 1;
+      } else {
+        carrinho.push({ nome: nomeItem, preco: preco, qtd: 1 });
+      }
+      renderCarrinho();
+    }
+
+    function removerItem(idx) {
+      carrinho.splice(idx, 1);
+      if (!carrinho.length) {
+        lojaAtual = null;
+        taxaAtual = 0;
+      }
+      renderCarrinho();
+    }
+
+    function renderCarrinho() {
+      const info = document.getElementById("lojaSelecionadaInfo");
+      const lista = document.getElementById("carrinhoLista");
+      const totalEl = document.getElementById("totalValor");
+
+      if (!carrinho.length) {
+        info.textContent = "Adicione um item do cardápio para começar.";
+        lista.innerHTML = "";
+        totalEl.textContent = fmtBRL(0);
+        return;
+      }
+
+      info.textContent = `Loja: ${lojaAtual} (Taxa: ${fmtBRL(taxaAtual)})`;
+      lista.innerHTML = carrinho.map((item, i) => `
+        <li>
+          <span>${item.qtd}x ${item.nome}</span>
+          <span>
+            ${fmtBRL(item.preco * item.qtd)}
+            <button class="btn" style="padding: 2px 7px; margin-left: 6px;" onclick="removerItem(${i})">x</button>
+          </span>
+        </li>
+      `).join("");
+
+      const subtotal = carrinho.reduce((acc, i) => acc + i.preco * i.qtd, 0);
+      totalEl.textContent = fmtBRL(subtotal + taxaAtual);
+    }
+
+    async function enviarPedido() {
+      const msgEl = document.getElementById("feedbackMsg");
+      if (!carrinho.length) {
+        msgEl.textContent = "Seu carrinho está vazio.";
+        return;
+      }
+      const subtotal = carrinho.reduce((acc, i) => acc + i.preco * i.qtd, 0);
+      const total = subtotal + taxaAtual;
+      const pagamento = document.getElementById("pagamentoSelect").value;
+
+      try {
+        const res = await fetch("/api/pedidos", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            loja: lojaAtual,
+            itens: carrinho,
+            pagamento: pagamento,
+            total: total
+          })
+        });
+        const data = await res.json();
+        if (data.ok) {
+          carrinho = [];
+          lojaAtual = null;
+          taxaAtual = 0;
+          renderCarrinho();
+          msgEl.textContent = `Pedido #${data.pedido.id} confirmado e enviado para os motoboys!`;
+          carregarPedidos();
+        } else {
+          msgEl.textContent = "Não foi possível enviar o pedido.";
+        }
+      } catch (e) {
+        msgEl.textContent = "Erro de conexão ao enviar pedido.";
+      }
+    }
+
+    async function carregarPedidos() {
+      const el = document.getElementById("pedidosContainer");
+      try {
+        const res = await fetch("/api/pedidos");
+        const pedidos = await res.json();
+        if (!pedidos.length) {
+          el.textContent = "Nenhum pedido ainda.";
+          return;
+        }
+        el.innerHTML = pedidos.slice(0, 6).map(p => `
+          <div class="pedido-card">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <strong>Pedido #${p.id} • ${p.loja}</strong>
+              <span class="status-pill">${p.status}</span>
+            </div>
+            <div class="muted" style="margin-top:4px;">${p.criado_em} • ${p.pagamento}</div>
+            <div style="margin-top:6px; font-weight:700; color:var(--accent-2);">${fmtBRL(p.total)}</div>
+          </div>
+        `).join("");
+      } catch (e) {
+        el.textContent = "Erro ao carregar pedidos.";
+      }
+    }
+
+    async function carregarAtualizacoes() {
+      try {
+        const res = await fetch("/api/atualizacoes");
+        const info = await res.json();
+        if (info.versao) {
+          document.getElementById("versaoBadge").textContent = `v${info.versao}`;
+        }
+      } catch (e) {}
+    }
+
+    if ("serviceWorker" in navigator) {
+      fetch("/sw.js").then(r => {
+        if (r.ok) navigator.serviceWorker.register("/sw.js").catch(() => {});
+      }).catch(() => {});
+    }
+
+    carregarLojas();
+    carregarPedidos();
+    carregarAtualizacoes();
+    setInterval(carregarPedidos, 8000);
+  </script>
+</body>
+</html>
