@@ -130,8 +130,7 @@ def _ensure_schema():
         existing_cols = {col["name"] for col in inspector.get_columns("couriers")}
         alter_statements = []
         if "full_name" not in existing_cols:
-            col_type = "VARCHAR(140)" if dialect == "postgresql" else "VARCHAR(140)"
-            alter_statements.append(f"ALTER TABLE couriers ADD COLUMN full_name {col_type}")
+            alter_statements.append("ALTER TABLE couriers ADD COLUMN full_name VARCHAR(140)")
         if "cpf" not in existing_cols:
             alter_statements.append("ALTER TABLE couriers ADD COLUMN cpf VARCHAR(20)")
         if "lat" not in existing_cols:
@@ -173,16 +172,20 @@ with app.app_context():
 
 
 @app.get("/")
+@app.get("/painel")
 def index():
     return render_template("painel_gestao.html")
 
 
 @app.get("/cliente")
+@app.get("/app_cliente")
 def app_cliente():
     return render_template("app_cliente.html")
 
 
 @app.get("/motoboy")
+@app.get("/app_motoboy")
+@app.get("/entregador")
 def app_motoboy():
     return render_template("app_motoboy.html")
 
