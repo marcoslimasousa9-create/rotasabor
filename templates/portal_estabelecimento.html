@@ -75,7 +75,7 @@
     <div class="topbar">
       <div>
         <h2 style="margin:0;">Portal do Estabelecimento • RotaSabor</h2>
-        <div class="muted" id="activeStoreBanner">Nenhuma loja selecionada — cadastre ou escolha abaixo</div>
+        <div class="muted" id="activeStoreBanner">Nenhuma loja cadastrada — preencha os campos do registro abaixo</div>
       </div>
       <span class="badge" id="securityBadge">Registro Seguro Ativo</span>
     </div>
@@ -93,7 +93,7 @@
         <div class="grid">
           <div>
             <label>Nome do Estabelecimento *</label>
-            <input type="text" id="storeName" required placeholder="Ex: Pizzaria Central" />
+            <input type="text" id="storeName" required placeholder="Nome da loja" />
           </div>
           <div>
             <label>Responsável *</label>
@@ -108,16 +108,28 @@
             <input type="text" id="storeMei" placeholder="00.000.000/0001-00" maxlength="18" />
           </div>
           <div>
+            <label>Categoria</label>
+            <input type="text" id="storeCategory" placeholder="Ex: Lanches, Pizzaria, Marmitas" />
+          </div>
+          <div>
             <label>Endereço Completo *</label>
             <input type="text" id="storeAddress" required placeholder="Rua, número, bairro, cidade" />
           </div>
           <div>
+            <label>Taxa de Entrega Padrão (R$)</label>
+            <input type="number" step="0.01" min="0" id="storeDeliveryFee" placeholder="0.00" />
+          </div>
+          <div>
+            <label>Tempo Estimado de Entrega</label>
+            <input type="text" id="storeEstimatedTime" placeholder="Ex: 25-35 min" />
+          </div>
+          <div>
             <label>Telefone / WhatsApp *</label>
-            <input type="tel" id="storePhone" required placeholder="(17) 99999-9999" />
+            <input type="tel" id="storePhone" required placeholder="(00) 00000-0000" />
           </div>
           <div>
             <label>E-mail de Acesso *</label>
-            <input type="email" id="storeEmail" required placeholder="loja@email.com" />
+            <input type="email" id="storeEmail" required placeholder="email@loja.com" />
           </div>
           <div>
             <label>Senha de Segurança *</label>
@@ -136,15 +148,15 @@
         <div class="grid">
           <div>
             <label>Nome do Produto *</label>
-            <input type="text" id="prodName" required placeholder="Ex: X-Bacon Artesanal" />
+            <input type="text" id="prodName" required placeholder="Nome do item" />
           </div>
           <div>
             <label>Preço (R$) *</label>
-            <input type="number" step="0.01" min="0.50" id="prodPrice" required placeholder="28.00" />
+            <input type="number" step="0.01" min="0.50" id="prodPrice" required placeholder="0.00" />
           </div>
           <div>
             <label>Descrição curta</label>
-            <input type="text" id="prodDesc" placeholder="Ingredientes ou tamanho" />
+            <input type="text" id="prodDesc" placeholder="Detalhes, ingredientes ou tamanho" />
           </div>
         </div>
         <button class="btn btn-green" type="submit">Publicar no App do Cliente</button>
@@ -222,21 +234,30 @@
         owner_name: document.getElementById("ownerName").value.trim(),
         cpf: onlyDigits(cpfVal),
         cnpj_mei: onlyDigits(document.getElementById("storeMei").value),
+        category: document.getElementById("storeCategory").value.trim(),
         address: document.getElementById("storeAddress").value.trim(),
+        delivery_fee: Number(document.getElementById("storeDeliveryFee").value || 0),
+        estimated_time: document.getElementById("storeEstimatedTime").value.trim(),
         phone: onlyDigits(document.getElementById("storePhone").value),
-        email: document.getElementById("storeEmail").value.trim().toLowerCase()
+        email: document.getElementById("storeEmail").value.trim().toLowerCase(),
+        password: document.getElementById("storePassword").value
       };
 
       try {
-        await fetch("/api/establishments", {
+        const res = await fetch("/api/establishments", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload)
         });
+        if (res.ok) {
+          const saved = await res.json();
+          payload.id = saved.id;
+        }
       } catch (_) {}
 
-      state.store = payload;
-      localStorage.setItem("rotasabor_store_profile", JSON.stringify(payload));
+      const { password, ...safeProfile } = payload;
+      state.store = safeProfile;
+      localStorage.setItem("rotasabor_store_profile", JSON.stringify(safeProfile));
       renderAll();
       document.getElementById("storeFeedback").textContent = "Estabelecimento salvo e pronto para publicar na vitrine do cliente.";
     });
@@ -249,6 +270,7 @@
       }
       const item = {
         id: Date.now(),
+        store_id: state.store.id || null,
         store_name: state.store.store_name,
         store_address: state.store.address,
         name: document.getElementById("prodName").value.trim(),
@@ -257,11 +279,15 @@
         featured: false
       };
       try {
-        await fetch("/api/products", {
+        const res = await fetch("/api/products", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(item)
         });
+        if (res.ok) {
+          const created = await res.json();
+          if (created.id) item.id = created.id;
+        }
       } catch (_) {}
 
       state.products.unshift(item);
@@ -270,17 +296,27 @@
       renderProducts();
     });
 
-    function chargeAd(pkgName, amount) {
+    async function chargeAd(pkgName, amount) {
       if (!state.store) {
         alert("Cadastre primeiro o estabelecimento na aba 1.");
         return;
       }
       const entry = {
         id: Date.now(),
+        store_id: state.store.id || null,
         package_name: pkgName,
         amount: Number(amount),
         date: new Date().toLocaleString("pt-BR")
       };
+      if (state.store.id) {
+        try {
+          await fetch(`/api/establishments/${state.store.id}/ads`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ package_name: pkgName, amount: Number(amount) })
+          });
+        } catch (_) {}
+      }
       state.adCharges.unshift(entry);
       localStorage.setItem("rotasabor_store_ad_charges", JSON.stringify(state.adCharges));
       renderAdCharges();
@@ -324,14 +360,17 @@
 
     function renderAll() {
       const banner = document.getElementById("activeStoreBanner");
-      if (state.store) {
+      if (state.store && state.store.store_name) {
         const docText = state.store.cnpj_mei ? `CPF: ${state.store.cpf} • MEI: ${state.store.cnpj_mei}` : `CPF: ${state.store.cpf}`;
         banner.textContent = `${state.store.store_name} — ${state.store.address} (${docText})`;
         document.getElementById("storeName").value = state.store.store_name || "";
         document.getElementById("ownerName").value = state.store.owner_name || "";
         document.getElementById("storeCpf").value = state.store.cpf || "";
         document.getElementById("storeMei").value = state.store.cnpj_mei || "";
+        document.getElementById("storeCategory").value = state.store.category || "";
         document.getElementById("storeAddress").value = state.store.address || "";
+        document.getElementById("storeDeliveryFee").value = state.store.delivery_fee ?? "";
+        document.getElementById("storeEstimatedTime").value = state.store.estimated_time || "";
         document.getElementById("storePhone").value = state.store.phone || "";
         document.getElementById("storeEmail").value = state.store.email || "";
       }
