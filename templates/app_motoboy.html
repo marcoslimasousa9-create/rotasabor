@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes" />
   <title>RotaSabor — Entregador</title>
   <meta name="theme-color" content="#ffffff" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -12,16 +12,15 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <style>
     :root {
-      --bg: #ffffff;
+      --bg: #f8fafc;
       --surface: #ffffff;
-      --surface-soft: #f3f4f6;
-      --border: #e5e7eb;
-      --text: #111827;
-      --muted: #6b7280;
+      --surface-soft: #f1f5f9;
+      --border: #cbd5e1;
+      --text: #0f172a;
+      --muted: #475569;
       --green: #16a34a;
-      --green-dark: #15803d;
       --orange: #ea580c;
-      --amber: #f59e0b;
+      --amber: #d97706;
       --red: #dc2626;
       --cyan: #0284c7;
     }
@@ -30,12 +29,27 @@
       --bg: #0b1320;
       --surface: #111c2e;
       --surface-soft: #1a2840;
-      --border: rgba(148, 163, 184, 0.22);
-      --text: #f9fafb;
-      --muted: #9ca3af;
+      --border: rgba(148, 163, 184, 0.28);
+      --text: #f8fafc;
+      --muted: #cbd5e1;
     }
 
-    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+      -webkit-text-size-adjust: 100%;
+    }
+
+    html {
+      font-size: 17px;
+    }
+
+    /* Garante letras e botões bem grandes no celular mesmo em WebView */
+    @media (max-width: 768px) {
+      html {
+        font-size: clamp(18px, 4.5vw, 21px);
+      }
+    }
 
     html, body {
       margin: 0;
@@ -43,25 +57,39 @@
       width: 100%;
       height: 100%;
       overflow: hidden;
-      font-size: 16px;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       background: var(--bg);
       color: var(--text);
     }
 
-    .app-screen {
+    /* Layout adaptativo: tela cheia no celular, painel dividido e ajustado no computador */
+    .app-shell {
       display: flex;
       flex-direction: column;
-      height: 100vh;
       width: 100vw;
+      height: 100dvh;
+      max-width: 100%;
+    }
+
+    @media (min-width: 900px) {
+      .app-shell {
+        flex-direction: row;
+      }
     }
 
     .map-stage {
       position: relative;
-      flex: 1 1 auto;
-      min-height: 260px;
-      background: #eef2f6;
+      flex: 1 1 54%;
+      min-height: 240px;
+      background: #e2e8f0;
       overflow: hidden;
+    }
+
+    @media (min-width: 900px) {
+      .map-stage {
+        flex: 1 1 60%;
+        height: 100dvh;
+      }
     }
 
     #courierMap {
@@ -78,9 +106,9 @@
 
     .top-float-bar {
       position: absolute;
-      top: 14px;
-      left: 14px;
-      right: 14px;
+      top: 12px;
+      left: 12px;
+      right: 12px;
       z-index: 15;
       display: flex;
       align-items: center;
@@ -93,24 +121,24 @@
 
     .brand-menu-pill {
       background: var(--surface);
-      border: 1px solid var(--border);
+      border: 2px solid var(--border);
       border-radius: 999px;
-      padding: 6px 14px 6px 6px;
+      padding: 6px 16px 6px 6px;
       display: inline-flex;
       align-items: center;
       gap: 10px;
-      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.14);
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.16);
       cursor: pointer;
     }
 
     .brand-badge-icon {
-      width: 38px;
-      height: 38px;
+      width: 2.3rem;
+      height: 2.3rem;
       border-radius: 999px;
       background: var(--orange);
       color: #ffffff;
       font-weight: 900;
-      font-size: 1.1rem;
+      font-size: 1rem;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -118,46 +146,46 @@
 
     .earnings-pill {
       background: var(--surface);
-      border: 1px solid var(--border);
+      border: 2px solid var(--border);
       border-radius: 999px;
       padding: 10px 18px;
-      font-size: 1.12rem;
+      font-size: 1.15rem;
       font-weight: 900;
       color: var(--text);
-      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.14);
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.16);
       cursor: pointer;
     }
 
     .bell-float-btn {
       position: absolute;
-      top: 72px;
-      right: 14px;
+      top: 74px;
+      right: 12px;
       z-index: 15;
-      width: 46px;
-      height: 46px;
+      width: 2.8rem;
+      height: 2.8rem;
       border-radius: 999px;
       background: var(--surface);
-      border: 1px solid var(--border);
+      border: 2px solid var(--border);
       color: var(--text);
       font-size: 1.2rem;
-      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.14);
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.16);
       cursor: pointer;
     }
 
     .filter-float-btn {
       position: absolute;
-      right: 14px;
-      bottom: 88px;
+      right: 12px;
+      bottom: 86px;
       z-index: 15;
-      width: 50px;
-      height: 50px;
+      width: 2.9rem;
+      height: 2.9rem;
       border-radius: 999px;
       background: var(--surface);
-      border: 1px solid var(--border);
+      border: 2px solid var(--border);
       color: var(--text);
       font-size: 1.25rem;
       font-weight: 800;
-      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.16);
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
       cursor: pointer;
     }
 
@@ -165,11 +193,11 @@
       position: absolute;
       left: 0;
       right: 0;
-      bottom: 20px;
+      bottom: 16px;
       z-index: 15;
       display: flex;
       justify-content: center;
-      padding: 0 16px;
+      padding: 0 14px;
       pointer-events: none;
     }
 
@@ -179,10 +207,10 @@
       color: #ffffff;
       border: none;
       border-radius: 999px;
-      padding: 15px 34px;
-      font-size: 1.22rem;
+      padding: 14px 30px;
+      font-size: 1.18rem;
       font-weight: 900;
-      box-shadow: 0 10px 24px rgba(22, 163, 74, 0.36);
+      box-shadow: 0 10px 24px rgba(22, 163, 74, 0.38);
       cursor: pointer;
       display: inline-flex;
       align-items: center;
@@ -191,16 +219,29 @@
 
     .go-free-btn.online {
       background: var(--red);
-      box-shadow: 0 10px 24px rgba(220, 38, 38, 0.32);
+      box-shadow: 0 10px 24px rgba(220, 38, 38, 0.34);
     }
 
     .bottom-panel {
       background: var(--surface);
-      border-top: 1px solid var(--border);
-      padding: 10px 14px 14px;
+      border-top: 2px solid var(--border);
+      padding: 12px 14px 18px;
       z-index: 16;
-      max-height: 48vh;
+      flex: 0 0 auto;
+      max-height: 52dvh;
       overflow-y: auto;
+    }
+
+    @media (min-width: 900px) {
+      .bottom-panel {
+        flex: 0 0 440px;
+        max-width: 440px;
+        max-height: 100dvh;
+        height: 100dvh;
+        border-top: none;
+        border-left: 2px solid var(--border);
+        padding: 18px;
+      }
     }
 
     .mode-switch-row {
@@ -216,13 +257,13 @@
       background: transparent;
       border: none;
       color: var(--muted);
-      font-size: 1rem;
+      font-size: 0.96rem;
       font-weight: 800;
       cursor: pointer;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 3px;
+      gap: 2px;
       padding: 4px;
     }
 
@@ -230,13 +271,48 @@
 
     .conn-status-center {
       text-align: center;
-      font-size: 1.02rem;
+      font-size: 1rem;
       font-weight: 900;
       color: var(--text);
     }
 
+    .active-nav-card {
+      margin-top: 12px;
+      border: 2px solid var(--green);
+      background: #ecfdf5;
+      color: #064e3b;
+      border-radius: 16px;
+      padding: 14px;
+    }
+
+    body.theme-dark .active-nav-card {
+      background: #064e3b;
+      color: #ecfdf5;
+    }
+
+    .offer-card {
+      margin-top: 12px;
+      border: 1.5px solid var(--border);
+      background: var(--surface-soft);
+      border-radius: 16px;
+      padding: 14px;
+    }
+
+    .offer-title {
+      font-size: 1.1rem;
+      font-weight: 900;
+    }
+
+    .offer-addr {
+      font-size: 0.98rem;
+      color: var(--muted);
+      margin-top: 5px;
+      line-height: 1.35;
+      font-weight: 600;
+    }
+
     .promo-banner-card {
-      margin-top: 10px;
+      margin-top: 12px;
       background: linear-gradient(90deg, #111827 0%, #c2410c 60%, #ea580c 100%);
       color: #ffffff;
       border-radius: 14px;
@@ -244,41 +320,33 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
     }
 
     .promo-headline {
-      font-size: 1.18rem;
+      font-size: 1.08rem;
       font-weight: 900;
       text-transform: uppercase;
-      line-height: 1.12;
+      line-height: 1.15;
     }
 
-    .offer-card {
-      margin-top: 10px;
-      border: 1px solid var(--border);
-      background: var(--surface-soft);
-      border-radius: 14px;
-      padding: 12px 14px;
-    }
-
-    .btn-row { display: flex; gap: 10px; margin-top: 10px; }
+    .btn-row { display: flex; gap: 10px; margin-top: 12px; flex-wrap: wrap; }
 
     .btn {
       border: none;
       border-radius: 12px;
-      padding: 12px 14px;
-      font-size: 0.98rem;
+      padding: 13px 14px;
+      font-size: 1rem;
       font-weight: 900;
       cursor: pointer;
       flex: 1 1 auto;
     }
 
     .btn-green { background: var(--green); color: #ffffff; }
-    .btn-gray { background: var(--surface); color: var(--text); border: 1px solid var(--border); }
-    .btn-red { background: rgba(220, 38, 38, 0.14); color: var(--red); border: 1px solid rgba(220, 38, 38, 0.35); flex: 0 0 auto; }
+    .btn-blue { background: var(--cyan); color: #ffffff; }
+    .btn-gray { background: var(--surface); color: var(--text); border: 1.5px solid var(--border); }
 
-    /* Tela de Menu cheia (igual à segunda imagem) */
+    /* Tela cheia de Menu */
     .full-menu-screen {
       position: fixed;
       inset: 0;
@@ -298,7 +366,7 @@
       padding: 14px 16px;
       display: flex;
       align-items: center;
-      gap: 16px;
+      gap: 14px;
       z-index: 2;
     }
 
@@ -307,14 +375,17 @@
       border: none;
       color: var(--text);
       font-size: 1.5rem;
-      font-weight: 800;
+      font-weight: 900;
       cursor: pointer;
-      padding: 2px 6px;
+      padding: 2px 8px;
     }
 
     .menu-group {
-      padding: 8px 0;
+      padding: 6px 0;
       border-bottom: 8px solid var(--surface-soft);
+      max-width: 760px;
+      width: 100%;
+      margin: 0 auto;
     }
 
     .menu-item-row {
@@ -323,7 +394,7 @@
       border: none;
       color: var(--text);
       padding: 16px 20px;
-      font-size: 1.12rem;
+      font-size: 1.08rem;
       font-weight: 800;
       display: flex;
       justify-content: space-between;
@@ -341,10 +412,10 @@
     select, input {
       width: 100%;
       background: var(--surface);
-      border: 1px solid var(--border);
+      border: 1.5px solid var(--border);
       color: var(--text);
       border-radius: 10px;
-      padding: 11px 12px;
+      padding: 12px 14px;
       font-size: 1rem;
       margin-top: 6px;
     }
@@ -352,7 +423,7 @@
     .pin-backdrop {
       position: fixed;
       inset: 0;
-      background: rgba(17, 24, 39, 0.65);
+      background: rgba(15, 23, 42, 0.72);
       z-index: 60;
       display: none;
       align-items: center;
@@ -363,11 +434,11 @@
 
     .pin-box {
       width: 100%;
-      max-width: 380px;
+      max-width: 400px;
       background: var(--surface);
-      border: 1px solid var(--border);
+      border: 1.5px solid var(--border);
       border-radius: 18px;
-      padding: 18px;
+      padding: 20px;
     }
 
     .pin-digits {
@@ -377,19 +448,19 @@
       font-weight: 900;
       letter-spacing: 0.35em;
       padding: 12px;
-      margin-top: 10px;
+      margin-top: 12px;
     }
 
     .toast {
       position: fixed;
-      top: 126px;
+      top: 84px;
       left: 50%;
       transform: translateX(-50%);
-      background: #111827;
+      background: #0f172a;
       color: #ffffff;
-      padding: 10px 16px;
+      padding: 12px 18px;
       border-radius: 12px;
-      font-size: 0.94rem;
+      font-size: 0.96rem;
       font-weight: 800;
       z-index: 70;
       display: none;
@@ -401,14 +472,14 @@
   </style>
 </head>
 <body>
-  <div class="app-screen">
+  <div class="app-shell">
     <div class="map-stage">
       <div id="courierMap"></div>
 
       <div class="top-float-bar">
         <button class="brand-menu-pill" type="button" id="openMenuBtn">
           <span class="brand-badge-icon">RS</span>
-          <span style="font-size:1.3rem;font-weight:900;color:var(--text);">☰</span>
+          <span style="font-size:1.25rem;font-weight:900;color:var(--text);">☰</span>
         </button>
 
         <button class="earnings-pill" type="button" id="topEarningsBtn">
@@ -417,7 +488,7 @@
         </button>
       </div>
 
-      <button class="bell-float-btn" type="button" id="bellBtn" title="Mensagens e alertas">🔔</button>
+      <button class="bell-float-btn" type="button" id="bellBtn" title="Alertas">🔔</button>
 
       <div class="center-go-wrap">
         <button class="go-free-btn" type="button" id="toggleFreeBtn">
@@ -426,7 +497,7 @@
         </button>
       </div>
 
-      <button class="filter-float-btn" type="button" id="gpsCenterBtn" title="Centralizar GPS">⚙</button>
+      <button class="filter-float-btn" type="button" id="gpsCenterBtn" title="Centralizar GPS">📍</button>
     </div>
 
     <div class="bottom-panel">
@@ -447,10 +518,10 @@
       <div class="promo-banner-card" onclick="setBottomView('deliveries')" style="cursor:pointer;">
         <div>
           <div class="promo-headline">RECEBA SUAS ENTREGAS NA HORA</div>
-          <div style="font-size:0.86rem;opacity:0.9;margin-top:4px;">Confirme com os 4 últimos dígitos do celular do cliente</div>
+          <div style="font-size:0.88rem;opacity:0.92;margin-top:4px;">Ao aceitar, abre a rota no Google Maps automaticamente</div>
         </div>
-        <div style="background:#ffffff;color:#111827;border-radius:10px;padding:8px 12px;font-weight:900;font-size:0.85rem;flex-shrink:0;">
-          PAGAMENTO
+        <div style="background:#ffffff;color:#111827;border-radius:10px;padding:8px 12px;font-weight:900;font-size:0.86rem;flex-shrink:0;">
+          MAPS
         </div>
       </div>
     </div>
@@ -460,7 +531,7 @@
   <div class="full-menu-screen" id="fullMenuScreen">
     <div class="menu-topbar">
       <button class="back-arrow-btn" type="button" id="closeMenuBtn">←</button>
-      <strong style="font-size:1.3rem;">Menu</strong>
+      <strong style="font-size:1.25rem;">Menu</strong>
     </div>
 
     <div class="menu-group">
@@ -481,7 +552,7 @@
         <select id="courierPicker">
           <option value="">Selecione o entregador...</option>
         </select>
-        <div style="margin-top:10px;font-size:0.92rem;color:var(--muted);" id="gpsStatusLine">GPS: aguardando ativação</div>
+        <div style="margin-top:10px;font-size:0.94rem;color:var(--muted);" id="gpsStatusLine">GPS: aguardando ativação</div>
       </div>
 
       <button class="menu-item-row" type="button" onclick="toggleSubpanel('panelPassword')">
@@ -491,7 +562,7 @@
       <div class="menu-subpanel hidden" id="panelPassword">
         <label for="newPassInput">Nova senha</label>
         <input type="password" id="newPassInput" placeholder="Digite a nova senha" />
-        <button class="btn btn-green" style="margin-top:10px;width:100%;" type="button" onclick="showToast('Senha atualizada localmente');toggleSubpanel('panelPassword')">Salvar senha</button>
+        <button class="btn btn-green" style="margin-top:10px;width:100%;" type="button" onclick="showToast('Senha salva');toggleSubpanel('panelPassword')">Salvar senha</button>
       </div>
     </div>
 
@@ -501,7 +572,7 @@
         <span>›</span>
       </button>
       <div class="menu-subpanel hidden" id="panelHistory">
-        <div id="courierHistoryBox" style="font-weight:700;">0 entregas concluídas • R$ 0,00</div>
+        <div id="courierHistoryBox" style="font-weight:800;">0 entregas concluídas • R$ 0,00</div>
       </div>
 
       <button class="menu-item-row" type="button" onclick="toggleSubpanel('panelChallenges')">
@@ -509,7 +580,7 @@
         <span>›</span>
       </button>
       <div class="menu-subpanel hidden" id="panelChallenges">
-        <div style="font-weight:700;">Complete entregas diárias para acompanhar seus ganhos na rota.</div>
+        <div style="font-weight:700;">Acompanhe suas metas diárias e ganhos por entrega.</div>
       </div>
 
       <button class="menu-item-row" type="button" onclick="toggleSubpanel('panelAreas')">
@@ -517,7 +588,7 @@
         <span>›</span>
       </button>
       <div class="menu-subpanel hidden" id="panelAreas">
-        <div style="font-weight:700;">Área ativa: Catanduva - SP</div>
+        <div style="font-weight:800;">Área ativa: Catanduva - SP</div>
       </div>
     </div>
 
@@ -538,7 +609,7 @@
         <span>›</span>
       </button>
 
-      <button class="menu-item-row" type="button" onclick="showToast('Dados de localização usados apenas para rotas e entregas')">
+      <button class="menu-item-row" type="button" onclick="showToast('Dados de GPS usados apenas para navegação de entrega')">
         <span>Política de Privacidade</span>
         <span>›</span>
       </button>
@@ -548,7 +619,7 @@
         <span>›</span>
       </button>
       <div class="menu-subpanel hidden" id="panelSchedule">
-        <div style="font-weight:700;">Repasses calculados automaticamente após confirmação da entrega.</div>
+        <div style="font-weight:700;">Repasses atualizados após confirmação dos 4 dígitos.</div>
       </div>
 
       <button class="menu-item-row" type="button" onclick="showToast('Benefícios do entregador RotaSabor')">
@@ -561,8 +632,8 @@
   <!-- MODAL 4 ÚLTIMOS DÍGITOS -->
   <div class="pin-backdrop" id="pinBackdrop">
     <div class="pin-box">
-      <strong style="font-size:1.18rem;">Confirmar entrega (4 dígitos)</strong>
-      <div style="color:var(--muted);font-size:0.94rem;margin-top:4px;" id="pinDesc">Informe os 4 últimos números do celular do cliente.</div>
+      <strong style="font-size:1.15rem;">Confirmar entrega (4 dígitos)</strong>
+      <div style="color:var(--muted);font-size:0.95rem;margin-top:6px;" id="pinDesc">Informe os 4 últimos números do celular do cliente.</div>
       <div style="margin-top:8px;font-weight:900;color:var(--green);" id="pinReceiveLabel">Receber: R$ 0,00</div>
       <input class="pin-digits" type="tel" id="pinInput" maxlength="4" inputmode="numeric" placeholder="0000" />
       <div class="btn-row">
@@ -579,6 +650,7 @@
     let marker = null;
     let lat = -21.1378;
     let lng = -48.9726;
+    let hasRealGps = false;
     let isFree = false;
     let orders = [];
     let couriers = [];
@@ -592,7 +664,7 @@
       el.textContent = msg;
       el.style.display = "block";
       clearTimeout(window._toast);
-      window._toast = setTimeout(() => { el.style.display = "none"; }, 2600);
+      window._toast = setTimeout(() => { el.style.display = "none"; }, 2800);
     }
 
     function toggleSubpanel(id) {
@@ -613,12 +685,15 @@
       L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 19 }).addTo(map);
       const pinIcon = L.divIcon({
         className: "rider-pin",
-        html: `<div style="width:32px;height:32px;border-radius:999px;background:#111827;border:4px solid #ffffff;box-shadow:0 4px 12px rgba(0,0,0,0.35);display:flex;align-items:center;justify-content:center;color:#ffffff;font-size:14px;">▲</div>`,
-        iconSize: [32, 32],
-        iconAnchor: [16, 16]
+        html: `<div style="width:36px;height:36px;border-radius:999px;background:#0f172a;border:4px solid #ffffff;box-shadow:0 4px 12px rgba(0,0,0,0.35);display:flex;align-items:center;justify-content:center;color:#ffffff;font-size:15px;">▲</div>`,
+        iconSize: [36, 36],
+        iconAnchor: [18, 18]
       });
       marker = L.marker([lat, lng], { icon: pinIcon }).addTo(map);
+      setTimeout(() => map.invalidateSize(), 200);
     }
+
+    window.addEventListener("resize", () => { if (map) map.invalidateSize(); });
 
     function locateRider(notify = false) {
       if (!("geolocation" in navigator)) return;
@@ -626,13 +701,14 @@
         (pos) => {
           lat = pos.coords.latitude;
           lng = pos.coords.longitude;
+          hasRealGps = true;
           document.getElementById("gpsStatusLine").textContent = `GPS: ativo (${lat.toFixed(4)}, ${lng.toFixed(4)})`;
           if (map) map.setView([lat, lng], 16);
           if (marker) marker.setLatLng([lat, lng]);
           if (notify) showToast("Localização GPS atualizada");
         },
         () => {
-          if (notify) showToast("Permita o GPS no navegador");
+          if (notify) showToast("Permita o acesso ao GPS no aparelho");
         },
         { enableHighAccuracy: true, timeout: 8000 }
       );
@@ -644,6 +720,24 @@
       document.body.classList.toggle("theme-dark");
       showToast("Tema atualizado");
     });
+
+    // Abre automaticamente a rota de navegação curva-a-curva no Google Maps
+    function openGoogleMapsNavigation(order) {
+      if (!order) return;
+      const rawAddress = (order.client_address || "").trim();
+      const fullDestination = rawAddress.toLowerCase().includes("catanduva")
+        ? rawAddress
+        : `${rawAddress}, Catanduva - SP, Brasil`;
+      const destEncoded = encodeURIComponent(fullDestination);
+
+      const originParam = hasRealGps ? `&origin=${lat},${lng}` : "";
+      const mapsTurnByTurnUrl = `https://www.google.com/maps/dir/?api=1${originParam}&destination=${destEncoded}&travelmode=driving&dir_action=navigate`;
+
+      const win = window.open(mapsTurnByTurnUrl, "_blank");
+      if (!win) {
+        window.location.href = mapsTurnByTurnUrl;
+      }
+    }
 
     function setConnectionState(free) {
       isFree = Boolean(free);
@@ -695,25 +789,28 @@
       }
 
       const activeHtml = myActive.map((o) => `
-        <div class="offer-card">
-          <strong>${o.order_code || "#" + o.id} • ${o.store_name || "Estabelecimento"}</strong>
-          <div style="color:var(--muted);font-size:0.9rem;margin-top:4px;">📍 ${o.client_address || ""}</div>
-          <div style="font-weight:900;color:var(--green);margin-top:4px;">Ganho líquido: ${fmtBRL(getNetEarning(o))}</div>
+        <div class="active-nav-card">
+          <div style="font-size:0.86rem;font-weight:900;text-transform:uppercase;opacity:0.85;">Corrida em andamento</div>
+          <div class="offer-title" style="margin-top:4px;">${o.order_code || "#" + o.id} • ${o.store_name || "Estabelecimento"}</div>
+          <div style="font-size:0.98rem;margin-top:4px;font-weight:700;">📍 ${o.client_address || ""}</div>
+          <div style="font-size:1.05rem;font-weight:900;margin-top:6px;">Receber: ${fmtBRL(getNetEarning(o))}</div>
           <div class="btn-row">
-            <button class="btn btn-green" type="button" onclick='openPin(${JSON.stringify(o)})'>Confirmar 4 dígitos</button>
+            <button class="btn btn-blue" type="button" onclick='openGoogleMapsNavigation(${JSON.stringify(o)})'>🧭 Abrir Rota Maps</button>
+            <button class="btn btn-green" type="button" onclick='openPin(${JSON.stringify(o)})'>✅ 4 dígitos</button>
           </div>
         </div>
       `).join("");
 
       const availHtml = available.map((o) => `
         <div class="offer-card">
-          <div style="display:flex;justify-content:space-between;align-items:center;">
-            <strong>${o.order_code || "#" + o.id} • ${o.store_name || "Estabelecimento"}</strong>
-            <span style="font-weight:900;color:var(--green);">${fmtBRL(getNetEarning(o))}</span>
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
+            <span class="offer-title">${o.order_code || "#" + o.id} • ${o.store_name || "Estabelecimento"}</span>
+            <span style="font-size:1.12rem;font-weight:900;color:var(--green);">${fmtBRL(getNetEarning(o))}</span>
           </div>
-          <div style="color:var(--muted);font-size:0.9rem;margin-top:4px;">📍 ${o.client_address || ""}</div>
+          <div class="offer-addr">📍 ${o.client_address || "Endereço não informado"}</div>
+          <div class="offer-addr">👤 ${o.client_name || "Cliente"}</div>
           <div class="btn-row">
-            <button class="btn btn-green" type="button" onclick="acceptDelivery(${o.id})">Aceitar entrega</button>
+            <button class="btn btn-green" type="button" onclick="acceptDelivery(${o.id})">Aceitar e Abrir Rota Maps</button>
           </div>
         </div>
       `).join("");
@@ -736,11 +833,16 @@
           body: JSON.stringify({ courier_id: cid, courier_accepted: true, status: "Aceito pelo entregador" })
         });
         if (res.ok) {
-          showToast("Entrega aceita!");
+          const acceptedOrder = await res.json();
+          showToast("Corrida aceita! Abrindo rota no Google Maps...");
           await loadOrders();
+          openGoogleMapsNavigation(acceptedOrder);
+        } else {
+          const err = await res.json().catch(() => ({}));
+          showToast(err.error || "Não foi possível aceitar");
         }
       } catch (_) {
-        showToast("Erro ao aceitar entrega");
+        showToast("Erro de conexão ao aceitar entrega");
       }
     }
 
