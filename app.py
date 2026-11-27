@@ -187,18 +187,22 @@ with app.app_context():
 
 @app.get("/")
 @app.get("/painel")
+@app.get("/painel_gestao.html")
 def index():
     return _render_safe("painel_gestao.html")
 
 
 @app.get("/cliente")
 @app.get("/app_cliente")
+@app.get("/app_cliente.html")
+@app.get("/cliente.html")
 def app_cliente():
     return _render_safe("app_cliente.html")
 
 
 @app.get("/motoboy")
 @app.get("/app_motoboy")
+@app.get("/app_motoboy.html")
 @app.get("/entregador")
 def app_motoboy():
     return _render_safe("app_motoboy.html")
