@@ -124,26 +124,32 @@ def _next_id(items: list) -> int:
 # =========================
 
 @app.route("/")
-def index():
-    return render_template("painel_gestao.html")
-
-
 @app.route("/gestao")
+@app.route("/painel_gestao")
+@app.route("/painel_gestao.html")
 def rota_gestao():
     return render_template("painel_gestao.html")
 
 
 @app.route("/estabelecimento")
+@app.route("/portal_estabelecimento")
+@app.route("/portal_estabelecimento.html")
 def rota_estabelecimento():
     return render_template("portal_estabelecimento.html")
 
 
 @app.route("/cliente")
+@app.route("/app-cliente")
+@app.route("/app_cliente")
+@app.route("/app_cliente.html")
 def rota_cliente():
     return render_template("app_cliente.html")
 
 
 @app.route("/motoboy")
+@app.route("/app-motoboy")
+@app.route("/app_motoboy")
+@app.route("/app_motoboy.html")
 def rota_motoboy():
     return render_template("app_motoboy.html")
 
@@ -155,7 +161,6 @@ def rota_motoboy():
 @app.route("/api/establishments", methods=["GET", "POST"])
 def api_establishments():
     if request.method == "GET":
-        # Remove hash de senha ao expor registros
         safe = [{k: v for k, v in s.items() if k != "password_hash"} for s in DB["establishments"]]
         return jsonify(safe)
 
@@ -167,7 +172,6 @@ def api_establishments():
     if not store_name:
         return jsonify({"error": "Nome do estabelecimento é obrigatório."}), 400
 
-    # Exige CPF válido quando enviado pelo cadastro completo do portal
     if cpf_clean and not _is_valid_cpf(cpf_clean):
         return jsonify({"error": "CPF inválido. Verifique os 11 dígitos."}), 400
 
@@ -249,7 +253,6 @@ def api_establishment_ads(store_id):
     }
     DB["ad_charges"].append(charge)
 
-    # Marca produtos da loja como destaque quando há pacote de propaganda
     for p in DB["products"]:
         if p.get("store_id") == store_id:
             p["featured"] = True
@@ -259,7 +262,7 @@ def api_establishment_ads(store_id):
 
 
 # =========================
-# CLIENTES E ENTREGADORES (CADASTRO OBRIGATÓRIO)
+# CLIENTES E ENTREGADORES
 # =========================
 
 @app.route("/api/clients", methods=["GET", "POST"])
@@ -331,7 +334,6 @@ def api_orders():
     if request.method == "GET":
         store_id = request.args.get("store_id")
         if store_id is not None:
-            # Visão do estabelecimento: apenas pedidos da loja, SEM dados internos de entregadores
             store_orders = []
             for o in DB["orders"]:
                 if str(o.get("store_id")) == str(store_id):
@@ -350,7 +352,6 @@ def api_orders():
                     })
             return jsonify(store_orders)
 
-        # Visão dos entregadores: pedidos soltos pela loja
         released = [o for o in DB["orders"] if o.get("released_to_couriers", False)]
         return jsonify(released)
 
@@ -397,7 +398,6 @@ def dispatch_order(order_id):
     order["status"] = "Disponível para entregadores"
     _save_state(DB)
 
-    # Retorna à loja apenas o despacho confirmado, sem dados dos entregadores
     return jsonify({
         "id": order["id"],
         "order_code": order["order_code"],
@@ -426,8 +426,8 @@ def patch_order(order_id):
     if str(order.get("status", "")).lower() == "entregue":
         provided_last4 = _only_digits(data.get("delivery_code") or data.get("last4"))
         expected_last4 = _only_digits(order.get("client_phone"))[-4:]
-        if expected_last4 and provided_last4 and provided_last4 != expected_last4:
-            return jsonify({"error": "Os 4 últimos dígitos do celular do cliente não conferem."}), 400
+        if len(expected_last4) == 4 and provided_last4 != expected_last4:
+            return jsonify({"error": "Informe os 4 últimos dígitos corretos do celular do cliente."}), 400
 
         fee = float(order.get("delivery_fee") or 0.0)
         pct = float(order.get("platform_pct_applied") or MIN_COURIER_PLATFORM_PCT)
@@ -476,4 +476,4 @@ def api_admin_overview():
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", port=port, debug=True)
+    app.run(host="0.0.0.0", port=port, debug=False)
