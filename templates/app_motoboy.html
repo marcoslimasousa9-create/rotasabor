@@ -93,12 +93,26 @@
 
     #liveMap {
       width: 100%;
-      height: 250px;
+      height: 340px;
       border-radius: 14px;
       border: 1px solid var(--border);
       overflow: hidden;
       background: var(--surface-2);
       z-index: 1;
+    }
+
+    .route-banner {
+      margin-top: 10px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      font-size: 0.82rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
     }
 
     .card {
@@ -185,7 +199,6 @@
       font-size: 0.83rem;
       cursor: pointer;
       flex: 1 1 auto;
-      text-decoration: none;
       text-align: center;
     }
 
@@ -281,11 +294,19 @@
 
         <div id="liveMap"></div>
 
+        <div class="route-banner" id="activeRouteBanner">
+          <div>
+            <strong id="routeTitleLabel">Sem rota ativa</strong>
+            <div class="meta" id="routeSummaryLabel" style="margin-top:2px;">Aceite uma entrega para traçar o caminho no mapa.</div>
+          </div>
+          <button class="btn btn-outline" style="flex:0 0 auto;padding:7px 11px;" type="button" id="clearRouteBtn">Limpar rota</button>
+        </div>
+
         <button class="btn btn-free-big" type="button" id="toggleOnlineBtn">▶ Ficar Livre</button>
 
         <div class="btn-row">
           <button class="btn btn-blue" type="button" id="toggleGpsBtn">Rastreamento ao vivo: ON/OFF</button>
-          <a class="btn btn-outline" id="openGmapsCurrentBtn" href="https://www.google.com/maps/@-21.1378,-48.9726,15z" target="_blank" rel="noopener">Abrir Google Maps</a>
+          <button class="btn btn-outline" type="button" id="sendOnceGpsBtn">Centralizar meu GPS</button>
         </div>
       </div>
 
@@ -316,7 +337,6 @@
           </div>
         </div>
         <div class="btn-row">
-          <button class="btn btn-outline" type="button" id="sendOnceGpsBtn">Enviar GPS agora</button>
           <button class="btn btn-blue" type="button" id="sendManualGpsBtn">Aplicar coordenadas</button>
         </div>
       </div>
@@ -350,6 +370,9 @@
     let currentLng = -48.9726;
     let map = null;
     let courierMarker = null;
+    let destMarker = null;
+    let routeLine = null;
+    let activeRouteOrder = null;
 
     const fmtBRL = (v) => Number(v || 0).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
@@ -377,9 +400,9 @@
 
     function initMap() {
       if (typeof L === "undefined" || map) return;
-      map = L.map("liveMap").setView([currentLat, currentLng], 15);
+      map = L.map("liveMap", { zoomControl: true }).setView([currentLat, currentLng], 15);
       L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-        attribution: "© OpenStreetMap"
+        attribution: "&copy; OpenStreetMap"
       }).addTo(map);
       courierMarker = L.circleMarker([currentLat, currentLng], {
         radius: 10,
@@ -387,8 +410,7 @@
         weight: 3,
         fillColor: "#10b981",
         fillOpacity: 1
-      }).addTo(map).bindPopup("Você está aqui");
-      updateGmapsCurrentLink();
+      }).addTo(map);
     }
 
     function updateMapPosition(lat, lng) {
@@ -396,21 +418,93 @@
       currentLng = Number(lng);
       document.getElementById("coordsReadout").textContent =
         `Lat: ${currentLat.toFixed(6)} | Lng: ${currentLng.toFixed(6)}`;
-      updateGmapsCurrentLink();
       if (map && courierMarker) {
         courierMarker.setLatLng([currentLat, currentLng]);
-        map.panTo([currentLat, currentLng], { animate: true });
+        if (!activeRouteOrder) {
+          map.panTo([currentLat, currentLng], { animate: true });
+        } else {
+          drawRouteToOrder(activeRouteOrder);
+        }
       }
     }
 
-    function updateGmapsCurrentLink() {
-      const link = document.getElementById("openGmapsCurrentBtn");
-      link.href = `https://www.google.com/maps/search/?api=1&query=${currentLat},${currentLng}`;
+    async function geocodeAddress(address) {
+      const query = encodeURIComponent(`${address}, Catanduva, SP, Brasil`);
+      const url = `https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${query}`;
+      const res = await fetch(url, { headers: { "Accept": "application/json" } });
+      if (!res.ok) throw new Error("Falha ao localizar endereço");
+      const data = await res.json();
+      if (!Array.isArray(data) || !data.length) {
+        throw new Error("Endereço não encontrado no mapa");
+      }
+      return { lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) };
     }
 
-    function buildGoogleMapsRouteUrl(destinationAddress) {
-      const dest = encodeURIComponent(destinationAddress || "Catanduva, SP");
-      return `https://www.google.com/maps/dir/?api=1&origin=${currentLat},${currentLng}&destination=${dest}&travelmode=driving`;
+    async function fetchRoadRoute(fromLat, fromLng, toLat, toLng) {
+      const url = `https://router.project-osrm.org/route/v1/driving/${fromLng},${fromLat};${toLng},${toLat}?overview=full&geometries=geojson`;
+      const res = await fetch(url);
+      if (!res.ok) return null;
+      const data = await res.json();
+      const route = data?.routes?.[0];
+      if (!route?.geometry?.coordinates?.length) return null;
+      const latLngs = route.geometry.coordinates.map(([lng, lat]) => [lat, lng]);
+      const km = (Number(route.distance || 0) / 1000).toFixed(1);
+      const mins = Math.max(1, Math.round(Number(route.duration || 0) / 60));
+      return { latLngs, km, mins };
+    }
+
+    function clearMapRoute() {
+      activeRouteOrder = null;
+      if (routeLine && map) {
+        map.removeLayer(routeLine);
+        routeLine = null;
+      }
+      if (destMarker && map) {
+        map.removeLayer(destMarker);
+        destMarker = null;
+      }
+      document.getElementById("routeTitleLabel").textContent = "Sem rota ativa";
+      document.getElementById("routeSummaryLabel").textContent = "Aceite uma entrega para traçar o caminho no mapa.";
+    }
+
+    document.getElementById("clearRouteBtn").addEventListener("click", clearMapRoute);
+
+    async function drawRouteToOrder(order) {
+      if (!order || !map) return;
+      activeRouteOrder = order;
+      const code = order.order_code || `RS-${String(order.id).padStart(3, "0")}`;
+      const address = order.client_address || "Centro, Catanduva - SP";
+      document.getElementById("routeTitleLabel").textContent = `Rota #${order.id} (${code}) • ${order.client_name || "Cliente"}`;
+      document.getElementById("routeSummaryLabel").textContent = `Calculando trajeto para: ${address}...`;
+
+      try {
+        const dest = await geocodeAddress(address);
+        if (destMarker) map.removeLayer(destMarker);
+        destMarker = L.circleMarker([dest.lat, dest.lng], {
+          radius: 10,
+          color: "#ffffff",
+          weight: 3,
+          fillColor: "#38bdf8",
+          fillOpacity: 1
+        }).addTo(map);
+
+        const road = await fetchRoadRoute(currentLat, currentLng, dest.lat, dest.lng);
+        const coords = road ? road.latLngs : [[currentLat, currentLng], [dest.lat, dest.lng]];
+        if (routeLine) map.removeLayer(routeLine);
+        routeLine = L.polyline(coords, { color: "#38bdf8", weight: 5, opacity: 0.92 }).addTo(map);
+
+        const bounds = L.latLngBounds([[currentLat, currentLng], [dest.lat, dest.lng]]);
+        map.fitBounds(bounds, { padding: [32, 32] });
+
+        if (road) {
+          document.getElementById("routeSummaryLabel").textContent =
+            `${road.km} km • ~${road.mins} min • ${address}`;
+        } else {
+          document.getElementById("routeSummaryLabel").textContent = `Destino: ${address}`;
+        }
+      } catch (_) {
+        document.getElementById("routeSummaryLabel").textContent = `Destino: ${address}`;
+      }
     }
 
     function switchTab(id) {
@@ -418,7 +512,10 @@
       document.getElementById(id).classList.remove("hidden");
       document.querySelectorAll(".nav-btn").forEach((b) => b.classList.toggle("active", b.dataset.tab === id));
       if (id === "tab-map" && map) {
-        setTimeout(() => map.invalidateSize(), 120);
+        setTimeout(() => {
+          map.invalidateSize();
+          if (activeRouteOrder) drawRouteToOrder(activeRouteOrder);
+        }, 120);
       }
     }
 
@@ -573,8 +670,12 @@
           })
         });
         if (res.ok) {
-          showToast(`Entrega #${orderId} aceita!`);
+          const updatedOrder = await res.json().catch(() => null);
+          const matchedOrder = updatedOrder || orders.find((o) => Number(o.id) === Number(orderId)) || { id: orderId };
           await loadOrders();
+          switchTab("tab-map");
+          await drawRouteToOrder(matchedOrder);
+          showToast(`Entrega #${orderId} aceita! Rota aberta no mapa.`);
         }
       } catch (_) {
         showToast("Erro ao aceitar entrega.");
@@ -608,6 +709,9 @@
         if (!res.ok) {
           showToast(data.error || "Código inválido para confirmar a entrega.");
           return;
+        }
+        if (activeRouteOrder && Number(activeRouteOrder.id) === Number(orderId)) {
+          clearMapRoute();
         }
         showToast(`Pedido #${orderId} entregue com sucesso!`);
         await loadOrders();
@@ -666,7 +770,6 @@
         const deliveryFee = Number(o.delivery_fee || 0);
         const isReady = Boolean(o.store_ready) || String(o.status || "").toLowerCase().includes("pronto");
         const isAccepted = Boolean(o.courier_accepted) || String(o.status || "").toLowerCase().includes("caminho") || String(o.status || "").toLowerCase().includes("colet");
-        const gmapsUrl = buildGoogleMapsRouteUrl(o.client_address || o.store_name || "Catanduva, SP");
 
         return `
           <article class="card">
@@ -691,15 +794,12 @@
 
             <div class="btn-row">
               ${!isAccepted
-                ? `<button class="btn btn-primary" type="button" onclick="acceptOrder(${o.id})">✓ Aceitar entrega</button>`
-                : `<button class="btn btn-outline" type="button" onclick="updateOrderStatus(${o.id}, 'Coletando')">Coletando</button>
-                   <button class="btn btn-blue" type="button" onclick="updateOrderStatus(${o.id}, 'A caminho')">A caminho</button>`
+                ? `<button class="btn btn-primary" type="button" onclick="acceptOrder(${o.id})">✓ Aceitar entrega e abrir rota</button>`
+                : `<button class="btn btn-blue" type="button" onclick='switchTab("tab-map");drawRouteToOrder(${JSON.stringify(o)})'>🗺 Ver rota no mapa</button>
+                   <button class="btn btn-outline" type="button" onclick="updateOrderStatus(${o.id}, 'Coletando')">Coletando</button>
+                   <button class="btn btn-outline" type="button" onclick="updateOrderStatus(${o.id}, 'A caminho')">A caminho</button>`
               }
               <button class="btn btn-primary" type="button" onclick="promptAndDeliver(${o.id})">Concluir (4 dígitos)</button>
-            </div>
-
-            <div class="btn-row">
-              <a class="btn btn-blue" href="${gmapsUrl}" target="_blank" rel="noopener">🗺 Ir no Google Maps</a>
             </div>
           </article>
         `;
