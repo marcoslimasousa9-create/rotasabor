@@ -1,678 +1,220 @@
-import json
-import os
-import re
-from datetime import datetime, timezone
-from pathlib import Path
-from typing import Any
+from datetime import datetime
+from flask import Flask, jsonify, render_template, request
 
-from flask import Flask, jsonify, render_template, request, send_from_directory
+app = Flask(__name__)
 
-BASE_DIR = Path(__file__).resolve().parent
-DATA_FILE = Path(os.environ.get("ROTASABOR_DATA_FILE", str(BASE_DIR / "rotasabor_db.json")))
-DATABASE_URL = os.environ.get("DATABASE_URL", "").strip()
+# Configuração padrão (ajuste conforme sua regra de negócio)
+MIN_COURIER_PLATFORM_PCT = 8.0  # % mínima cobrada do entregador na aba/app dele
 
-# O Render costuma fornecer postgres://; bibliotecas modernas preferem postgresql://
-if DATABASE_URL.startswith("postgres://"):
-    DATABASE_URL = "postgresql://" + DATABASE_URL[len("postgres://") :]
-
-USE_POSTGRES = bool(DATABASE_URL)
-
-try:
-    import psycopg
-    from psycopg.rows import dict_row
-except ImportError:
-    psycopg = None
-    dict_row = None
-
-app = Flask(
-    __name__,
-    static_folder=str(BASE_DIR / "static"),
-    template_folder=str(BASE_DIR / "templates"),
-)
-
-
-def _now_iso() -> str:
-    return datetime.now(timezone.utc).isoformat()
-
-
-def _extract_last4(phone_raw: Any) -> str:
-    digits = re.sub(r"\D", "", str(phone_raw or ""))
-    return digits[-4:] if len(digits) >= 4 else "1234"
-
-
-def _default_data() -> dict[str, list[dict[str, Any]]]:
-    return {
-        "clients": [],
-        "stores": [
-            {
-                "id": 1,
-                "name": "Hamburgueria Centro",
-                "category": "Lanches & Pizzas",
-                "city": "Catanduva - SP",
-                "delivery_fee": 8.0,
-                "prep_time": "25-35 min",
-                "active": True,
-                "created_at": _now_iso(),
-            },
-            {
-                "id": 2,
-                "name": "Marmitaria Sabor da Casa",
-                "category": "Refeições & Marmitas",
-                "city": "Catanduva - SP",
-                "delivery_fee": 7.0,
-                "prep_time": "30-45 min",
-                "active": True,
-                "created_at": _now_iso(),
-            },
-        ],
-        "couriers": [],
-        "orders": [],
+# Estruturas em memória (substitua ou sincronize com o seu banco SQLite/PostgreSQL)
+ESTABLISHMENTS = []
+PRODUCTS = []
+AD_CHARGES = []
+COURIERS = []
+ORDERS = [
+    {
+        "id": 6,
+        "order_code": "RS-006",
+        "store_id": 1,
+        "store_name": "Hamburgueria Centro",
+        "client_name": "Cliente Exemplo",
+        "client_phone": "17999991234",
+        "client_address": "Rua Camanducaia, Catanduva - SP",
+        "items_total": 45.00,
+        "delivery_fee": 7.00,
+        "status": "Pronto para despacho",
+        "released_to_couriers": True,
+        "courier_accepted": False,
+        "courier_id": None,
+        "platform_pct_applied": MIN_COURIER_PLATFORM_PCT,
+        "platform_courier_cut": 0.0,
+        "courier_net_earning": 0.0,
+        "created_at": datetime.now().isoformat(),
     }
+]
 
 
-def _pg_connect():
-    if psycopg is None:
-        raise RuntimeError(
-            "DATABASE_URL configurada, mas o pacote 'psycopg' não está instalado. "
-            "Adicione 'psycopg[binary]' ao requirements.txt."
-        )
-    return psycopg.connect(DATABASE_URL, row_factory=dict_row)
+@app.route("/estabelecimento")
+def rota_portal_estabelecimento():
+    return render_template("portal_estabelecimento.html")
 
 
-def _init_db() -> None:
-    if USE_POSTGRES:
-        with _pg_connect() as conn:
-            with conn.cursor() as cur:
-                cur.execute(
-                    """
-                    CREATE TABLE IF NOT EXISTS clients (
-                        id SERIAL PRIMARY KEY,
-                        name TEXT NOT NULL,
-                        phone TEXT NOT NULL DEFAULT '',
-                        address TEXT NOT NULL DEFAULT '',
-                        created_at TEXT NOT NULL
-                    );
-                    CREATE TABLE IF NOT EXISTS stores (
-                        id SERIAL PRIMARY KEY,
-                        name TEXT NOT NULL,
-                        category TEXT NOT NULL DEFAULT 'Geral',
-                        city TEXT NOT NULL DEFAULT 'Catanduva - SP',
-                        delivery_fee DOUBLE PRECISION NOT NULL DEFAULT 0,
-                        prep_time TEXT NOT NULL DEFAULT '30 min',
-                        active BOOLEAN NOT NULL DEFAULT TRUE,
-                        created_at TEXT NOT NULL
-                    );
-                    CREATE TABLE IF NOT EXISTS couriers (
-                        id SERIAL PRIMARY KEY,
-                        name TEXT NOT NULL,
-                        phone TEXT NOT NULL DEFAULT '',
-                        vehicle TEXT NOT NULL DEFAULT 'Moto',
-                        plate TEXT NOT NULL DEFAULT '',
-                        status TEXT NOT NULL DEFAULT 'offline',
-                        lat DOUBLE PRECISION,
-                        lng DOUBLE PRECISION,
-                        updated_at TEXT NOT NULL
-                    );
-                    CREATE TABLE IF NOT EXISTS orders (
-                        id SERIAL PRIMARY KEY,
-                        order_code TEXT NOT NULL DEFAULT '',
-                        client_id INTEGER,
-                        client_name TEXT NOT NULL DEFAULT 'Cliente Balcão',
-                        customer_phone TEXT NOT NULL DEFAULT '',
-                        customer_phone_last4 TEXT NOT NULL DEFAULT '1234',
-                        client_address TEXT NOT NULL DEFAULT '',
-                        store_id INTEGER,
-                        store_name TEXT NOT NULL DEFAULT '',
-                        courier_id INTEGER,
-                        items_json TEXT NOT NULL DEFAULT '[]',
-                        delivery_fee DOUBLE PRECISION NOT NULL DEFAULT 0,
-                        total DOUBLE PRECISION NOT NULL DEFAULT 0,
-                        payment TEXT NOT NULL DEFAULT 'Pix',
-                        status TEXT NOT NULL DEFAULT 'Pendente',
-                        store_ready BOOLEAN NOT NULL DEFAULT FALSE,
-                        courier_accepted BOOLEAN NOT NULL DEFAULT FALSE,
-                        created_at TEXT NOT NULL,
-                        updated_at TEXT NOT NULL
-                    );
-                    ALTER TABLE orders ADD COLUMN IF NOT EXISTS order_code TEXT NOT NULL DEFAULT '';
-                    ALTER TABLE orders ADD COLUMN IF NOT EXISTS customer_phone TEXT NOT NULL DEFAULT '';
-                    ALTER TABLE orders ADD COLUMN IF NOT EXISTS customer_phone_last4 TEXT NOT NULL DEFAULT '1234';
-                    ALTER TABLE orders ADD COLUMN IF NOT EXISTS delivery_fee DOUBLE PRECISION NOT NULL DEFAULT 0;
-                    ALTER TABLE orders ADD COLUMN IF NOT EXISTS store_ready BOOLEAN NOT NULL DEFAULT FALSE;
-                    ALTER TABLE orders ADD COLUMN IF NOT EXISTS courier_accepted BOOLEAN NOT NULL DEFAULT FALSE;
-                    """
-                )
-                cur.execute("SELECT COUNT(*) AS cnt FROM stores;")
-                row = cur.fetchone()
-                if row and row["cnt"] == 0:
-                    for s in _default_data()["stores"]:
-                        cur.execute(
-                            """
-                            INSERT INTO stores (name, category, city, delivery_fee, prep_time, active, created_at)
-                            VALUES (%s, %s, %s, %s, %s, %s, %s);
-                            """,
-                            (
-                                s["name"],
-                                s["category"],
-                                s["city"],
-                                s["delivery_fee"],
-                                s["prep_time"],
-                                s["active"],
-                                s["created_at"],
-                            ),
-                        )
-            conn.commit()
-    else:
-        if not DATA_FILE.exists():
-            _write_json_db(_default_data())
-
-
-def _read_json_db() -> dict[str, list[dict[str, Any]]]:
-    if not DATA_FILE.exists():
-        data = _default_data()
-        _write_json_db(data)
-        return data
-    try:
-        with DATA_FILE.open("r", encoding="utf-8") as f:
-            raw = json.load(f)
-        if not isinstance(raw, dict):
-            return _default_data()
-        base = _default_data()
-        for k in base:
-            if isinstance(raw.get(k), list):
-                base[k] = raw[k]
-        return base
-    except Exception:
-        return _default_data()
-
-
-def _write_json_db(data: dict[str, list[dict[str, Any]]]) -> None:
-    DATA_FILE.parent.mkdir(parents=True, exist_ok=True)
-    with DATA_FILE.open("w", encoding="utf-8") as f:
-        json.dump(data, f, ensure_ascii=False, indent=2)
-
-
-def _format_order_row(row: dict[str, Any]) -> dict[str, Any]:
-    items_raw = row.get("items_json")
-    if isinstance(items_raw, str):
-        try:
-            items = json.loads(items_raw)
-        except Exception:
-            items = []
-    elif isinstance(items_raw, list):
-        items = items_raw
-    else:
-        items = row.get("items") or []
-
-    oid = row.get("id")
-    default_code = f"RS-{int(oid):03d}" if oid is not None else "RS-000"
-    code = str(row.get("order_code") or "").strip() or default_code
-
-    return {
-        "id": oid,
-        "order_code": code,
-        "client_id": row.get("client_id"),
-        "client_name": row.get("client_name") or "Cliente",
-        "customer_phone": row.get("customer_phone") or "",
-        "customer_phone_last4": str(row.get("customer_phone_last4") or "1234"),
-        "client_address": row.get("client_address") or "",
-        "store_id": row.get("store_id"),
-        "store_name": row.get("store_name") or "",
-        "courier_id": row.get("courier_id"),
-        "items": items,
-        "delivery_fee": float(row.get("delivery_fee") or 0),
-        "total": float(row.get("total") or 0),
-        "payment": row.get("payment") or "Pix",
-        "status": row.get("status") or "Pendente",
-        "store_ready": bool(row.get("store_ready", False)),
-        "courier_accepted": bool(row.get("courier_accepted", False)),
-        "created_at": row.get("created_at") or "",
-        "updated_at": row.get("updated_at") or "",
-    }
-
-
-try:
-    _init_db()
-except Exception as exc:
-    app.logger.warning("Aviso na inicialização do banco: %s", exc)
-
-
-# --- Rotas de Páginas ---
-
-
-@app.route("/")
-def index():
-    return render_template("painel_gestao.html")
-
-
-@app.route("/painel")
-def painel():
-    return render_template("painel_gestao.html")
-
-
-@app.route("/app-cliente")
-def app_cliente():
-    return render_template("app_cliente.html")
-
-
-@app.route("/app-motoboy")
-def app_motoboy():
-    return render_template("app_motoboy.html")
-
-
-@app.route("/loja")
-def loja():
-    return render_template("loja.html")
-
-
-@app.route("/manifest.json")
-def manifest_json():
-    return send_from_directory(app.static_folder, "manifest.json", mimetype="application/manifest+json")
-
-
-@app.route("/sw.js")
-def service_worker_js():
-    response = send_from_directory(app.static_folder, "sw.js", mimetype="application/javascript")
-    response.headers["Service-Worker-Allowed"] = "/"
-    return response
-
-
-# --- API: Clientes ---
-
-
-@app.route("/api/clients", methods=["GET", "POST"])
-def clients_collection():
+@app.route("/api/establishments", methods=["GET", "POST"])
+def api_establishments():
     if request.method == "GET":
-        if USE_POSTGRES:
-            with _pg_connect() as conn:
-                with conn.cursor() as cur:
-                    cur.execute("SELECT * FROM clients ORDER BY id DESC;")
-                    return jsonify([dict(r) for r in cur.fetchall()]), 200
-        db = _read_json_db()
-        return jsonify(list(reversed(db["clients"]))), 200
+        return jsonify(ESTABLISHMENTS)
 
-    payload = request.get_json(silent=True) or {}
-    name = str(payload.get("name") or "").strip()
-    phone = str(payload.get("phone") or "").strip()
-    address = str(payload.get("address") or "").strip()
-    if not name:
-        return jsonify({"error": "Nome do cliente é obrigatório"}), 400
-
-    now = _now_iso()
-    if USE_POSTGRES:
-        with _pg_connect() as conn:
-            with conn.cursor() as cur:
-                cur.execute(
-                    """
-                    INSERT INTO clients (name, phone, address, created_at)
-                    VALUES (%s, %s, %s, %s)
-                    RETURNING *;
-                    """,
-                    (name, phone, address, now),
-                )
-                created = dict(cur.fetchone())
-            conn.commit()
-        return jsonify(created), 201
-
-    db = _read_json_db()
-    next_id = max([int(c.get("id", 0)) for c in db["clients"]], default=0) + 1
-    client = {
-        "id": next_id,
-        "name": name,
-        "phone": phone,
-        "address": address,
-        "created_at": now,
+    data = request.get_json(silent=True) or {}
+    new_store = {
+        "id": len(ESTABLISHMENTS) + 1,
+        "store_name": (data.get("store_name") or "").strip(),
+        "owner_name": (data.get("owner_name") or "").strip(),
+        "cpf": (data.get("cpf") or "").strip(),
+        "cnpj_mei": (data.get("cnpj_mei") or "").strip(),
+        "address": (data.get("address") or "").strip(),
+        "phone": (data.get("phone") or "").strip(),
+        "email": (data.get("email") or "").strip().lower(),
+        "status": "Ativo",
+        "created_at": datetime.now().isoformat(),
     }
-    db["clients"].append(client)
-    _write_json_db(db)
-    return jsonify(client), 201
+    if not new_store["store_name"] or not new_store["cpf"]:
+        return jsonify({"error": "Nome do estabelecimento e CPF são obrigatórios."}), 400
+
+    ESTABLISHMENTS.append(new_store)
+    return jsonify(new_store), 201
 
 
-# --- API: Estabelecimentos ---
-
-
-@app.route("/api/stores", methods=["GET", "POST"])
-def stores_collection():
+@app.route("/api/products", methods=["GET", "POST"])
+def api_products():
     if request.method == "GET":
-        if USE_POSTGRES:
-            with _pg_connect() as conn:
-                with conn.cursor() as cur:
-                    cur.execute("SELECT * FROM stores ORDER BY id ASC;")
-                    return jsonify([dict(r) for r in cur.fetchall()]), 200
-        db = _read_json_db()
-        return jsonify(db["stores"]), 200
+        # Ordena produtos impulsionados por propaganda primeiro para a vitrine do cliente
+        ordered = sorted(PRODUCTS, key=lambda p: (0 if p.get("featured") else 1, -p["id"]))
+        return jsonify(ordered)
 
-    payload = request.get_json(silent=True) or {}
-    name = str(payload.get("name") or "").strip()
-    if not name:
-        return jsonify({"error": "Nome do estabelecimento é obrigatório"}), 400
-
-    category = str(payload.get("category") or "Geral").strip()
-    city = str(payload.get("city") or "Catanduva - SP").strip()
-    delivery_fee = float(payload.get("delivery_fee") or 0)
-    prep_time = str(payload.get("prep_time") or "30-40 min").strip()
-    active = bool(payload.get("active", True))
-    now = _now_iso()
-
-    if USE_POSTGRES:
-        with _pg_connect() as conn:
-            with conn.cursor() as cur:
-                cur.execute(
-                    """
-                    INSERT INTO stores (name, category, city, delivery_fee, prep_time, active, created_at)
-                    VALUES (%s, %s, %s, %s, %s, %s, %s)
-                    RETURNING *;
-                    """,
-                    (name, category, city, delivery_fee, prep_time, active, now),
-                )
-                created = dict(cur.fetchone())
-            conn.commit()
-        return jsonify(created), 201
-
-    db = _read_json_db()
-    next_id = max([int(s.get("id", 0)) for s in db["stores"]], default=0) + 1
-    store = {
-        "id": next_id,
-        "name": name,
-        "category": category,
-        "city": city,
-        "delivery_fee": delivery_fee,
-        "prep_time": prep_time,
-        "active": active,
-        "created_at": now,
+    data = request.get_json(silent=True) or {}
+    product = {
+        "id": len(PRODUCTS) + 1,
+        "store_id": data.get("store_id"),
+        "store_name": (data.get("store_name") or "Estabelecimento").strip(),
+        "store_address": (data.get("store_address") or "").strip(),
+        "name": (data.get("name") or "").strip(),
+        "price": float(data.get("price") or 0.0),
+        "description": (data.get("description") or "").strip(),
+        "featured": bool(data.get("featured", False)),
+        "available": True,
     }
-    db["stores"].append(store)
-    _write_json_db(db)
-    return jsonify(store), 201
+    if not product["name"] or product["price"] <= 0:
+        return jsonify({"error": "Nome e preço válido são obrigatórios."}), 400
+
+    PRODUCTS.append(product)
+    return jsonify(product), 201
 
 
-# --- API: Entregadores ---
-
-
-@app.route("/api/couriers", methods=["GET", "POST"])
-def couriers_collection():
+@app.route("/api/establishments/<int:store_id>/ads", methods=["GET", "POST"])
+def api_establishment_ads(store_id):
     if request.method == "GET":
-        if USE_POSTGRES:
-            with _pg_connect() as conn:
-                with conn.cursor() as cur:
-                    cur.execute("SELECT * FROM couriers ORDER BY id DESC;")
-                    return jsonify([dict(r) for r in cur.fetchall()]), 200
-        db = _read_json_db()
-        return jsonify(list(reversed(db["couriers"]))), 200
+        return jsonify([c for c in AD_CHARGES if int(c["store_id"]) == store_id])
 
-    payload = request.get_json(silent=True) or {}
-    name = str(payload.get("name") or "").strip()
-    if not name:
-        return jsonify({"error": "Nome do entregador é obrigatório"}), 400
-
-    phone = str(payload.get("phone") or "").strip()
-    vehicle = str(payload.get("vehicle") or "Moto").strip()
-    plate = str(payload.get("plate") or "").strip().upper()
-    status = str(payload.get("status") or "online").strip()
-    now = _now_iso()
-
-    if USE_POSTGRES:
-        with _pg_connect() as conn:
-            with conn.cursor() as cur:
-                cur.execute(
-                    """
-                    INSERT INTO couriers (name, phone, vehicle, plate, status, lat, lng, updated_at)
-                    VALUES (%s, %s, %s, %s, %s, NULL, NULL, %s)
-                    RETURNING *;
-                    """,
-                    (name, phone, vehicle, plate, status, now),
-                )
-                created = dict(cur.fetchone())
-            conn.commit()
-        return jsonify(created), 201
-
-    db = _read_json_db()
-    next_id = max([int(c.get("id", 0)) for c in db["couriers"]], default=0) + 1
-    courier = {
-        "id": next_id,
-        "name": name,
-        "phone": phone,
-        "vehicle": vehicle,
-        "plate": plate,
-        "status": status,
-        "lat": None,
-        "lng": None,
-        "updated_at": now,
+    data = request.get_json(silent=True) or {}
+    charge = {
+        "id": len(AD_CHARGES) + 1,
+        "store_id": store_id,
+        "package_name": (data.get("package_name") or "Impulso Vitrine").strip(),
+        "amount": float(data.get("amount") or 0.0),
+        "status": "Registrado",
+        "created_at": datetime.now().isoformat(),
     }
-    db["couriers"].append(courier)
-    _write_json_db(db)
-    return jsonify(courier), 201
+    if charge["amount"] <= 0:
+        return jsonify({"error": "Valor do pacote de propaganda inválido."}), 400
 
-
-@app.route("/api/couriers/<int:courier_id>/location", methods=["POST"])
-def update_courier_location(courier_id: int):
-    payload = request.get_json(silent=True) or {}
-    try:
-        lat = float(payload["lat"])
-        lng = float(payload["lng"])
-    except (KeyError, TypeError, ValueError):
-        return jsonify({"error": "Latitude e longitude válidas são obrigatórias"}), 400
-
-    now = _now_iso()
-    if USE_POSTGRES:
-        with _pg_connect() as conn:
-            with conn.cursor() as cur:
-                cur.execute(
-                    """
-                    UPDATE couriers
-                    SET lat = %s, lng = %s, updated_at = %s
-                    WHERE id = %s
-                    RETURNING *;
-                    """,
-                    (lat, lng, now, courier_id),
-                )
-                updated = cur.fetchone()
-            conn.commit()
-        if not updated:
-            return jsonify({"error": "Entregador não encontrado"}), 404
-        return jsonify(dict(updated)), 200
-
-    db = _read_json_db()
-    for c in db["couriers"]:
-        if int(c.get("id", 0)) == courier_id:
-            c["lat"] = lat
-            c["lng"] = lng
-            c["updated_at"] = now
-            _write_json_db(db)
-            return jsonify(c), 200
-    return jsonify({"error": "Entregador não encontrado"}), 404
-
-
-# --- API: Pedidos / Entregas ---
+    AD_CHARGES.append(charge)
+    return jsonify(charge), 201
 
 
 @app.route("/api/orders", methods=["GET", "POST"])
-def orders_collection():
+def api_orders():
     if request.method == "GET":
-        if USE_POSTGRES:
-            with _pg_connect() as conn:
-                with conn.cursor() as cur:
-                    cur.execute("SELECT * FROM orders ORDER BY id ASC;")
-                    return jsonify([_format_order_row(dict(r)) for r in cur.fetchall()]), 200
-        db = _read_json_db()
-        return jsonify([_format_order_row(o) for o in db["orders"]]), 200
+        # Apenas pedidos soltos pelo estabelecimento entram na fila dos entregadores
+        available_for_couriers = [o for o in ORDERS if o.get("released_to_couriers", True)]
+        return jsonify(available_for_couriers)
 
-    payload = request.get_json(silent=True) or {}
-    items = payload.get("items") or []
-    if not items:
-        return jsonify({"error": "Carrinho vazio"}), 400
+    data = request.get_json(silent=True) or {}
+    order_id = len(ORDERS) + 1
+    fee = float(data.get("delivery_fee") or 0.0)
+    pct = float(data.get("min_platform_pct") or MIN_COURIER_PLATFORM_PCT)
+    platform_cut = round(fee * (pct / 100.0), 2)
+    net_earning = round(max(0.0, fee - platform_cut), 2)
 
-    now = _now_iso()
-    client_id = payload.get("client_id")
-    client_name = str(payload.get("client_name") or "Cliente").strip()
-    customer_phone = str(payload.get("customer_phone") or payload.get("phone") or "").strip()
-    last4_raw = str(payload.get("customer_phone_last4") or "").strip()
-    last4 = last4_raw if (len(last4_raw) == 4 and last4_raw.isdigit()) else _extract_last4(customer_phone)
-    client_address = str(payload.get("client_address") or "").strip()
-    store_id = payload.get("store_id")
-    store_name = str(payload.get("store_name") or "").strip()
-    delivery_fee = float(payload.get("delivery_fee") or 0)
-    total = float(payload.get("total") or 0)
-    payment = str(payload.get("payment") or "Pix").strip()
-    store_ready = bool(payload.get("store_ready", False))
-    courier_accepted = bool(payload.get("courier_accepted", False))
-    status_val = str(payload.get("status") or "Pendente").strip()
-
-    if USE_POSTGRES:
-        with _pg_connect() as conn:
-            with conn.cursor() as cur:
-                cur.execute(
-                    """
-                    INSERT INTO orders (
-                        order_code, client_id, client_name, customer_phone, customer_phone_last4,
-                        client_address, store_id, store_name, courier_id,
-                        items_json, delivery_fee, total, payment, status,
-                        store_ready, courier_accepted, created_at, updated_at
-                    )
-                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, NULL, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-                    RETURNING *;
-                    """,
-                    (
-                        "",
-                        client_id,
-                        client_name,
-                        customer_phone,
-                        last4,
-                        client_address,
-                        store_id,
-                        store_name,
-                        json.dumps(items, ensure_ascii=False),
-                        delivery_fee,
-                        total,
-                        payment,
-                        status_val,
-                        store_ready,
-                        courier_accepted,
-                        now,
-                        now,
-                    ),
-                )
-                row = dict(cur.fetchone())
-                oid = int(row["id"])
-                code = str(payload.get("order_code") or "").strip() or f"RS-{oid:03d}"
-                cur.execute(
-                    "UPDATE orders SET order_code = %s WHERE id = %s RETURNING *;",
-                    (code, oid),
-                )
-                created = _format_order_row(dict(cur.fetchone()))
-            conn.commit()
-        return jsonify(created), 201
-
-    db = _read_json_db()
-    next_id = max([int(o.get("id", 0)) for o in db["orders"]], default=0) + 1
-    code = str(payload.get("order_code") or "").strip() or f"RS-{next_id:03d}"
-    new_order = {
-        "id": next_id,
-        "order_code": code,
-        "client_id": client_id,
-        "client_name": client_name,
-        "customer_phone": customer_phone,
-        "customer_phone_last4": last4,
-        "client_address": client_address,
-        "store_id": store_id,
-        "store_name": store_name,
+    order = {
+        "id": order_id,
+        "order_code": f"RS-{order_id:03d}",
+        "store_id": data.get("store_id"),
+        "store_name": (data.get("store_name") or "Estabelecimento").strip(),
+        "client_name": (data.get("client_name") or "Cliente").strip(),
+        "client_phone": (data.get("client_phone") or "").strip(),
+        "client_address": (data.get("client_address") or "").strip(),
+        "items_total": float(data.get("items_total") or 0.0),
+        "delivery_fee": fee,
+        "status": "Aguardando despacho da loja",
+        "released_to_couriers": bool(data.get("released_to_couriers", False)),
+        "courier_accepted": False,
         "courier_id": None,
-        "items_json": json.dumps(items, ensure_ascii=False),
-        "delivery_fee": delivery_fee,
-        "total": total,
-        "payment": payment,
-        "status": status_val,
-        "store_ready": store_ready,
-        "courier_accepted": courier_accepted,
-        "created_at": now,
-        "updated_at": now,
+        "platform_pct_applied": pct,
+        "platform_courier_cut": platform_cut,
+        "courier_net_earning": net_earning,
+        "created_at": datetime.now().isoformat(),
     }
-    db["orders"].append(new_order)
-    _write_json_db(db)
-    return jsonify(_format_order_row(new_order)), 201
+    ORDERS.append(order)
+    return jsonify(order), 201
+
+
+@app.route("/api/orders/<int:order_id>/dispatch", methods=["POST"])
+def dispatch_order_to_couriers(order_id):
+    order = next((o for o in ORDERS if int(o["id"]) == order_id), None)
+    if not order:
+        return jsonify({"error": "Pedido não encontrado."}), 404
+
+    order["released_to_couriers"] = True
+    order["status"] = "Disponível para entregadores"
+    # Retorna apenas o status do pedido para a loja (sem dados dos entregadores)
+    return jsonify({
+        "id": order["id"],
+        "order_code": order["order_code"],
+        "status": order["status"],
+        "released_to_couriers": True,
+    })
 
 
 @app.route("/api/orders/<int:order_id>", methods=["PATCH"])
-def update_order(order_id: int):
-    payload = request.get_json(silent=True) or {}
-    new_status = payload.get("status")
-    courier_id = payload.get("courier_id")
-    now = _now_iso()
+def update_order(order_id):
+    order = next((o for o in ORDERS if int(o["id"]) == order_id), None)
+    if not order:
+        return jsonify({"error": "Pedido não encontrado."}), 404
 
-    def _validate_and_apply(current: dict[str, Any]) -> tuple[dict[str, Any] | None, tuple[str, int] | None]:
-        if new_status is not None and str(new_status).strip().lower() == "entregue":
-            expected_code = str(current.get("customer_phone_last4") or "").strip()
-            provided_code = str(payload.get("delivery_code") or payload.get("last4") or "").strip()
-            if expected_code and provided_code != expected_code:
-                return None, ("Código de confirmação (4 últimos dígitos) inválido.", 400)
+    data = request.get_json(silent=True) or {}
 
-        updated = dict(current)
-        if new_status is not None and str(new_status).strip():
-            updated["status"] = str(new_status).strip()
-        if courier_id is not None:
-            updated["courier_id"] = courier_id
-        if "store_ready" in payload:
-            updated["store_ready"] = bool(payload["store_ready"])
-        if "courier_accepted" in payload:
-            updated["courier_accepted"] = bool(payload["courier_accepted"])
-        if "delivery_fee" in payload and payload["delivery_fee"] is not None:
-            updated["delivery_fee"] = float(payload["delivery_fee"])
-        updated["updated_at"] = now
-        return updated, None
+    if "courier_id" in data:
+        order["courier_id"] = data["courier_id"]
+    if "courier_accepted" in data:
+        order["courier_accepted"] = bool(data["courier_accepted"])
+    if "status" in data:
+        order["status"] = data["status"]
 
-    if USE_POSTGRES:
-        with _pg_connect() as conn:
-            with conn.cursor() as cur:
-                cur.execute("SELECT * FROM orders WHERE id = %s;", (order_id,))
-                row = cur.fetchone()
-                if not row:
-                    return jsonify({"error": "Pedido não encontrado"}), 404
+    if str(order.get("status", "")).lower() == "entregue":
+        provided_code = "".join(ch for ch in str(data.get("delivery_code") or data.get("last4") or "") if ch.isdigit())
+        expected_last4 = "".join(ch for ch in str(order.get("client_phone") or "") if ch.isdigit())[-4:]
+        if expected_last4 and provided_code != expected_last4:
+            return jsonify({"error": "Os 4 últimos números do celular do cliente não conferem."}), 400
 
-                updated, err = _validate_and_apply(dict(row))
-                if err:
-                    msg, code = err
-                    return jsonify({"error": msg}), code
+        fee = float(order.get("delivery_fee") or 0.0)
+        pct = float(order.get("platform_pct_applied") or MIN_COURIER_PLATFORM_PCT)
+        cut = round(fee * (pct / 100.0), 2)
+        order["platform_courier_cut"] = cut
+        order["courier_net_earning"] = round(max(0.0, fee - cut), 2)
 
-                cur.execute(
-                    """
-                    UPDATE orders
-                    SET status = %s,
-                        courier_id = %s,
-                        store_ready = %s,
-                        courier_accepted = %s,
-                        delivery_fee = %s,
-                        updated_at = %s
-                    WHERE id = %s
-                    RETURNING *;
-                    """,
-                    (
-                        updated["status"],
-                        updated["courier_id"],
-                        updated["store_ready"],
-                        updated["courier_accepted"],
-                        updated["delivery_fee"],
-                        updated["updated_at"],
-                        order_id,
-                    ),
-                )
-                formatted = _format_order_row(dict(cur.fetchone()))
-            conn.commit()
-        return jsonify(formatted), 200
-
-    db = _read_json_db()
-    for idx, o in enumerate(db["orders"]):
-        if int(o.get("id", 0)) == order_id:
-            updated, err = _validate_and_apply(o)
-            if err:
-                msg, code = err
-                return jsonify({"error": msg}), code
-            db["orders"][idx] = updated
-            _write_json_db(db)
-            return jsonify(_format_order_row(updated)), 200
-
-    return jsonify({"error": "Pedido não encontrado"}), 404
+    return jsonify(order)
 
 
-if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", port=port, debug=True)
+@app.route("/api/admin/overview", methods=["GET"])
+def admin_overview():
+    total_ads = round(sum(float(c.get("amount") or 0.0) for c in AD_CHARGES), 2)
+    delivered = [o for o in ORDERS if str(o.get("status", "")).lower() == "entregue"]
+    total_courier_cut = round(sum(float(o.get("platform_courier_cut") or 0.0) for o in delivered), 2)
+    total_courier_net = round(sum(float(o.get("courier_net_earning") or 0.0) for o in delivered), 2)
+    total_products_value = round(sum(float(o.get("items_total") or 0.0) for o in ORDERS), 2)
+    total_delivery_fees = round(sum(float(o.get("delivery_fee") or 0.0) for o in ORDERS), 2)
+
+    return jsonify({
+        "my_total_earnings": round(total_ads + total_courier_cut, 2),
+        "my_ads_earnings": total_ads,
+        "my_courier_pct_earnings": total_courier_cut,
+        "couriers_net_payout": total_courier_net,
+        "gross_products_volume": total_products_value,
+        "gross_delivery_fees": total_delivery_fees,
+        "establishments_count": len(ESTABLISHMENTS),
+        "products_count": len(PRODUCTS),
+        "orders_count": len(ORDERS),
+        "delivered_count": len(delivered),
+        "history": ORDERS,
+        "ad_charges": AD_CHARGES,
+    })
