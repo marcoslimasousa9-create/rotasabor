@@ -1,19 +1,19 @@
 {
-  "name": "RotaSabor Cliente — Catanduva",
-  "short_name": "RS Cliente",
-  "description": "Peça lanches, pizzas e açaí em Catanduva com Pix Asaas Sandbox.",
-  "start_url": "/app-cliente",
+  "name": "RotaSabor — Pedidos Online",
+  "short_name": "RotaSabor",
+  "description": "Aplicativo de pedidos online do RotaSabor.",
+  "start_url": "/cliente",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#0b1220",
-  "theme_color": "#ff4d2d",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff",
   "icons": [
     {
       "src": "/static/icon.svg",
       "sizes": "any",
       "type": "image/svg+xml",
-      "purpose": "any maskable"
+      "purpose": "any"
     }
   ]
 }
