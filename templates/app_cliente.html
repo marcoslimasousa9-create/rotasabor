@@ -12,12 +12,12 @@
     :root {
       --bg: #ffffff;
       --surface: #ffffff;
-      --surface-soft: #f1f5f9;
+      --surface-soft: #f3f4f6;
       --surface-mint: #ecfdf5;
       --surface-warm: #fefce8;
-      --border: #cbd5e1;
-      --text: #0f172a;
-      --muted: #475569;
+      --border: #e5e7eb;
+      --text: #111827;
+      --muted: #6b7280;
       --green: #16a34a;
       --yellow: #facc15;
       --yellow-soft: #fef08a;
@@ -33,49 +33,46 @@
     html, body {
       margin: 0;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      font-size: 20px;
+      font-size: 15px;
       background: var(--bg);
       color: var(--text);
-      padding-bottom: 120px;
-    }
-
-    @media (max-width: 768px) {
-      html, body {
-        font-size: 22px;
-      }
+      padding-bottom: 108px;
     }
 
     .topbar {
       position: sticky;
       top: 0;
       z-index: 30;
-      background: #ffffff;
-      border-bottom: 2px solid var(--border);
-      padding: 14px 16px;
+      background: rgba(255, 255, 255, 0.98);
+      border-bottom: 1px solid var(--border);
+      padding: 10px 14px;
     }
 
-    .topbar-inner { max-width: 1200px; margin: 0 auto; }
+    .topbar-inner {
+      max-width: 1160px;
+      margin: 0 auto;
+    }
 
     .addr-bar {
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 10px;
-      margin-bottom: 12px;
+      margin-bottom: 8px;
     }
 
     .addr-btn {
       background: transparent;
       border: none;
-      padding: 4px 0;
+      padding: 2px 0;
       color: var(--text);
-      font-size: 20px;
-      font-weight: 900;
+      font-size: 15px;
+      font-weight: 800;
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
       cursor: pointer;
-      max-width: 75%;
+      max-width: 78%;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
@@ -83,28 +80,26 @@
 
     .cart-top-btn {
       background: var(--surface-soft);
-      border: 2px solid var(--border);
+      border: 1px solid var(--border);
       color: var(--text);
       border-radius: 999px;
-      padding: 10px 18px;
-      font-size: 20px;
-      font-weight: 900;
+      padding: 6px 12px;
+      font-size: 14px;
+      font-weight: 800;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
       flex-shrink: 0;
     }
 
     .search-input-wrap {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 8px;
       background: var(--surface-soft);
-      border: 1.5px solid var(--border);
-      border-radius: 14px;
-      padding: 13px 16px;
-      font-size: 20px;
+      border-radius: 10px;
+      padding: 9px 12px;
     }
 
     .search-input-wrap input {
@@ -112,292 +107,296 @@
       border: none;
       background: transparent;
       color: var(--text);
-      font-size: 20px;
+      font-size: 15px;
       outline: none;
       padding: 0;
     }
 
     .container {
-      max-width: 1200px;
+      max-width: 1160px;
       margin: 0 auto;
-      padding: 16px;
+      padding: 12px 14px;
     }
 
     .hero-promo {
-      background: linear-gradient(125deg, #063b2c 0%, #0f6b4a 55%, #15803d 100%);
+      background: linear-gradient(120deg, #052e23 0%, #0d5c42 60%, #15803d 100%);
       color: #ffffff;
-      border-radius: 18px;
-      padding: 20px;
+      border-radius: 14px;
+      padding: 16px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 14px;
-      margin-bottom: 16px;
+      gap: 12px;
+      margin-bottom: 12px;
     }
 
     .hero-tag {
       display: inline-block;
       background: var(--yellow);
       color: #111827;
-      font-size: 15px;
+      font-size: 11px;
       font-weight: 900;
-      padding: 5px 12px;
-      border-radius: 8px;
-      margin-bottom: 8px;
+      padding: 3px 8px;
+      border-radius: 5px;
+      margin-bottom: 6px;
+      text-transform: uppercase;
     }
 
-    .hero-title { margin: 0; font-size: 26px; font-weight: 900; line-height: 1.15; }
-    .hero-sub { margin-top: 6px; font-size: 18px; opacity: 0.95; }
+    .hero-title { margin: 0; font-size: 20px; font-weight: 900; line-height: 1.15; }
+    .hero-sub { margin-top: 4px; font-size: 13px; opacity: 0.92; }
 
     .hero-badge-box {
       background: var(--yellow);
       color: #111827;
-      border-radius: 16px;
-      padding: 14px 18px;
+      border-radius: 12px;
+      padding: 10px 14px;
       text-align: center;
       font-weight: 900;
       flex-shrink: 0;
-      line-height: 1.1;
+      line-height: 1.05;
     }
 
     .cat-row {
       display: flex;
-      gap: 14px;
+      gap: 12px;
       overflow-x: auto;
-      padding-bottom: 8px;
-      margin-bottom: 14px;
+      padding-bottom: 6px;
+      margin-bottom: 10px;
       scrollbar-width: none;
     }
     .cat-row::-webkit-scrollbar { display: none; }
 
     .cat-pill-card {
       background: transparent;
-      border: 1.5px solid transparent;
+      border: none;
       color: var(--text);
-      min-width: 96px;
+      min-width: 64px;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 8px;
+      gap: 5px;
       cursor: pointer;
-      padding: 8px;
-      border-radius: 14px;
+      padding: 4px;
+      border-radius: 10px;
       flex-shrink: 0;
-      font-size: 17px;
-      font-weight: 800;
+      font-size: 13px;
+      font-weight: 700;
     }
 
     .cat-pill-card.active {
       background: var(--surface-mint);
-      border-color: var(--green);
       color: var(--green);
+      font-weight: 800;
     }
 
-    .cat-circle-img {
-      width: 72px;
-      height: 72px;
-      border-radius: 16px;
-      object-fit: cover;
-      border: 1.5px solid var(--border);
+    .cat-thumb {
+      width: 52px;
+      height: 52px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 26px;
+      border: 1px solid var(--border);
     }
 
     .benefits-strip {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 10px;
+      gap: 6px;
       flex-wrap: wrap;
-      font-size: 16px;
-      font-weight: 800;
-      margin-bottom: 14px;
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 10px;
     }
 
-    .benefits-strip span { color: var(--green); font-weight: 900; font-size: 18px; }
+    .benefits-strip span { color: var(--green); font-weight: 900; }
 
     .coupon-cards-row {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-      margin-bottom: 14px;
+      gap: 8px;
+      margin-bottom: 10px;
     }
 
     .coupon-box {
       background: var(--surface-mint);
-      border: 1.5px solid #86efac;
-      border-radius: 14px;
-      padding: 14px 10px;
+      border: 1px solid #bbf7d0;
+      border-radius: 10px;
+      padding: 9px 6px;
       text-align: center;
       cursor: pointer;
     }
 
-    .coupon-off { font-size: 22px; font-weight: 900; color: #15803d; }
-    .coupon-sub { font-size: 15px; color: var(--muted); font-weight: 700; margin-top: 4px; }
+    .coupon-off { font-size: 16px; font-weight: 900; color: #15803d; }
+    .coupon-sub { font-size: 11px; color: var(--muted); font-weight: 700; margin-top: 2px; }
 
     .filter-pills {
       display: flex;
-      gap: 10px;
+      gap: 8px;
       overflow-x: auto;
-      padding-bottom: 10px;
-      margin-bottom: 14px;
+      padding-bottom: 8px;
+      margin-bottom: 10px;
       scrollbar-width: none;
     }
     .filter-pills::-webkit-scrollbar { display: none; }
 
     .f-pill {
       background: var(--surface-soft);
-      border: 1.5px solid var(--border);
+      border: none;
       color: var(--text);
       border-radius: 999px;
-      padding: 11px 18px;
-      font-size: 18px;
-      font-weight: 800;
+      padding: 7px 14px;
+      font-size: 13px;
+      font-weight: 700;
       white-space: nowrap;
       cursor: pointer;
       flex-shrink: 0;
     }
 
     .f-pill.active {
-      background: #0f172a;
+      background: #111827;
       color: #ffffff;
-      border-color: #0f172a;
     }
 
     .stores-grid-wrap {
       display: grid;
       grid-template-columns: 1fr;
-      gap: 16px;
+      gap: 14px;
     }
 
-    @media (min-width: 900px) {
+    @media (min-width: 860px) {
       .stores-grid-wrap {
         grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 20px;
+        gap: 16px;
       }
     }
 
     .store-block {
       background: var(--surface);
-      border: 2px solid var(--border);
-      border-radius: 18px;
-      padding: 16px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 12px;
       min-width: 0;
     }
 
     .store-header-row {
       display: flex;
-      gap: 14px;
+      gap: 10px;
       align-items: flex-start;
       cursor: pointer;
-      margin-bottom: 14px;
+      margin-bottom: 10px;
     }
 
     .store-avatar {
-      width: 72px;
-      height: 72px;
-      border-radius: 14px;
-      object-fit: cover;
-      border: 1.5px solid var(--border);
+      width: 52px;
+      height: 52px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      font-weight: 900;
+      color: #ffffff;
+      border: 1px solid var(--border);
       flex-shrink: 0;
     }
 
-    .store-title { margin: 0; font-size: 22px; font-weight: 900; color: var(--text); }
+    .store-title { margin: 0; font-size: 16px; font-weight: 800; color: var(--text); }
     .store-rating-line {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 5px;
       flex-wrap: wrap;
-      font-size: 17px;
-      margin-top: 6px;
-      font-weight: 800;
+      font-size: 13px;
+      margin-top: 3px;
+      font-weight: 700;
     }
 
     .star-txt { color: #eab308; font-weight: 900; }
-    .muted-txt { color: var(--muted); font-weight: 700; font-size: 17px; }
+    .muted-txt { color: var(--muted); font-weight: 600; font-size: 13px; }
     .strike-price { text-decoration: line-through; color: var(--muted); font-weight: 600; }
 
     .promo-tags-row {
       display: flex;
       flex-wrap: wrap;
-      gap: 8px;
-      margin-top: 8px;
+      gap: 6px;
+      margin-top: 6px;
     }
 
     .tag-yellow {
       background: var(--yellow-soft);
       color: #111827;
-      font-size: 15px;
-      font-weight: 900;
-      padding: 5px 10px;
-      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 800;
+      padding: 2px 7px;
+      border-radius: 5px;
     }
 
     .prod-carousel {
       display: flex;
-      gap: 12px;
+      gap: 10px;
       overflow-x: auto;
-      padding-bottom: 6px;
+      padding-bottom: 4px;
       scrollbar-width: none;
     }
     .prod-carousel::-webkit-scrollbar { display: none; }
 
     .mini-prod-card {
-      width: 172px;
+      width: 124px;
       flex-shrink: 0;
     }
 
     .mini-img-wrap {
       position: relative;
-      width: 172px;
-      height: 140px;
-      border-radius: 14px;
+      width: 124px;
+      height: 102px;
+      border-radius: 10px;
       overflow: hidden;
-      background: var(--surface-soft);
-      border: 1.5px solid var(--border);
-    }
-
-    .mini-img-wrap img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 38px;
     }
 
     .off-badge {
       position: absolute;
-      top: 8px;
-      left: 8px;
+      top: 6px;
+      left: 6px;
       background: var(--yellow);
       color: #111827;
-      font-size: 14px;
+      font-size: 11px;
       font-weight: 900;
-      padding: 4px 8px;
-      border-radius: 8px;
+      padding: 2px 6px;
+      border-radius: 5px;
     }
 
     .plus-circle {
       position: absolute;
-      right: 8px;
-      bottom: 8px;
-      width: 44px;
-      height: 44px;
+      right: 6px;
+      bottom: 6px;
+      width: 30px;
+      height: 30px;
       border-radius: 999px;
-      border: 2px solid #cbd5e1;
+      border: 1px solid #d1d5db;
       background: #ffffff;
       color: #111827;
-      font-size: 28px;
+      font-size: 20px;
       font-weight: 900;
       line-height: 1;
       cursor: pointer;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.24);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
     }
 
-    .mini-price { font-size: 21px; font-weight: 900; color: var(--green); margin-top: 8px; }
-    .mini-old { font-size: 16px; color: var(--muted); text-decoration: line-through; }
+    .mini-price { font-size: 16px; font-weight: 900; color: var(--green); margin-top: 5px; }
+    .mini-old { font-size: 12px; color: var(--muted); text-decoration: line-through; }
     .mini-name {
-      font-size: 18px;
-      font-weight: 800;
+      font-size: 13px;
+      font-weight: 700;
       color: var(--text);
-      margin-top: 4px;
+      margin-top: 2px;
       line-height: 1.25;
       display: -webkit-box;
       -webkit-line-clamp: 2;
@@ -405,72 +404,71 @@
       overflow: hidden;
     }
 
-    .store-detail-hero {
-      position: relative;
-      margin-bottom: 14px;
-      border-radius: 18px;
-      overflow: hidden;
-    }
-
     .store-detail-banner {
       width: 100%;
-      height: 220px;
-      object-fit: cover;
-      display: block;
+      height: 160px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 56px;
+      color: #ffffff;
+      position: relative;
+      margin-bottom: 10px;
     }
 
     .detail-top-overlay {
       position: absolute;
-      top: 14px;
-      left: 14px;
-      right: 14px;
+      top: 10px;
+      left: 10px;
+      right: 10px;
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
 
     .circle-icon-btn {
-      width: 48px;
-      height: 48px;
+      width: 36px;
+      height: 36px;
       border-radius: 999px;
-      border: 1.5px solid var(--border);
-      background: rgba(255, 255, 255, 0.96);
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.95);
       color: #111827;
-      font-size: 24px;
+      font-size: 18px;
       font-weight: 900;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.14);
     }
 
     .detail-store-card {
       background: #ffffff;
-      border: 2px solid var(--border);
-      border-radius: 18px;
-      padding: 16px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 12px;
     }
 
     .detail-metrics-box {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
+      gap: 8px;
       background: var(--surface-soft);
-      border-radius: 14px;
-      padding: 12px;
-      margin-top: 14px;
+      border-radius: 10px;
+      padding: 10px;
+      margin-top: 10px;
       text-align: center;
     }
 
-    .metric-val { font-size: 19px; font-weight: 900; color: var(--text); }
-    .metric-lbl { font-size: 15px; color: var(--muted); font-weight: 700; margin-top: 4px; }
+    .metric-val { font-size: 14px; font-weight: 800; color: var(--text); }
+    .metric-lbl { font-size: 11px; color: var(--muted); font-weight: 700; margin-top: 2px; }
 
     .detail-tabs {
       display: flex;
-      gap: 20px;
-      border-bottom: 2px solid var(--border);
-      margin: 16px 0 12px;
+      gap: 16px;
+      border-bottom: 1px solid var(--border);
+      margin: 12px 0 8px;
       overflow-x: auto;
       scrollbar-width: none;
     }
@@ -479,10 +477,10 @@
     .d-tab-btn {
       background: transparent;
       border: none;
-      border-bottom: 4px solid transparent;
-      padding: 12px 4px;
-      font-size: 20px;
-      font-weight: 900;
+      border-bottom: 3px solid transparent;
+      padding: 8px 2px;
+      font-size: 14px;
+      font-weight: 800;
       color: var(--muted);
       white-space: nowrap;
       cursor: pointer;
@@ -490,87 +488,90 @@
 
     .d-tab-btn.active {
       color: var(--text);
-      border-bottom-color: #0f172a;
+      border-bottom-color: #111827;
     }
 
     .menu-row-item {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      gap: 14px;
-      padding: 16px 0;
-      border-bottom: 1.5px solid var(--border);
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
     }
 
-    .menu-row-img-wrap {
+    .menu-row-thumb-wrap {
       position: relative;
-      width: 120px;
-      height: 120px;
+      width: 86px;
+      height: 86px;
       flex-shrink: 0;
     }
 
-    .menu-row-img-wrap img {
-      width: 100%;
-      height: 100%;
-      border-radius: 14px;
-      object-fit: cover;
-      border: 1.5px solid var(--border);
+    .menu-row-thumb {
+      width: 86px;
+      height: 86px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 34px;
+      border: 1px solid var(--border);
     }
 
     .card-box {
       background: #ffffff;
-      border: 2px solid var(--border);
-      border-radius: 18px;
-      padding: 18px;
-      margin-bottom: 16px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 14px;
+      margin-bottom: 12px;
     }
 
-    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; }
+    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; }
 
-    label { display: block; font-size: 18px; font-weight: 800; color: var(--muted); margin-bottom: 6px; }
+    label { display: block; font-size: 13px; font-weight: 700; color: var(--muted); margin-bottom: 4px; }
 
     input, select {
       width: 100%;
       background: var(--surface-soft);
-      border: 2px solid var(--border);
+      border: 1px solid var(--border);
       color: var(--text);
-      border-radius: 12px;
-      padding: 14px;
-      font-size: 20px;
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 15px;
     }
 
     .btn-primary-green {
       width: 100%;
       border: none;
-      border-radius: 14px;
+      border-radius: 12px;
       background: var(--green);
       color: #ffffff;
-      font-size: 22px;
+      font-size: 16px;
       font-weight: 900;
-      padding: 16px 18px;
+      padding: 13px 16px;
       cursor: pointer;
-      margin-top: 16px;
+      margin-top: 12px;
     }
 
     .floating-promo-bar {
       position: fixed;
       left: 12px;
       right: 12px;
-      bottom: 86px;
-      max-width: 1180px;
+      bottom: 66px;
+      max-width: 1140px;
       margin: 0 auto;
       z-index: 25;
       background: var(--surface-warm);
-      border: 2px solid var(--yellow);
-      border-radius: 14px;
-      padding: 12px 16px;
+      border: 1px solid var(--yellow);
+      border-radius: 10px;
+      padding: 8px 12px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 10px;
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.14);
-      font-size: 18px;
-      font-weight: 900;
+      gap: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      font-size: 13px;
+      font-weight: 800;
     }
 
     .bottom-bar {
@@ -580,39 +581,39 @@
       right: 0;
       z-index: 30;
       background: #ffffff;
-      border-top: 2px solid var(--border);
+      border-top: 1px solid var(--border);
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      padding: 10px 8px;
+      padding: 7px 6px;
     }
 
     .b-nav-btn {
       background: transparent;
       border: none;
       color: var(--muted);
-      font-size: 17px;
-      font-weight: 900;
-      padding: 4px;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 3px;
       cursor: pointer;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 3px;
+      gap: 2px;
     }
 
-    .b-nav-btn span:first-child { font-size: 26px; }
-    .b-nav-btn.active { color: #0f172a; }
+    .b-nav-btn span:first-child { font-size: 19px; }
+    .b-nav-btn.active { color: #111827; font-weight: 900; }
 
     .toast {
       position: fixed;
-      top: 125px;
+      top: 98px;
       left: 50%;
       transform: translateX(-50%);
-      background: #0f172a;
+      background: #111827;
       color: #ffffff;
-      padding: 14px 20px;
-      border-radius: 14px;
-      font-size: 19px;
+      padding: 10px 16px;
+      border-radius: 10px;
+      font-size: 14px;
       font-weight: 800;
       z-index: 60;
       display: none;
@@ -653,18 +654,18 @@
           <div>
             <span class="hero-tag">OFERTAS DO DIA</span>
             <h1 class="hero-title">Entrega rápida e descontos especiais</h1>
-            <div class="hero-sub">Escolha seu restaurante e peça com facilidade.</div>
+            <div class="hero-sub">Escolha seu restaurante, aproveite cupons e peça em segundos.</div>
           </div>
           <div class="hero-badge-box">
-            <div style="font-size:15px;">ATÉ</div>
-            <div style="font-size:24px;">R$ 9,90</div>
+            <div style="font-size:11px;">ATÉ</div>
+            <div style="font-size:18px;">R$ 9,90</div>
           </div>
         </div>
 
         <div class="cat-row" id="categoryStrip"></div>
 
         <div class="benefits-strip">
-          <div><span>✓</span> Entrega rápida</div>
+          <div><span>✓</span> Entrega grátis</div>
           <div><span>✓</span> Pedido rastreável</div>
           <div><span>✓</span> Horário Garantido ›</div>
         </div>
@@ -699,20 +700,20 @@
 
     <section id="tab-orders" class="hidden">
       <div class="card-box">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-          <h3 style="margin:0;font-size:24px;">Sua sacola</h3>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+          <h3 style="margin:0;font-size:17px;">Sua sacola</h3>
           <button class="f-pill" type="button" onclick="switchMainTab('tab-home')">+ Itens</button>
         </div>
         <div id="cartBox"></div>
-        <div style="margin-top:14px;padding-top:12px;border-top:1.5px solid var(--border);">
+        <div style="margin-top:10px;padding-top:8px;border-top:1px solid var(--border);">
           <div class="muted-txt" id="subTotalText">Itens: R$ 0,00</div>
           <div class="muted-txt" id="deliveryFeeText">Taxa de entrega: R$ 0,00</div>
-          <div style="font-size:24px;font-weight:900;margin-top:6px;" id="totalOrderText">Total: R$ 0,00</div>
+          <div style="font-size:17px;font-weight:900;margin-top:4px;" id="totalOrderText">Total: R$ 0,00</div>
         </div>
       </div>
 
       <div class="card-box">
-        <h3 style="margin:0 0 12px;font-size:24px;">Dados para entrega</h3>
+        <h3 style="margin:0 0 8px;font-size:17px;">Dados para entrega</h3>
         <div class="grid-2">
           <div>
             <label for="cliName">Seu nome</label>
@@ -723,7 +724,7 @@
             <input type="tel" id="cliPhone" placeholder="(17) 99999-1234" />
           </div>
         </div>
-        <div class="grid-2" style="margin-top:12px;">
+        <div class="grid-2" style="margin-top:8px;">
           <div>
             <label for="cliPayment">Pagamento</label>
             <select id="cliPayment">
@@ -740,8 +741,8 @@
         <button class="btn-primary-green" type="button" id="sendOrderBtn">Finalizar pedido</button>
       </div>
 
-      <div style="display:flex;justify-content:space-between;align-items:center;margin:16px 0 10px;">
-        <h3 style="margin:0;font-size:24px;">Meus pedidos</h3>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin:10px 0 6px;">
+        <h3 style="margin:0;font-size:17px;">Meus pedidos</h3>
         <button class="f-pill" type="button" id="refreshOrdersBtn">Atualizar</button>
       </div>
       <div id="myOrdersList"></div>
@@ -749,7 +750,7 @@
 
     <section id="tab-account" class="hidden">
       <div class="card-box">
-        <h3 style="margin:0 0 12px;font-size:24px;">Minha conta e endereço</h3>
+        <h3 style="margin:0 0 8px;font-size:17px;">Minha conta e endereço</h3>
         <div class="grid-2">
           <div>
             <label for="accName">Nome</label>
@@ -760,7 +761,7 @@
             <input type="tel" id="accPhone" placeholder="(17) 99999-0000" />
           </div>
         </div>
-        <div style="margin-top:12px;">
+        <div style="margin-top:8px;">
           <label for="accAddress">Endereço padrão</label>
           <input type="text" id="accAddress" placeholder="Rua, número, bairro — Catanduva/SP" />
         </div>
@@ -771,7 +772,7 @@
 
   <div class="floating-promo-bar" id="floatingPromoBar">
     <span>🎁 R$ 7,99 OFF na entrega acima de R$ 20</span>
-    <button class="f-pill active" style="padding:8px 16px;font-size:17px;background:var(--yellow);color:#111827;" type="button" onclick="applyQuickFilter('free')">Ver</button>
+    <button class="f-pill active" style="padding:4px 10px;font-size:12px;background:var(--yellow);color:#111827;" type="button" onclick="applyQuickFilter('free')">Ver</button>
   </div>
 
   <nav class="bottom-bar">
@@ -790,24 +791,13 @@
   </nav>
 
   <script>
-    function makeImg(c1, c2, emoji, text) {
-      const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="320" height="220" viewBox="0 0 320 220">
-        <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="${c1}"/><stop offset="100%" stop-color="${c2}"/></linearGradient></defs>
-        <rect width="320" height="220" rx="16" fill="url(#g)"/>
-        <circle cx="160" cy="92" r="46" fill="rgba(255,255,255,0.22)"/>
-        <text x="160" y="108" text-anchor="middle" font-size="48">${emoji}</text>
-        <text x="160" y="172" text-anchor="middle" fill="#ffffff" font-family="system-ui,sans-serif" font-size="18" font-weight="800">${text}</text>
-      </svg>`;
-      return "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(svg);
-    }
-
     const CATEGORIES = [
-      { id: "marmita", name: "Marmita", img: makeImg("#16a34a", "#15803d", "🍱", "Marmita") },
-      { id: "lanches", name: "Lanches", img: makeImg("#ea580c", "#c2410c", "🍔", "Lanches") },
-      { id: "pastel", name: "Pastel", img: makeImg("#eab308", "#ca8a04", "🥟", "Pastel") },
-      { id: "pizza", name: "Pizza", img: makeImg("#dc2626", "#991b1b", "🍕", "Pizza") },
-      { id: "doces", name: "Doces", img: makeImg("#9333ea", "#6b21a8", "🍰", "Doces") },
-      { id: "japonesa", name: "Japonesa", img: makeImg("#0284c7", "#0369a1", "🍣", "Japonesa") }
+      { id: "marmita", name: "Marmita", emoji: "🍱", bg: "#dcfce7" },
+      { id: "lanches", name: "Lanches", emoji: "🍔", bg: "#ffedd5" },
+      { id: "pastel", name: "Pastel", emoji: "🥟", bg: "#fef9c3" },
+      { id: "pizza", name: "Pizza", emoji: "🍕", bg: "#fee2e2" },
+      { id: "doces", name: "Doces", emoji: "🍰", bg: "#f3e8ff" },
+      { id: "japonesa", name: "Japonesa", emoji: "🍣", bg: "#e0f2fe" }
     ];
 
     const SEED_STORES = [
@@ -815,19 +805,20 @@
         id: 1,
         name: "Restaurante Original - marmitaria",
         category: "Brasileira, Marmitas",
-        rating: "4.6",
-        reviews: "30+",
+        rating: "4.8",
+        reviews: "100+",
         delivery_fee: 6.00,
         old_fee: 13.99,
-        prep_time: "16 a 31 min",
-        distance: "4,8 km",
-        tags: ["Itens até 90% OFF", "15% OFF acima de R$ 60"],
-        logo: makeImg("#111827", "#374151", "🍽️", "Original"),
-        banner: makeImg("#14532d", "#166534", "🍱", "Restaurante Original"),
+        prep_time: "17-32 min",
+        distance: "4,5 km",
+        tags: ["Itens até 50% OFF", "Entrega grátis à vontade"],
+        logoBg: "#111827",
+        logoEmoji: "🍽️",
+        bannerBg: "#14532d",
         items: [
-          { id: "m1", sec: "Ofertas do dia", tag: "60% OFF", name: "Marmita P - Peito de Frango", desc: "Acompanha arroz branco, feijão carioca, farofa crocante e salada.", price: 9.90, oldPrice: 24.98, img: makeImg("#16a34a", "#0f766e", "🍗", "Marmita P") },
-          { id: "m2", sec: "Ofertas do dia", tag: "1º pedido", name: "Marmita M - Contrafilé e Frango", desc: "Arroz, feijão, batata frita, contrafilé grelhado e filé de frango.", price: 9.00, oldPrice: 30.00, img: makeImg("#b45309", "#78350f", "🥩", "Marmita M") },
-          { id: "m3", sec: "Mais vendidos", tag: "40% OFF", name: "Marmita G - Linguiça Costela", desc: "Acompanha arroz branco, feijão carioca, farofa crocante e mandioca.", price: 30.00, oldPrice: 50.00, img: makeImg("#991b1b", "#7f1d1d", "🍖", "Marmita G") }
+          { id: "m1", sec: "Ofertas do dia", tag: "60% OFF", name: "Marmita P - Peito de Frango", desc: "Acompanha arroz branco, feijão carioca, farofa e salada.", price: 9.90, oldPrice: 24.98, emoji: "🍗", bg: "#dcfce7" },
+          { id: "m2", sec: "Ofertas do dia", tag: "70% OFF", name: "Marmita M - Contrafilé", desc: "Arroz, feijão, batata frita, contrafilé grelhado e salada.", price: 9.00, oldPrice: 30.00, emoji: "🥩", bg: "#fef3c7" },
+          { id: "m3", sec: "Mais vendidos", tag: "40% OFF", name: "Marmita G - Linguiça Costela", desc: "Acompanha arroz branco, feijão carioca, farofa e mandioca.", price: 30.00, oldPrice: 50.00, emoji: "🍖", bg: "#fee2e2" }
         ]
       },
       {
@@ -835,18 +826,19 @@
         name: "Luizão Lanches",
         category: "Lanches, Hambúrguer",
         rating: "5.0",
-        reviews: "40+",
+        reviews: "100+",
         delivery_fee: 0.00,
         old_fee: 9.99,
-        prep_time: "13 a 28 min",
+        prep_time: "13-28 min",
         distance: "2,2 km",
         tags: ["TOP", "Itens até 60% OFF"],
-        logo: makeImg("#f59e0b", "#d97706", "🍔", "Luizão"),
-        banner: makeImg("#7c2d12", "#9a3412", "🍔", "Luizão Lanches"),
+        logoBg: "#d97706",
+        logoEmoji: "🍔",
+        bannerBg: "#7c2d12",
         items: [
-          { id: "l1", sec: "Ofertas do dia", tag: "50% OFF", name: "X-Tudinho", desc: "Pão, hambúrguer, presunto, queijo, bacon, milho, alface e tomate.", price: 21.00, oldPrice: 41.99, img: makeImg("#ea580c", "#c2410c", "🍔", "X-Tudinho") },
-          { id: "l2", sec: "Ofertas do dia", tag: "44% OFF", name: "X-Tudo", desc: "Duplo hambúrguer, bacon crocante, calabresa, presunto, queijo e ovos.", price: 31.99, oldPrice: 56.99, img: makeImg("#b91c1c", "#991b1b", "🥪", "X-Tudo") },
-          { id: "l3", sec: "Mais vendidos", tag: "60% OFF", name: "Hot Dog Simples", desc: "Salsicha, molho especial da casa, batata palha, milho e maionese.", price: 9.90, oldPrice: 24.99, img: makeImg("#d97706", "#b45309", "🌭", "Hot Dog") }
+          { id: "l1", sec: "Ofertas do dia", tag: "50% OFF", name: "X-Tudinho", desc: "Pão, hambúrguer, presunto, queijo, bacon, milho, alface e tomate.", price: 21.00, oldPrice: 41.99, emoji: "🍔", bg: "#ffedd5" },
+          { id: "l2", sec: "Ofertas do dia", tag: "44% OFF", name: "X-Tudo", desc: "Duplo hambúrguer, bacon crocante, calabresa, presunto, queijo e ovos.", price: 31.99, oldPrice: 56.99, emoji: "🥪", bg: "#fef9c3" },
+          { id: "l3", sec: "Mais vendidos", tag: "60% OFF", name: "Hot Dog Simples", desc: "Salsicha, molho especial da casa, batata palha, milho e maionese.", price: 9.90, oldPrice: 24.99, emoji: "🌭", bg: "#e0f2fe" }
         ]
       }
     ];
@@ -865,7 +857,13 @@
       el.textContent = msg;
       el.style.display = "block";
       clearTimeout(window._t);
-      window._t = setTimeout(() => { el.style.display = "none"; }, 2400);
+      window._t = setTimeout(() => { el.style.display = "none"; }, 2200);
+    }
+
+    function fetchWithTimeout(url, opts = {}, ms = 3500) {
+      const ctrl = new AbortController();
+      const id = setTimeout(() => ctrl.abort(), ms);
+      return fetch(url, { ...opts, signal: ctrl.signal }).finally(() => clearTimeout(id));
     }
 
     function switchMainTab(tabId) {
@@ -959,7 +957,7 @@
       const el = document.getElementById("categoryStrip");
       el.innerHTML = CATEGORIES.map((c) => `
         <button class="cat-pill-card ${activeCat === c.id ? "active" : ""}" type="button" onclick="toggleCat('${c.id}')">
-          <img class="cat-circle-img" src="${c.img}" alt="${c.name}" />
+          <div class="cat-thumb" style="background:${c.bg};">${c.emoji}</div>
           <span>${c.name}</span>
         </button>
       `).join("");
@@ -1018,8 +1016,8 @@
       });
 
       box.innerHTML = `
-        <div class="store-detail-hero">
-          <img class="store-detail-banner" src="${st.banner || st.logo}" alt="${st.name}" />
+        <div class="store-detail-banner" style="background:${st.bannerBg || "#14532d"};">
+          <span>${st.logoEmoji || "🍽️"}</span>
           <div class="detail-top-overlay">
             <button class="circle-icon-btn" type="button" onclick="closeStoreDetail()">‹</button>
             <button class="circle-icon-btn" type="button" onclick="switchMainTab('tab-orders')">🛒</button>
@@ -1027,8 +1025,8 @@
         </div>
 
         <div class="detail-store-card">
-          <div style="display:flex;gap:14px;align-items:center;">
-            <img class="store-avatar" src="${st.logo}" alt="${st.name}" />
+          <div style="display:flex;gap:10px;align-items:center;">
+            <div class="store-avatar" style="background:${st.logoBg || "#111827"};">${st.logoEmoji || "🍽️"}</div>
             <div style="flex:1;min-width:0;">
               <h2 class="store-title">${st.name} ›</h2>
               <div class="store-rating-line">
@@ -1055,7 +1053,7 @@
             </div>
           </div>
 
-          <div class="promo-tags-row" style="margin-top:12px;">
+          <div class="promo-tags-row" style="margin-top:8px;">
             ${(st.tags || []).map((t) => `<span class="tag-yellow">${t}</span>`).join("")}
           </div>
         </div>
@@ -1066,20 +1064,20 @@
           `).join("")}
         </div>
 
-        <h3 style="margin:8px 0 12px;font-size:22px;">🔥 ${openedTab}</h3>
+        <h3 style="margin:6px 0 8px;font-size:16px;">🔥 ${openedTab}</h3>
         ${filteredItems.map((it) => `
           <div class="menu-row-item">
             <div style="flex:1;min-width:0;">
-              ${it.tag ? `<span class="tag-yellow" style="margin-bottom:6px;display:inline-block;">${it.tag}</span>` : ""}
-              <div style="font-size:21px;font-weight:900;">${it.name}</div>
-              <div class="muted-txt" style="margin-top:4px;">${it.desc || ""}</div>
-              <div style="margin-top:8px;">
-                <strong style="color:var(--green);font-size:22px;">${brl(it.price)}</strong>
-                ${it.oldPrice ? `<span class="strike-price" style="margin-left:8px;font-size:17px;">${brl(it.oldPrice)}</span>` : ""}
+              ${it.tag ? `<span class="tag-yellow" style="margin-bottom:4px;display:inline-block;">${it.tag}</span>` : ""}
+              <div style="font-size:15px;font-weight:800;">${it.name}</div>
+              <div class="muted-txt" style="margin-top:2px;">${it.desc || ""}</div>
+              <div style="margin-top:5px;">
+                <strong style="color:var(--green);font-size:16px;">${brl(it.price)}</strong>
+                ${it.oldPrice ? `<span class="strike-price" style="margin-left:6px;font-size:12px;">${brl(it.oldPrice)}</span>` : ""}
               </div>
             </div>
-            <div class="menu-row-img-wrap">
-              <img src="${it.img}" alt="${it.name}" />
+            <div class="menu-row-thumb-wrap">
+              <div class="menu-row-thumb" style="background:${it.bg || "#f3f4f6"};">${it.emoji || "🍽️"}</div>
               <button class="plus-circle" type="button" onclick='addItem(event, ${JSON.stringify(it)}, ${JSON.stringify(st)})'>+</button>
             </div>
           </div>
@@ -1116,7 +1114,7 @@
         return `
           <article class="store-block">
             <div class="store-header-row" onclick="openStoreDetail(${s.id})">
-              <img class="store-avatar" src="${s.logo}" alt="${s.name}" />
+              <div class="store-avatar" style="background:${s.logoBg || "#111827"};">${s.logoEmoji || "🍽️"}</div>
               <div style="flex:1;min-width:0;">
                 <h3 class="store-title">${s.name}</h3>
                 <div class="store-rating-line">
@@ -1136,8 +1134,8 @@
             <div class="prod-carousel">
               ${(s.items || []).map((it) => `
                 <div class="mini-prod-card" onclick="openStoreDetail(${s.id})" style="cursor:pointer;">
-                  <div class="mini-img-wrap">
-                    <img src="${it.img}" alt="${it.name}" />
+                  <div class="mini-img-wrap" style="background:${it.bg || "#f3f4f6"};">
+                    <span>${it.emoji || "🍽️"}</span>
                     ${it.tag ? `<span class="off-badge">${it.tag}</span>` : ""}
                     <button class="plus-circle" type="button" onclick='addItem(event, ${JSON.stringify(it)}, ${JSON.stringify(s)})'>+</button>
                   </div>
@@ -1171,12 +1169,12 @@
       }
 
       box.innerHTML = cart.map((item, idx) => `
-        <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 0;border-bottom:1.5px solid var(--border);">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--border);">
           <div>
             <strong>${item.name}</strong>
             <div class="muted-txt">${item.store_name} • ${brl(item.price)}</div>
           </div>
-          <div style="display:flex;align-items:center;gap:8px;">
+          <div style="display:flex;align-items:center;gap:6px;">
             <button class="f-pill" type="button" onclick="changeCartQty(${idx}, -1)">-</button>
             <strong>${item.qty}</strong>
             <button class="f-pill" type="button" onclick="changeCartQty(${idx}, 1)">+</button>
@@ -1213,7 +1211,7 @@
       const fee = Number(cart[0]?.delivery_fee || 0);
 
       try {
-        const res = await fetch("/api/orders", {
+        const res = await fetchWithTimeout("/api/orders", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -1225,7 +1223,7 @@
             items_total: Number(sub.toFixed(2)),
             delivery_fee: Number(fee.toFixed(2))
           })
-        });
+        }, 5000);
         const data = await res.json().catch(() => ({}));
         if (!res.ok) {
           toast(data.error || "Erro ao enviar pedido");
@@ -1237,14 +1235,14 @@
         toast(`Pedido enviado! 4 últimos dígitos: ${digits.slice(-4)}`);
         loadMyOrders();
       } catch (_) {
-        toast("Falha de conexão ao enviar pedido");
+        toast("Servidor demorou a responder; tente novamente");
       }
     });
 
     async function loadMyOrders() {
       const box = document.getElementById("myOrdersList");
       try {
-        const res = await fetch("/api/orders");
+        const res = await fetchWithTimeout("/api/orders", {}, 3500);
         const list = res.ok ? await res.json() : [];
         if (!Array.isArray(list) || !list.length) {
           box.innerHTML = `<div class="card-box"><div class="muted-txt">Nenhum pedido encontrado no momento.</div></div>`;
@@ -1258,21 +1256,24 @@
                 <strong>${o.order_code || "#" + o.id} • ${o.store_name || "Estabelecimento"}</strong>
                 <span class="tag-yellow">${o.status || "Em andamento"}</span>
               </div>
-              <div class="muted-txt" style="margin-top:6px;">📍 ${o.client_address || ""}</div>
+              <div class="muted-txt" style="margin-top:4px;">📍 ${o.client_address || ""}</div>
               <div class="muted-txt">Itens: ${brl(o.items_total)} • Entrega: ${brl(o.delivery_fee)}</div>
-              ${last4 ? `<div style="margin-top:10px;padding:10px 12px;border-radius:12px;background:var(--surface-soft);font-size:18px;">Código de confirmação da entrega (4 últimos dígitos): <strong>${last4}</strong></div>` : ""}
+              ${last4 ? `<div style="margin-top:8px;padding:8px 10px;border-radius:10px;background:var(--surface-soft);font-size:13px;">Código de confirmação da entrega (4 últimos dígitos): <strong>${last4}</strong></div>` : ""}
             </div>
           `;
         }).join("");
       } catch (_) {
-        box.innerHTML = `<div class="card-box"><div class="muted-txt">Não foi possível atualizar os pedidos.</div></div>`;
+        box.innerHTML = `<div class="card-box"><div class="muted-txt">Sem resposta do servidor no momento.</div></div>`;
       }
     }
 
     async function mergeBackendStoresAndProducts() {
       try {
-        const [sRes, pRes] = await Promise.all([fetch("/api/establishments"), fetch("/api/products")]);
-        if (sRes.ok) {
+        const [sRes, pRes] = await Promise.all([
+          fetchWithTimeout("/api/establishments", {}, 3000).catch(() => null),
+          fetchWithTimeout("/api/products", {}, 3000).catch(() => null)
+        ]);
+        if (sRes && sRes.ok) {
           const apiStores = await sRes.json();
           if (Array.isArray(apiStores) && apiStores.length) {
             const mapped = apiStores.map((s, idx) => ({
@@ -1280,20 +1281,21 @@
               name: s.store_name || s.name || "Estabelecimento",
               category: s.category || "Lanches & Refeições",
               rating: "5.0",
-              reviews: "Novo",
+              reviews: "100+",
               delivery_fee: Number(s.default_delivery_fee ?? s.delivery_fee ?? 8),
               old_fee: null,
               prep_time: s.estimated_time || "25-35 min",
               distance: "Catanduva",
               tags: ["RotaSabor"],
-              logo: CATEGORIES[idx % CATEGORIES.length].img,
-              banner: makeImg("#063b2c", "#0f766e", "🛵", s.store_name || s.name || "Loja"),
+              logoBg: "#0f766e",
+              logoEmoji: CATEGORIES[idx % CATEGORIES.length].emoji,
+              bannerBg: "#064e3b",
               items: [...SEED_STORES[0].items]
             }));
             storesData = [...mapped, ...SEED_STORES];
           }
         }
-        if (pRes.ok) {
+        if (pRes && pRes.ok) {
           const apiProds = await pRes.json();
           if (Array.isArray(apiProds) && apiProds.length && storesData.length) {
             const customItems = apiProds.map((p) => ({
@@ -1304,7 +1306,8 @@
               desc: p.description || "Produto cadastrado pela loja",
               price: Number(p.price || 0),
               oldPrice: null,
-              img: makeImg("#0f766e", "#15803d", "🍽️", p.name)
+              emoji: "🍽️",
+              bg: "#dcfce7"
             }));
             storesData[0].items = [...customItems, ...storesData[0].items];
           }
@@ -1315,6 +1318,7 @@
 
     document.getElementById("refreshOrdersBtn").addEventListener("click", loadMyOrders);
 
+    // Renderização imediata sem esperar rede
     syncClientProfile();
     saveCart();
     renderCategories();
