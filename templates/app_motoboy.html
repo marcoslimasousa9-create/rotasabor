@@ -55,7 +55,6 @@
       color: var(--text);
     }
 
-    /* MAPA EM TELA CHEIA COM PERSPECTIVA DE NAVEGAÇÃO */
     #fullscreenMap {
       position: fixed;
       inset: -12%;
@@ -536,7 +535,7 @@
   <div class="pin-backdrop" id="pinModalBackdrop">
     <div class="pin-card">
       <strong style="font-size:1rem;">Confirmar entrega (4 dígitos)</strong>
-      <div class="meta" id="pinOrderSummary">Digite os 4 últimos dígitos do celular do cliente.</div>
+      <div class="meta" id="pinOrderSummary">Digite os 4 últimos números do celular do cliente.</div>
       <div style="margin-top:8px;">
         <span class="tag-fee" id="pinPayPreview">Receber: R$ 0,00</span>
       </div>
@@ -576,6 +575,24 @@
     let offerTimers = {};
 
     const fmtBRL = (v) => Number(v || 0).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+
+    function extractClientLast4(order) {
+      if (!order || typeof order !== "object") return "";
+      const candidates = [
+        order.client_phone,
+        order.customer_phone,
+        order.phone,
+        order.telefone,
+        order.celular,
+        order.whatsapp
+      ];
+      for (const raw of candidates) {
+        if (!raw) continue;
+        const digits = String(raw).replace(/\D/g, "");
+        if (digits.length >= 4) return digits.slice(-4);
+      }
+      return "";
+    }
 
     function showToast(msg) {
       const el = document.getElementById("toastBox");
@@ -905,8 +922,8 @@
       const target = activeRouteOrder;
       exitAutoRouteMode();
       openPinModal(target);
-      speakPhrase("Você chegou ao destino. Digite os quatro últimos dígitos.", true);
-      showToast("Chegada detectada! Informe os 4 dígitos.");
+      speakPhrase("Você chegou ao destino. Digite os quatro últimos números do celular do cliente.", true);
+      showToast("Chegada detectada! Peça os 4 últimos números do celular.");
     }
 
     document.getElementById("arrivedBtn").addEventListener("click", handleArrival);
@@ -930,7 +947,7 @@
       pendingPinOrder = order;
       const code = order.order_code || `RS-${String(order.id).padStart(3, "0")}`;
       document.getElementById("pinOrderSummary").textContent =
-        `Pedido #${order.id} (${code}) • ${order.client_name || "Cliente"}`;
+        `Pedido #${order.id} (${code}) • 4 últimos números do celular de ${order.client_name || "Cliente"}`;
       document.getElementById("pinPayPreview").textContent = `Receber: ${fmtBRL(order.delivery_fee || 0)}`;
       const input = document.getElementById("pinCodeInput");
       input.value = "";
@@ -949,7 +966,13 @@
       if (!pendingPinOrder) return;
       const pin = document.getElementById("pinCodeInput").value.trim();
       if (pin.length !== 4) {
-        showToast("Digite os 4 últimos dígitos.");
+        showToast("Digite os 4 últimos números do celular do cliente.");
+        return;
+      }
+
+      const expectedLast4 = extractClientLast4(pendingPinOrder);
+      if (expectedLast4 && pin !== expectedLast4) {
+        showToast("Os 4 dígitos não conferem com o celular do cliente.");
         return;
       }
 
@@ -969,7 +992,7 @@
         });
         const data = await res.json().catch(() => ({}));
         if (!res.ok) {
-          showToast(data.error || "Código de 4 dígitos incorreto.");
+          showToast(data.error || "Código incorreto para este pedido.");
           return;
         }
         const receivedFee = Number(pendingPinOrder.delivery_fee || 0);
