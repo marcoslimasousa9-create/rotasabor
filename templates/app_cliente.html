@@ -1030,31 +1030,27 @@
             <div style="flex:1;min-width:0;">
               <h2 class="store-title">${st.name} ›</h2>
               <div class="store-rating-line">
-                <span>${st.category}</span>
+                <span>${st.category || "Restaurante"}</span>
                 <span>•</span>
-                <span class="star-txt">★ ${st.rating}</span>
-                <span class="muted-txt">(${st.reviews}) ›</span>
+                <span class="star-txt">★ ${st.rating || "4.9"}</span>
+                <span class="muted-txt">(${st.reviews || "100+"})</span>
               </div>
             </div>
           </div>
 
           <div class="detail-metrics-box">
             <div>
-              <div class="metric-val" style="color:var(--green);">⚡ ${st.prep_time}</div>
-              <div class="metric-lbl">Horário Garantido ›</div>
-            </div>
-            <div>
               <div class="metric-val">${fee === 0 ? "Grátis" : brl(fee)}</div>
-              <div class="metric-lbl">${st.old_fee ? `<span class="strike-price">${brl(st.old_fee)}</span> ›` : "Entrega ›"}</div>
+              <div class="metric-lbl">Entrega</div>
             </div>
             <div>
-              <div class="metric-val">RotaSabor</div>
-              <div class="metric-lbl">Entrega ›</div>
+              <div class="metric-val">${st.prep_time || "20-35 min"}</div>
+              <div class="metric-lbl">Tempo</div>
             </div>
-          </div>
-
-          <div class="promo-tags-row" style="margin-top:8px;">
-            ${(st.tags || []).map((t) => `<span class="tag-yellow">${t}</span>`).join("")}
+            <div>
+              <div class="metric-val">${st.distance || "3,0 km"}</div>
+              <div class="metric-lbl">Distância</div>
+            </div>
           </div>
         </div>
 
@@ -1064,24 +1060,25 @@
           `).join("")}
         </div>
 
-        <h3 style="margin:6px 0 8px;font-size:16px;">🔥 ${openedTab}</h3>
-        ${filteredItems.map((it) => `
-          <div class="menu-row-item">
-            <div style="flex:1;min-width:0;">
-              ${it.tag ? `<span class="tag-yellow" style="margin-bottom:4px;display:inline-block;">${it.tag}</span>` : ""}
-              <div style="font-size:15px;font-weight:800;">${it.name}</div>
-              <div class="muted-txt" style="margin-top:2px;">${it.desc || ""}</div>
-              <div style="margin-top:5px;">
-                <strong style="color:var(--green);font-size:16px;">${brl(it.price)}</strong>
-                ${it.oldPrice ? `<span class="strike-price" style="margin-left:6px;font-size:12px;">${brl(it.oldPrice)}</span>` : ""}
+        <div>
+          ${filteredItems.map((it) => `
+            <div class="menu-row-item">
+              <div style="flex:1;min-width:0;">
+                <div style="font-size:15px;font-weight:800;">${it.name}</div>
+                <div class="muted-txt" style="margin-top:2px;">${it.desc || ""}</div>
+                <div style="margin-top:6px;display:flex;align-items:center;gap:8px;">
+                  <span class="mini-price" style="margin:0;">${brl(it.price)}</span>
+                  ${it.oldPrice ? `<span class="mini-old">${brl(it.oldPrice)}</span>` : ""}
+                  ${it.tag ? `<span class="tag-yellow">${it.tag}</span>` : ""}
+                </div>
+              </div>
+              <div class="menu-row-thumb-wrap">
+                <div class="menu-row-thumb" style="background:${it.bg || "#f3f4f6"};">${it.emoji || "🍽️"}</div>
+                <button class="plus-circle" type="button" onclick='addItem(event, ${JSON.stringify(it)}, ${JSON.stringify(st)})'>+</button>
               </div>
             </div>
-            <div class="menu-row-thumb-wrap">
-              <div class="menu-row-thumb" style="background:${it.bg || "#f3f4f6"};">${it.emoji || "🍽️"}</div>
-              <button class="plus-circle" type="button" onclick='addItem(event, ${JSON.stringify(it)}, ${JSON.stringify(st)})'>+</button>
-            </div>
-          </div>
-        `).join("")}
+          `).join("") || `<div class="muted-txt" style="padding:12px 0;">Nenhum item encontrado.</div>`}
+        </div>
       `;
     }
 
@@ -1094,63 +1091,60 @@
       const box = document.getElementById("storesFeedContainer");
       const q = (document.getElementById("searchInput").value || "").trim().toLowerCase();
 
-      let list = storesData.filter((s) => {
-        const hay = `${s.name} ${s.category} ${(s.items || []).map((i) => i.name).join(" ")}`.toLowerCase();
+      const list = storesData.filter((st) => {
+        const hay = `${st.name} ${st.category} ${(st.items || []).map((i) => i.name).join(" ")}`.toLowerCase();
         if (q && !hay.includes(q)) return false;
-        if (activeCat && !hay.includes(activeCat.slice(0, 5))) return false;
-        if (activeFilter === "free" && Number(s.delivery_fee || 0) > 0) return false;
-        if (activeFilter === "offers" && !(s.tags && s.tags.length)) return false;
-        if (activeFilter === "top" && parseFloat(s.rating || "0") < 4.8) return false;
+        if (activeCat && !hay.includes(activeCat)) return false;
+        if (activeFilter === "free" && Number(st.delivery_fee || 0) > 0) return false;
+        if (activeFilter === "top" && Number(st.rating || 0) < 4.9) return false;
+        if (activeFilter === "offers" && !(st.items || []).some((i) => i.tag || i.oldPrice)) return false;
         return true;
       });
 
-      if (!list.length) {
-        box.innerHTML = `<div class="card-box"><div class="muted-txt">Nenhum estabelecimento encontrado com esse filtro.</div></div>`;
-        return;
-      }
+      box.innerHTML = list.map((st) => {
+        const fee = Number(st.delivery_fee || 0);
+        const itemsHtml = (st.items || []).map((it) => `
+          <div class="mini-prod-card" onclick="openStoreDetail(${st.id})" style="cursor:pointer;">
+            <div class="mini-img-wrap" style="background:${it.bg || "#f3f4f6"};">
+              <span>${it.emoji || "🍽️"}</span>
+              ${it.tag ? `<span class="off-badge">${it.tag}</span>` : ""}
+              <button class="plus-circle" type="button" onclick='addItem(event, ${JSON.stringify(it)}, ${JSON.stringify(st)})'>+</button>
+            </div>
+            <div class="mini-price">${brl(it.price)}</div>
+            ${it.oldPrice ? `<div class="mini-old">${brl(it.oldPrice)}</div>` : ""}
+            <div class="mini-name">${it.name}</div>
+          </div>
+        `).join("");
 
-      box.innerHTML = list.map((s) => {
-        const fee = Number(s.delivery_fee || 0);
         return `
-          <article class="store-block">
-            <div class="store-header-row" onclick="openStoreDetail(${s.id})">
-              <div class="store-avatar" style="background:${s.logoBg || "#111827"};">${s.logoEmoji || "🍽️"}</div>
+          <div class="store-block">
+            <div class="store-header-row" onclick="openStoreDetail(${st.id})">
+              <div class="store-avatar" style="background:${st.logoBg || "#111827"};">${st.logoEmoji || "🍽️"}</div>
               <div style="flex:1;min-width:0;">
-                <h3 class="store-title">${s.name}</h3>
+                <h3 class="store-title">${st.name} ›</h3>
                 <div class="store-rating-line">
-                  <span class="star-txt">★ ${s.rating}</span>
-                  <span class="muted-txt">(${s.reviews})</span>
+                  <span class="star-txt">★ ${st.rating || "4.9"}</span>
+                  <span class="muted-txt">(${st.reviews || "100+"})</span>
                   <span>•</span>
-                  <span>${fee === 0 ? `<strong style="color:var(--green);">Grátis</strong>` : brl(fee)}</span>
-                  ${s.old_fee ? `<span class="strike-price">${brl(s.old_fee)}</span>` : ""}
-                  <span class="muted-txt">• ${s.prep_time} • ${s.distance}</span>
+                  <span>${fee === 0 ? "Entrega grátis" : `Entrega ${brl(fee)}`}</span>
+                  ${st.old_fee ? `<span class="strike-price">${brl(st.old_fee)}</span>` : ""}
+                </div>
+                <div class="store-rating-line" style="margin-top:2px;">
+                  <span class="muted-txt">${st.prep_time || "20-35 min"}</span>
+                  <span class="muted-txt">• ${st.distance || "3,0 km"}</span>
                 </div>
                 <div class="promo-tags-row">
-                  ${(s.tags || []).map((tg) => `<span class="tag-yellow">${tg}</span>`).join("")}
+                  ${(st.tags || []).map((tg) => `<span class="tag-yellow">${tg}</span>`).join("")}
                 </div>
               </div>
             </div>
-
-            <div class="prod-carousel">
-              ${(s.items || []).map((it) => `
-                <div class="mini-prod-card" onclick="openStoreDetail(${s.id})" style="cursor:pointer;">
-                  <div class="mini-img-wrap" style="background:${it.bg || "#f3f4f6"};">
-                    <span>${it.emoji || "🍽️"}</span>
-                    ${it.tag ? `<span class="off-badge">${it.tag}</span>` : ""}
-                    <button class="plus-circle" type="button" onclick='addItem(event, ${JSON.stringify(it)}, ${JSON.stringify(s)})'>+</button>
-                  </div>
-                  <div class="mini-price">${brl(it.price)}</div>
-                  ${it.oldPrice ? `<div class="mini-old">${brl(it.oldPrice)}</div>` : ""}
-                  <div class="mini-name">${it.name}</div>
-                </div>
-              `).join("")}
-            </div>
-          </article>
+            <div class="prod-carousel">${itemsHtml}</div>
+          </div>
         `;
-      }).join("");
+      }).join("") || `<div class="card-box muted-txt">Nenhum estabelecimento encontrado para o filtro atual.</div>`;
     }
 
-    function changeCartQty(idx, delta) {
+    function changeQty(idx, delta) {
       if (!cart[idx]) return;
       cart[idx].qty = Number(cart[idx].qty || 1) + delta;
       if (cart[idx].qty <= 0) cart.splice(idx, 1);
@@ -1161,54 +1155,72 @@
     function renderCart() {
       const box = document.getElementById("cartBox");
       if (!cart.length) {
-        box.innerHTML = `<div class="muted-txt">Sua sacola está vazia. Toque no botão + de qualquer produto.</div>`;
+        box.innerHTML = `<div class="muted-txt">Sua sacola está vazia.</div>`;
         document.getElementById("subTotalText").textContent = "Itens: R$ 0,00";
         document.getElementById("deliveryFeeText").textContent = "Taxa de entrega: R$ 0,00";
         document.getElementById("totalOrderText").textContent = "Total: R$ 0,00";
         return;
       }
 
-      box.innerHTML = cart.map((item, idx) => `
+      box.innerHTML = cart.map((it, i) => `
         <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--border);">
           <div>
-            <strong>${item.name}</strong>
-            <div class="muted-txt">${item.store_name} • ${brl(item.price)}</div>
+            <div style="font-weight:800;">${it.name}</div>
+            <div class="muted-txt">${brl(it.price)} cada</div>
           </div>
-          <div style="display:flex;align-items:center;gap:6px;">
-            <button class="f-pill" type="button" onclick="changeCartQty(${idx}, -1)">-</button>
-            <strong>${item.qty}</strong>
-            <button class="f-pill" type="button" onclick="changeCartQty(${idx}, 1)">+</button>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <button class="f-pill" type="button" onclick="changeQty(${i}, -1)">-</button>
+            <strong>${it.qty}</strong>
+            <button class="f-pill" type="button" onclick="changeQty(${i}, 1)">+</button>
           </div>
         </div>
       `).join("");
 
-      const sub = cart.reduce((s, x) => s + Number(x.price || 0) * Number(x.qty || 1), 0);
-      const fee = Number(cart[0]?.delivery_fee || 0);
-      document.getElementById("subTotalText").textContent = `Itens: ${brl(sub)}`;
+      const subtotal = cart.reduce((s, x) => s + Number(x.price || 0) * Number(x.qty || 1), 0);
+      const fee = subtotal > 0 ? Number(cart[0].delivery_fee || 0) : 0;
+      document.getElementById("subTotalText").textContent = `Itens: ${brl(subtotal)}`;
       document.getElementById("deliveryFeeText").textContent = `Taxa de entrega: ${brl(fee)}`;
-      document.getElementById("totalOrderText").textContent = `Total: ${brl(sub + fee)}`;
+      document.getElementById("totalOrderText").textContent = `Total: ${brl(subtotal + fee)}`;
     }
+
+    async function loadMyOrders() {
+      const box = document.getElementById("myOrdersList");
+      try {
+        const res = await fetchWithTimeout("/api/orders");
+        if (!res.ok) return;
+        const rows = await res.json();
+        const phoneFilter = (document.getElementById("cliPhone").value || "").replace(/\D/g, "");
+        const list = phoneFilter ? rows.filter((r) => String(r.client_phone || "").includes(phoneFilter)) : rows.slice(0, 5);
+        box.innerHTML = list.map((o) => `
+          <div class="card-box">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <strong>${o.order_code || "#" + o.id} • ${o.store_name || "Estabelecimento"}</strong>
+              <span class="tag-yellow">${o.status || "Em andamento"}</span>
+            </div>
+            <div class="muted-txt" style="margin-top:4px;">${o.client_address || ""}</div>
+            <div style="font-weight:800;margin-top:6px;">Total: ${brl(Number(o.items_total || 0) + Number(o.delivery_fee || 0))}</div>
+          </div>
+        `).join("") || `<div class="muted-txt">Nenhum pedido recente.</div>`;
+      } catch (_) {}
+    }
+
+    document.getElementById("refreshOrdersBtn").addEventListener("click", loadMyOrders);
 
     document.getElementById("sendOrderBtn").addEventListener("click", async () => {
       if (!cart.length) {
-        toast("Adicione itens na sacola primeiro");
+        toast("Adicione itens à sacola primeiro");
         return;
       }
-      const name = document.getElementById("cliName").value.trim();
-      const phone = document.getElementById("cliPhone").value.trim();
-      const addr = document.getElementById("cliAddress").value.trim();
-      const digits = phone.replace(/\D/g, "");
-      if (!name || digits.length < 8 || !addr) {
-        toast("Preencha nome, celular válido e endereço");
+      const clientName = document.getElementById("cliName").value.trim();
+      const clientPhone = document.getElementById("cliPhone").value.trim();
+      const clientAddress = document.getElementById("cliAddress").value.trim();
+      if (!clientName || clientPhone.replace(/\D/g, "").length < 8 || !clientAddress) {
+        toast("Preencha nome, celular e endereço");
         return;
       }
-      localStorage.setItem("rotasabor_client_name", name);
-      localStorage.setItem("rotasabor_client_phone", phone);
-      localStorage.setItem("rotasabor_client_addr", addr);
-      syncClientProfile();
 
-      const sub = cart.reduce((s, x) => s + Number(x.price || 0) * Number(x.qty || 1), 0);
-      const fee = Number(cart[0]?.delivery_fee || 0);
+      const itemsTotal = cart.reduce((s, x) => s + Number(x.price || 0) * Number(x.qty || 1), 0);
+      const deliveryFee = Number(cart[0].delivery_fee || 0);
 
       try {
         const res = await fetchWithTimeout("/api/orders", {
@@ -1217,113 +1229,86 @@
           body: JSON.stringify({
             store_id: cart[0].store_id,
             store_name: cart[0].store_name,
-            client_name: name,
-            client_phone: digits,
-            client_address: addr,
-            items_total: Number(sub.toFixed(2)),
-            delivery_fee: Number(fee.toFixed(2))
+            client_name: clientName,
+            client_phone: clientPhone,
+            client_address: clientAddress,
+            items_total: itemsTotal,
+            delivery_fee: deliveryFee
           })
-        }, 5000);
+        });
         const data = await res.json().catch(() => ({}));
         if (!res.ok) {
-          toast(data.error || "Erro ao enviar pedido");
+          toast(data.error || "Não foi possível enviar o pedido");
           return;
         }
         cart = [];
         saveCart();
         renderCart();
-        toast(`Pedido enviado! 4 últimos dígitos: ${digits.slice(-4)}`);
-        loadMyOrders();
+        toast(`Pedido ${data.order_code || ""} enviado!`);
+        await loadMyOrders();
       } catch (_) {
-        toast("Servidor demorou a responder; tente novamente");
+        toast("Erro de conexão ao enviar pedido");
       }
     });
 
-    async function loadMyOrders() {
-      const box = document.getElementById("myOrdersList");
+    async function syncRemoteCatalog() {
       try {
-        const res = await fetchWithTimeout("/api/orders", {}, 3500);
-        const list = res.ok ? await res.json() : [];
-        if (!Array.isArray(list) || !list.length) {
-          box.innerHTML = `<div class="card-box"><div class="muted-txt">Nenhum pedido encontrado no momento.</div></div>`;
-          return;
-        }
-        box.innerHTML = [...list].reverse().map((o) => {
-          const last4 = String(o.client_phone || "").replace(/\D/g, "").slice(-4);
-          return `
-            <div class="card-box">
-              <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;">
-                <strong>${o.order_code || "#" + o.id} • ${o.store_name || "Estabelecimento"}</strong>
-                <span class="tag-yellow">${o.status || "Em andamento"}</span>
-              </div>
-              <div class="muted-txt" style="margin-top:4px;">📍 ${o.client_address || ""}</div>
-              <div class="muted-txt">Itens: ${brl(o.items_total)} • Entrega: ${brl(o.delivery_fee)}</div>
-              ${last4 ? `<div style="margin-top:8px;padding:8px 10px;border-radius:10px;background:var(--surface-soft);font-size:13px;">Código de confirmação da entrega (4 últimos dígitos): <strong>${last4}</strong></div>` : ""}
-            </div>
-          `;
-        }).join("");
-      } catch (_) {
-        box.innerHTML = `<div class="card-box"><div class="muted-txt">Sem resposta do servidor no momento.</div></div>`;
-      }
-    }
-
-    async function mergeBackendStoresAndProducts() {
-      try {
-        const [sRes, pRes] = await Promise.all([
-          fetchWithTimeout("/api/establishments", {}, 3000).catch(() => null),
-          fetchWithTimeout("/api/products", {}, 3000).catch(() => null)
+        const [estRes, prodRes] = await Promise.all([
+          fetchWithTimeout("/api/establishments"),
+          fetchWithTimeout("/api/products")
         ]);
-        if (sRes && sRes.ok) {
-          const apiStores = await sRes.json();
-          if (Array.isArray(apiStores) && apiStores.length) {
-            const mapped = apiStores.map((s, idx) => ({
-              id: s.id,
-              name: s.store_name || s.name || "Estabelecimento",
-              category: s.category || "Lanches & Refeições",
-              rating: "5.0",
-              reviews: "100+",
-              delivery_fee: Number(s.default_delivery_fee ?? s.delivery_fee ?? 8),
-              old_fee: null,
-              prep_time: s.estimated_time || "25-35 min",
-              distance: "Catanduva",
-              tags: ["RotaSabor"],
-              logoBg: "#0f766e",
-              logoEmoji: CATEGORIES[idx % CATEGORIES.length].emoji,
-              bannerBg: "#064e3b",
-              items: [...SEED_STORES[0].items]
-            }));
-            storesData = [...mapped, ...SEED_STORES];
-          }
-        }
-        if (pRes && pRes.ok) {
-          const apiProds = await pRes.json();
-          if (Array.isArray(apiProds) && apiProds.length && storesData.length) {
-            const customItems = apiProds.map((p) => ({
-              id: p.id,
-              sec: p.featured ? "Ofertas do dia" : "Mais vendidos",
-              tag: p.featured ? "DESTAQUE" : null,
-              name: p.name,
-              desc: p.description || "Produto cadastrado pela loja",
-              price: Number(p.price || 0),
-              oldPrice: null,
-              emoji: "🍽️",
-              bg: "#dcfce7"
-            }));
-            storesData[0].items = [...customItems, ...storesData[0].items];
-          }
+        if (!estRes.ok || !prodRes.ok) return;
+        const ests = await estRes.json();
+        const prods = await prodRes.json();
+        if (!Array.isArray(ests) || !ests.length) return;
+
+        const mapped = ests.map((e, idx) => {
+          const storeProds = (prods || []).filter((p) => Number(p.establishment_id) === Number(e.id));
+          const seedFallback = SEED_STORES[idx] || SEED_STORES[0];
+          const items = storeProds.length
+            ? storeProds.map((p) => ({
+                id: p.id,
+                sec: "Ofertas do dia",
+                tag: p.featured ? "OFERTA" : "",
+                name: p.name,
+                desc: p.description || "",
+                price: Number(p.price || 0),
+                emoji: seedFallback.logoEmoji || "🍽️",
+                bg: "#f3f4f6"
+              }))
+            : seedFallback.items;
+
+          return {
+            id: e.id,
+            name: e.store_name,
+            category: e.category || "Restaurante",
+            rating: "4.9",
+            reviews: "100+",
+            delivery_fee: Number(e.default_delivery_fee ?? 8),
+            prep_time: e.estimated_time || "25-35 min",
+            distance: "2,5 km",
+            tags: ["RotaSabor"],
+            logoBg: seedFallback.logoBg || "#111827",
+            logoEmoji: seedFallback.logoEmoji || "🍽️",
+            bannerBg: seedFallback.bannerBg || "#14532d",
+            items
+          };
+        });
+
+        storesData = mapped;
+        renderStoresFeed();
+        if (openedStore) {
+          openedStore = storesData.find((s) => String(s.id) === String(openedStore.id)) || null;
+          renderStoreDetail();
         }
       } catch (_) {}
-      renderStoresFeed();
     }
 
-    document.getElementById("refreshOrdersBtn").addEventListener("click", loadMyOrders);
-
-    // Renderização imediata sem esperar rede
     syncClientProfile();
     saveCart();
     renderCategories();
     renderStoresFeed();
-    mergeBackendStoresAndProducts();
+    syncRemoteCatalog();
   </script>
 </body>
 </html>
