@@ -1,1 +1,208 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>RotaSabor — App Cliente</title>
+  <link rel="manifest" href="/static/manifest-cliente.json" />
+  <meta name="theme-color" content="#0b1220" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <style>
+    :root {
+      --bg: #0b1220;
+      --card: #111a2e;
+      --border: #1e2d4a;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --accent: #38bdf8;
+      --ok: #10b981;
+      --warn: #f59e0b;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
+    body { background: var(--bg); color: var(--text); min-height: 100vh; padding: 16px; }
+    .container { max-width: 520px; margin: 0 auto; display: flex; flex-direction: column; gap: 14px; }
+    .header {
+      background: var(--card); border: 1px solid var(--border); border-radius: 14px;
+      padding: 16px; display: flex; justify-content: space-between; align-items: center;
+    }
+    .brand { font-size: 1.15rem; font-weight: 700; color: var(--accent); }
+    .subtitle { font-size: 0.8rem; color: var(--muted); }
+    .badge {
+      font-size: 0.72rem; font-weight: 600; padding: 5px 10px; border-radius: 999px;
+      background: rgba(56, 189, 248, 0.14); color: var(--accent); border: 1px solid rgba(56, 189, 248, 0.35);
+    }
+    .card {
+      background: var(--card); border: 1px solid var(--border); border-radius: 14px;
+      padding: 16px; display: flex; flex-direction: column; gap: 12px;
+    }
+    .card-title { font-size: 0.95rem; font-weight: 700; }
+    label { font-size: 0.8rem; color: var(--muted); display: block; margin-bottom: 4px; }
+    input, textarea, select {
+      width: 100%; background: var(--bg); color: var(--text); border: 1px solid var(--border);
+      border-radius: 10px; padding: 10px 12px; font-size: 0.92rem; outline: none;
+    }
+    input:focus, textarea:focus, select:focus { border-color: var(--accent); }
+    .btn {
+      width: 100%; border: none; border-radius: 10px; padding: 12px 14px;
+      font-size: 0.92rem; font-weight: 700; cursor: pointer; transition: opacity 0.15s;
+    }
+    .btn:active { opacity: 0.85; }
+    .btn-primary { background: var(--accent); color: #061322; }
+    .btn-secondary { background: #1a2640; color: var(--text); border: 1px solid var(--border); }
+    .status-box {
+      background: var(--bg); border: 1px solid var(--border); border-radius: 10px;
+      padding: 12px; font-size: 0.85rem; line-height: 1.45; color: var(--muted);
+    }
+    .status-ok { color: var(--ok); font-weight: 700; }
+    .status-warn { color: var(--warn); font-weight: 700; }
+    .row { display: flex; gap: 10px; }
+    .row > * { flex: 1; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div>
+        <div class="brand">RotaSabor Cliente</div>
+        <div class="subtitle">Pedidos e acompanhamento em Catanduva</div>
+      </div>
+      <span class="badge">PWA CLIENTE</span>
+    </div>
 
+    <div class="card">
+      <div class="card-title">Fazer novo pedido</div>
+      <div>
+        <label for="clienteNome">Seu nome</label>
+        <input id="clienteNome" type="text" placeholder="Ex.: Marcos" />
+      </div>
+      <div class="row">
+        <div>
+          <label for="clienteTelefone">Telefone / WhatsApp</label>
+          <input id="clienteTelefone" type="tel" placeholder="(17) 99999-9999" />
+        </div>
+        <div>
+          <label for="bairro">Bairro</label>
+          <input id="bairro" type="text" placeholder="Ex.: Centro" />
+        </div>
+      </div>
+      <div>
+        <label for="endereco">Endereço de entrega</label>
+        <input id="endereco" type="text" placeholder="Rua, número, complemento" />
+      </div>
+      <div>
+        <label for="itensPedido">Itens do pedido</label>
+        <textarea id="itensPedido" rows="3" placeholder="Ex.: 2 marmitas executivas, sem cebola"></textarea>
+      </div>
+      <button class="btn btn-primary" id="btnEnviarPedido" type="button">Enviar pedido</button>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Acompanhar pedido</div>
+      <div class="row">
+        <input id="pedidoIdBusca" type="text" placeholder="Código ou ID do pedido" />
+        <button class="btn btn-secondary" id="btnBuscarPedido" type="button" style="max-width: 140px;">Consultar</button>
+      </div>
+      <div class="status-box" id="statusPedido">
+        Nenhum pedido consultado ainda. Envie um pedido acima ou informe o código para acompanhar o status.
+      </div>
+    </div>
+  </div>
+
+  <script>
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("/sw.js").catch(() => {
+          navigator.serviceWorker.register("/static/sw.js").catch(() => {});
+        });
+      });
+    }
+
+    const statusBox = document.getElementById("statusPedido");
+    const pedidoIdBusca = document.getElementById("pedidoIdBusca");
+
+    function renderStatus(data) {
+      if (!data) {
+        statusBox.innerHTML = `<span class="status-warn">Pedido não encontrado.</span> Verifique o código e tente novamente.`;
+        return;
+      }
+      const id = data.id ?? data.pedido_id ?? "-";
+      const estado = data.status ?? data.situacao ?? "Em andamento";
+      const obs = data.observacao ?? data.detalhes ?? "";
+      statusBox.innerHTML = `
+        <div><strong>Pedido:</strong> #${id}</div>
+        <div><strong>Status:</strong> <span class="status-ok">${estado}</span></div>
+        ${obs ? `<div><strong>Detalhes:</strong> ${obs}</div>` : ""}
+      `;
+    }
+
+    async function enviarPedido() {
+      const payload = {
+        cliente: document.getElementById("clienteNome").value.trim(),
+        telefone: document.getElementById("clienteTelefone").value.trim(),
+        bairro: document.getElementById("bairro").value.trim(),
+        endereco: document.getElementById("endereco").value.trim(),
+        itens: document.getElementById("itensPedido").value.trim()
+      };
+
+      if (!payload.cliente || !payload.endereco || !payload.itens) {
+        statusBox.innerHTML = `<span class="status-warn">Preencha nome, endereço e itens do pedido.</span>`;
+        return;
+      }
+
+      statusBox.innerHTML = `Enviando pedido...`;
+      const endpoints = ["/api/pedidos", "/pedidos", "/novo-pedido"];
+
+      for (const url of endpoints) {
+        try {
+          const resp = await fetch(url, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+          });
+          if (resp.ok) {
+            const json = await resp.json().catch(() => ({}));
+            const novoId = json.id ?? json.pedido_id ?? json.data?.id ?? "";
+            if (novoId) pedidoIdBusca.value = novoId;
+            renderStatus({
+              id: novoId || "registrado",
+              status: json.status || "Recebido",
+              observacao: `Entrega para ${payload.bairro || payload.endereco}`
+            });
+            return;
+          }
+        } catch (_) {}
+      }
+
+      statusBox.innerHTML = `<span class="status-warn">Não foi possível enviar agora.</span> Verifique a conexão e tente novamente.`;
+    }
+
+    async function buscarPedido() {
+      const id = pedidoIdBusca.value.trim();
+      if (!id) {
+        statusBox.innerHTML = `<span class="status-warn">Digite o código do pedido para consultar.</span>`;
+        return;
+      }
+
+      statusBox.innerHTML = `Consultando pedido #${id}...`;
+      const endpoints = [`/api/pedidos/${encodeURIComponent(id)}`, `/pedidos/${encodeURIComponent(id)}`];
+
+      for (const url of endpoints) {
+        try {
+          const resp = await fetch(url);
+          if (resp.ok) {
+            const json = await resp.json().catch(() => null);
+            renderStatus(json?.pedido ?? json);
+            return;
+          }
+        } catch (_) {}
+      }
+
+      renderStatus(null);
+    }
+
+    document.getElementById("btnEnviarPedido").addEventListener("click", enviarPedido);
+    document.getElementById("btnBuscarPedido").addEventListener("click", buscarPedido);
+  </script>
+</body>
+</html>
