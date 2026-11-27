@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>RotaSabor — App do Entregador</title>
-  <meta name="theme-color" content="#0b1220" />
+  <title>RotaSabor — Entregador</title>
+  <meta name="theme-color" content="#070c16" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <link rel="manifest" href="/static/manifest-motoboy.json" />
   <link rel="icon" type="image/svg+xml" href="/static/icon.svg" />
@@ -13,375 +13,485 @@
   <style>
     :root {
       --bg: #070c16;
-      --surface: #0f172a;
-      --surface-2: #162033;
-      --border: rgba(148, 163, 184, 0.16);
+      --glass: rgba(15, 23, 42, 0.88);
+      --glass-2: rgba(22, 32, 51, 0.94);
+      --border: rgba(148, 163, 184, 0.2);
       --text: #f8fafc;
       --muted: #94a3b8;
       --primary: #10b981;
       --accent: #38bdf8;
       --warning: #f59e0b;
       --danger: #ef4444;
-      --topbar-bg: rgba(11, 18, 32, 0.96);
-      --radius: 16px;
+      --sidebar-w: 270px;
     }
 
     body.theme-light {
       --bg: #f4f6f9;
-      --surface: #ffffff;
-      --surface-2: #eef2f6;
-      --border: rgba(15, 23, 42, 0.12);
+      --glass: rgba(255, 255, 255, 0.9);
+      --glass-2: rgba(241, 245, 249, 0.96);
+      --border: rgba(15, 23, 42, 0.14);
       --text: #0f172a;
       --muted: #475569;
       --primary: #16a34a;
       --accent: #0284c7;
       --warning: #d97706;
       --danger: #dc2626;
-      --topbar-bg: rgba(255, 255, 255, 0.96);
     }
 
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
-    body {
+    html, body {
       margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       background: var(--bg);
       color: var(--text);
-      padding-bottom: 84px;
-      transition: background-color 0.2s ease, color 0.2s ease;
     }
 
-    .topbar {
-      position: sticky;
-      top: 0;
-      z-index: 25;
-      background: var(--topbar-bg);
-      backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--border);
-      padding: 12px 16px;
+    /* MAPA SEMPRE EM TELA CHEIA */
+    #fullscreenMap {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 1;
+      background: var(--bg);
     }
 
-    .topbar-row {
-      max-width: 960px;
-      margin: 0 auto;
+    /* TOPO FLUTUANTE SOBRE O MAPA */
+    .hud-top {
+      position: fixed;
+      top: 12px;
+      left: 12px;
+      right: 12px;
+      z-index: 20;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 10px;
+      gap: 8px;
+      pointer-events: none;
     }
 
-    .title { font-size: 1.02rem; font-weight: 800; }
-    .sub { font-size: 0.75rem; color: var(--muted); }
+    .hud-top > * { pointer-events: auto; }
 
-    .top-actions { display: flex; align-items: center; gap: 8px; }
-
-    .pill-btn {
-      background: var(--surface-2);
+    .hud-pill {
+      background: var(--glass);
+      backdrop-filter: blur(12px);
       border: 1px solid var(--border);
       color: var(--text);
       border-radius: 999px;
-      padding: 6px 11px;
-      font-size: 0.76rem;
-      font-weight: 800;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-    }
-
-    .container { max-width: 960px; margin: 0 auto; padding: 14px 16px; }
-
-    #liveMap {
-      width: 100%;
-      height: 340px;
-      border-radius: 14px;
-      border: 1px solid var(--border);
-      overflow: hidden;
-      background: var(--surface-2);
-      z-index: 1;
-    }
-
-    .route-banner {
-      margin-top: 10px;
-      padding: 10px 12px;
-      border-radius: 12px;
-      background: var(--surface-2);
-      border: 1px solid var(--border);
-      font-size: 0.82rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-
-    .card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 14px;
-      margin-bottom: 12px;
-    }
-
-    .card-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
-    .card-title { margin: 0; font-size: 1rem; font-weight: 800; }
-    .meta { color: var(--muted); font-size: 0.82rem; margin-top: 4px; }
-
-    .fee-highlight {
-      margin-top: 8px;
-      padding: 10px 12px;
-      border-radius: 12px;
-      background: rgba(16, 185, 129, 0.14);
-      border: 1px solid rgba(16, 185, 129, 0.35);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .fee-amount { font-size: 1.05rem; font-weight: 900; color: var(--primary); }
-
-    .code-pill {
-      display: inline-block;
-      background: rgba(56, 189, 248, 0.16);
-      color: var(--accent);
-      border-radius: 8px;
-      padding: 3px 8px;
+      padding: 8px 12px;
       font-size: 0.78rem;
       font-weight: 800;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
     }
 
-    .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 12px; }
-
-    .stat-box {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 12px 14px;
-    }
-
-    .stat-label { font-size: 0.75rem; color: var(--muted); font-weight: 700; }
-    .stat-value { font-size: 1.15rem; font-weight: 800; margin-top: 4px; color: var(--primary); }
-
-    .badge {
-      padding: 4px 10px;
-      border-radius: 999px;
-      font-size: 0.74rem;
-      font-weight: 800;
-      background: rgba(16, 185, 129, 0.16);
+    .hud-earnings {
+      background: var(--glass);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(16, 185, 129, 0.45);
       color: var(--primary);
-      white-space: nowrap;
+      border-radius: 999px;
+      padding: 8px 14px;
+      font-size: 0.84rem;
+      font-weight: 900;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
     }
-    .badge.warn { background: rgba(245, 158, 11, 0.18); color: var(--warning); }
-    .badge.offline { background: rgba(148, 163, 184, 0.16); color: var(--muted); }
 
-    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; }
+    /* COLUNA LATERAL (PREPARADA PARA VÁRIAS OPÇÕES FUTURAS) */
+    .sidebar-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.45);
+      z-index: 35;
+      display: none;
+    }
+    .sidebar-backdrop.open { display: block; }
 
-    label { display: block; font-size: 0.78rem; color: var(--muted); margin-bottom: 4px; font-weight: 700; }
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      width: var(--sidebar-w);
+      max-width: 82vw;
+      background: var(--glass-2);
+      backdrop-filter: blur(16px);
+      border-right: 1px solid var(--border);
+      z-index: 40;
+      transform: translateX(-100%);
+      transition: transform 0.22s ease;
+      padding: 16px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      overflow-y: auto;
+    }
+    .sidebar.open { transform: translateX(0); }
+
+    .sidebar-title { font-size: 1rem; font-weight: 900; margin: 0; }
+    .sidebar-sub { font-size: 0.75rem; color: var(--muted); }
+
+    .side-section-label {
+      font-size: 0.7rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+      margin-top: 8px;
+    }
+
+    .side-btn {
+      width: 100%;
+      background: var(--glass);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 12px;
+      padding: 10px 12px;
+      font-size: 0.84rem;
+      font-weight: 700;
+      text-align: left;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
 
     select, input {
       width: 100%;
-      background: var(--surface-2);
+      background: var(--glass);
       border: 1px solid var(--border);
       color: var(--text);
-      padding: 10px 12px;
       border-radius: 10px;
-      font-size: 0.9rem;
+      padding: 9px 11px;
+      font-size: 0.86rem;
     }
 
-    .btn-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+    /* CAMADA INFERIOR FLUTUANTE SOBRE O MAPA */
+    .hud-bottom {
+      position: fixed;
+      left: 12px;
+      right: 12px;
+      bottom: 12px;
+      z-index: 20;
+      pointer-events: none;
+    }
+
+    .hud-bottom > * { pointer-events: auto; }
+
+    .floating-card {
+      background: var(--glass);
+      backdrop-filter: blur(14px);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 14px;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.36);
+      max-height: 44vh;
+      overflow-y: auto;
+    }
+
+    .row-between { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+    .order-title { margin: 0; font-size: 0.98rem; font-weight: 900; }
+    .meta { font-size: 0.8rem; color: var(--muted); margin-top: 3px; }
+
+    .tag-code {
+      display: inline-block;
+      background: rgba(56, 189, 248, 0.18);
+      color: var(--accent);
+      border-radius: 8px;
+      padding: 3px 8px;
+      font-size: 0.76rem;
+      font-weight: 900;
+    }
+
+    .tag-fee {
+      display: inline-block;
+      background: rgba(16, 185, 129, 0.2);
+      color: var(--primary);
+      border-radius: 8px;
+      padding: 4px 10px;
+      font-size: 0.88rem;
+      font-weight: 900;
+    }
+
+    .btn-row { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
 
     .btn {
       border: none;
       border-radius: 12px;
-      padding: 10px 12px;
-      font-weight: 800;
-      font-size: 0.83rem;
+      padding: 11px 14px;
+      font-size: 0.86rem;
+      font-weight: 900;
       cursor: pointer;
       flex: 1 1 auto;
-      text-align: center;
     }
 
-    .btn-free-big {
-      width: 100%;
-      padding: 13px 16px;
-      font-size: 0.96rem;
-      margin-top: 12px;
-      background: var(--primary);
-      color: #ffffff;
+    .btn-primary { background: var(--primary); color: #04130d; }
+    .btn-blue { background: var(--accent); color: #04101d; }
+    .btn-warning { background: var(--warning); color: #110c02; }
+    .btn-outline {
+      background: var(--glass-2);
+      color: var(--text);
+      border: 1px solid var(--border);
     }
-    body:not(.theme-light) .btn-free-big { color: #04130d; }
 
-    .btn-primary { background: var(--primary); color: #ffffff; }
-    body:not(.theme-light) .btn-primary { color: #04130d; }
-    .btn-blue { background: var(--accent); color: #ffffff; }
-    body:not(.theme-light) .btn-blue { color: #04101d; }
-    .btn-outline { background: var(--surface-2); color: var(--text); border: 1px solid var(--border); }
+    .offer-item {
+      border: 1px solid var(--border);
+      background: var(--glass-2);
+      border-radius: 14px;
+      padding: 11px 12px;
+      margin-top: 8px;
+    }
 
-    .bottom-nav {
+    /* MODAL FLUTUANTE DOS 4 DÍGITOS SOBRE O MAPA */
+    .pin-modal-backdrop {
       position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      background: var(--topbar-bg);
-      border-top: 1px solid var(--border);
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      padding: 8px 6px;
-      z-index: 30;
+      inset: 0;
+      background: rgba(2, 6, 23, 0.72);
+      backdrop-filter: blur(6px);
+      z-index: 50;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    .pin-modal-backdrop.open { display: flex; }
+
+    .pin-modal {
+      width: 100%;
+      max-width: 360px;
+      background: var(--glass-2);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 18px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
     }
 
-    .nav-btn {
-      background: transparent;
-      border: none;
-      color: var(--muted);
-      font-weight: 800;
-      font-size: 0.78rem;
-      padding: 6px;
-      cursor: pointer;
+    .pin-input {
+      width: 100%;
+      text-align: center;
+      font-size: 1.5rem;
+      font-weight: 900;
+      letter-spacing: 0.35em;
+      padding: 12px;
+      margin-top: 10px;
+      border-radius: 12px;
     }
-    .nav-btn.active { color: var(--primary); }
 
     .toast {
       position: fixed;
-      top: 72px;
+      top: 64px;
       left: 50%;
       transform: translateX(-50%);
-      background: var(--surface-2);
+      background: var(--glass-2);
       border: 1px solid var(--primary);
       color: var(--text);
-      padding: 10px 16px;
+      padding: 9px 15px;
       border-radius: 12px;
-      font-size: 0.85rem;
-      font-weight: 700;
-      z-index: 50;
+      font-size: 0.82rem;
+      font-weight: 800;
+      z-index: 60;
       display: none;
+      white-space: nowrap;
     }
 
     .hidden { display: none !important; }
   </style>
 </head>
 <body>
-  <header class="topbar">
-    <div class="topbar-row">
-      <div>
-        <div class="title">RotaSabor • Entregador</div>
-        <div class="sub" id="gpsStatusLabel">GPS: aguardando ativação</div>
-      </div>
-      <div class="top-actions">
-        <button class="pill-btn" type="button" id="themeToggleBtn">
-          <span id="themeIcon">☀️</span>
-          <span id="themeLabel">Claro</span>
-        </button>
-        <button class="pill-btn" type="button" id="refreshBtn">↻</button>
-      </div>
+  <!-- MAPA EM TELA CHEIA PERMANENTE -->
+  <div id="fullscreenMap"></div>
+
+  <!-- BARRA SUPERIOR FLUTUANTE -->
+  <div class="hud-top">
+    <div style="display:flex;gap:8px;align-items:center;">
+      <button class="hud-pill" type="button" id="openSidebarBtn">☰ Menu</button>
+      <button class="hud-pill" type="button" id="onlineHudBtn">● Offline</button>
     </div>
-  </header>
+    <div class="hud-earnings" id="hudEarningsBox">R$ 0,00</div>
+  </div>
 
   <div class="toast" id="toastBox"></div>
 
-  <main class="container">
-    <!-- ABA MAPA -->
-    <section id="tab-map">
-      <div class="card">
-        <div class="card-top" style="margin-bottom: 10px;">
-          <div>
-            <div class="card-title" id="connectionHeadline">Você está desconectado</div>
-            <div class="meta" id="coordsReadout">Catanduva - SP • Lat: -21.1378 | Lng: -48.9726</div>
-          </div>
-          <span class="badge offline" id="onlineBadge">Offline</span>
-        </div>
-
-        <div id="liveMap"></div>
-
-        <div class="route-banner" id="activeRouteBanner">
-          <div>
-            <strong id="routeTitleLabel">Sem rota ativa</strong>
-            <div class="meta" id="routeSummaryLabel" style="margin-top:2px;">Aceite uma entrega para traçar o caminho no mapa.</div>
-          </div>
-          <button class="btn btn-outline" style="flex:0 0 auto;padding:7px 11px;" type="button" id="clearRouteBtn">Limpar rota</button>
-        </div>
-
-        <button class="btn btn-free-big" type="button" id="toggleOnlineBtn">▶ Ficar Livre</button>
-
-        <div class="btn-row">
-          <button class="btn btn-blue" type="button" id="toggleGpsBtn">Rastreamento ao vivo: ON/OFF</button>
-          <button class="btn btn-outline" type="button" id="sendOnceGpsBtn">Centralizar meu GPS</button>
-        </div>
+  <!-- COLUNA LATERAL RETRÁTIL (BASE PARA FUTURAS OPÇÕES) -->
+  <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+  <aside class="sidebar" id="sidebarMenu">
+    <div class="row-between">
+      <div>
+        <h2 class="sidebar-title">RotaSabor</h2>
+        <div class="sidebar-sub" id="sidebarGpsInfo">GPS: aguardando</div>
       </div>
+      <button class="hud-pill" type="button" id="closeSidebarBtn">✕</button>
+    </div>
 
-      <div class="stats-grid">
-        <div class="stat-box">
-          <div class="stat-label">Entregas concluídas</div>
-          <div class="stat-value" id="doneCountValue">0</div>
+    <div class="side-section-label">Entregador</div>
+    <select id="courierSelect">
+      <option value="">Selecione o entregador...</option>
+    </select>
+
+    <div class="side-section-label">Áudio & Tela</div>
+    <button class="side-btn" type="button" id="soundToggleBtn">
+      <span>Som de grana</span>
+      <strong id="soundStatusLabel">ON</strong>
+    </button>
+    <button class="side-btn" type="button" id="themeToggleBtn">
+      <span>Tema do mapa/HUD</span>
+      <strong id="themeStatusLabel">Escuro</strong>
+    </button>
+    <button class="side-btn" type="button" id="recenterBtn">
+      <span>Centralizar no meu GPS</span>
+      <span>◎</span>
+    </button>
+    <button class="side-btn" type="button" id="refreshDataBtn">
+      <span>Atualizar pedidos</span>
+      <span>↻</span>
+    </button>
+
+    <div class="side-section-label">Resumo</div>
+    <div class="meta" id="sidebarStatsText">0 entregas concluídas • Total: R$ 0,00</div>
+
+    <div class="side-section-label">Mais opções (em breve)</div>
+    <button class="side-btn" type="button" onclick="showToast('Histórico detalhado em breve')">
+      <span>Histórico completo</span>
+      <span>›</span>
+    </button>
+    <button class="side-btn" type="button" onclick="showToast('Metas e bônus em breve')">
+      <span>Metas e repasses</span>
+      <span>›</span>
+    </button>
+  </aside>
+
+  <!-- CAMADA INFERIOR FLUTUANTE SOBRE O MAPA -->
+  <div class="hud-bottom">
+    <!-- MODO ROTA ATIVO (QUANDO ACEITA A ENTREGA) -->
+    <div class="floating-card hidden" id="routeHudCard">
+      <div class="row-between">
+        <div>
+          <span class="tag-code" id="routeOrderCode">RS-001</span>
+          <h3 class="order-title" id="routeClientTitle" style="margin-top:5px;">Cliente</h3>
+          <div class="meta" id="routeAddressText">Endereço do cliente</div>
+          <div class="meta" id="routeMetricsText" style="color:var(--accent);font-weight:800;">Calculando rota...</div>
         </div>
-        <div class="stat-box">
-          <div class="stat-label">Ganho de entregas</div>
-          <div class="stat-value" id="doneTotalValue">R$ 0,00</div>
-        </div>
+        <span class="tag-fee" id="routeFeeText">R$ 0,00</span>
       </div>
-
-      <div class="card">
-        <label for="courierSelect">Entregador ativo</label>
-        <select id="courierSelect">
-          <option value="">Selecione um entregador cadastrado...</option>
-        </select>
-        <div class="grid-2" style="margin-top: 10px;">
-          <div>
-            <label for="manualLat">Latitude manual</label>
-            <input type="text" id="manualLat" placeholder="-21.1378" />
-          </div>
-          <div>
-            <label for="manualLng">Longitude manual</label>
-            <input type="text" id="manualLng" placeholder="-48.9726" />
-          </div>
-        </div>
-        <div class="btn-row">
-          <button class="btn btn-blue" type="button" id="sendManualGpsBtn">Aplicar coordenadas</button>
-        </div>
+      <div class="btn-row">
+        <button class="btn btn-warning" type="button" id="arrivedBtn">📍 Cheguei no cliente</button>
+        <button class="btn btn-primary" type="button" id="openPinFromRouteBtn">Inserir 4 dígitos</button>
       </div>
-    </section>
+    </div>
 
-    <!-- ABA ENTREGAS -->
-    <section id="tab-active" class="hidden">
-      <h3 style="margin: 6px 0 10px;">Entregas disponíveis e em andamento</h3>
-      <div id="activeOrdersList"></div>
-    </section>
+    <!-- LISTA DE ENTREGAS DISPONÍVEIS FLUTUANTE -->
+    <div class="floating-card" id="offersHudCard">
+      <div class="row-between">
+        <div>
+          <h3 class="order-title">Entregas disponíveis</h3>
+          <div class="meta" id="offersCountSub">Toque em aceitar para abrir a rota no mapa</div>
+        </div>
+        <button class="btn btn-outline" style="flex:0 0 auto;padding:6px 10px;font-size:0.78rem;" type="button" id="quickRefreshOffersBtn">↻</button>
+      </div>
+      <div id="offersContainer"></div>
+    </div>
+  </div>
 
-    <!-- ABA CONCLUÍDAS -->
-    <section id="tab-history" class="hidden">
-      <h3 style="margin: 6px 0 10px;">Entregas concluídas</h3>
-      <div id="doneOrdersList"></div>
-    </section>
-  </main>
-
-  <nav class="bottom-nav">
-    <button class="nav-btn active" data-tab="tab-map" type="button">🗺 Mapa</button>
-    <button class="nav-btn" data-tab="tab-active" type="button">🛵 Entregas</button>
-    <button class="nav-btn" data-tab="tab-history" type="button">✓ Concluídas</button>
-  </nav>
+  <!-- TELA / MODAL DE 4 DÍGITOS PARA CONFIRMAR PAGAMENTO -->
+  <div class="pin-modal-backdrop" id="pinModalBackdrop">
+    <div class="pin-modal">
+      <h3 class="order-title">Confirmar entrega (4 dígitos)</h3>
+      <div class="meta" id="pinOrderInfo">Digite os 4 últimos dígitos do celular do cliente.</div>
+      <div style="margin-top:8px;">
+        <span class="tag-fee" id="pinFeePreview">Receber: R$ 0,00</span>
+      </div>
+      <input class="pin-input" type="tel" id="pinCodeInput" maxlength="4" inputmode="numeric" placeholder="0000" />
+      <div class="btn-row" style="margin-top:14px;">
+        <button class="btn btn-outline" type="button" id="cancelPinBtn">Cancelar</button>
+        <button class="btn btn-primary" type="button" id="confirmPinBtn">Confirmar e receber</button>
+      </div>
+    </div>
+  </div>
 
   <script>
-    let watchId = null;
-    let couriers = [];
-    let orders = [];
-    let isOnline = false;
-    let currentLat = -21.1378;
-    let currentLng = -48.9726;
     let map = null;
     let courierMarker = null;
     let destMarker = null;
-    let routeLine = null;
+    let routePolyline = null;
+
+    let watchId = null;
+    let isOnline = false;
+    let soundEnabled = localStorage.getItem("rotasabor_sound_on") !== "0";
+    let currentLat = -21.1378;
+    let currentLng = -48.9726;
+
+    let couriers = [];
+    let orders = [];
     let activeRouteOrder = null;
+    let pendingPinOrder = null;
+    let arrivalTriggeredForOrderId = null;
 
     const fmtBRL = (v) => Number(v || 0).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+
+    function showToast(msg) {
+      const box = document.getElementById("toastBox");
+      box.textContent = msg;
+      box.style.display = "block";
+      clearTimeout(window._toastT);
+      window._toastT = setTimeout(() => { box.style.display = "none"; }, 2600);
+    }
+
+    /* SOM DE GRANA SINTETIZADO VIA WEB AUDIO API */
+    function playMoneySound() {
+      if (!soundEnabled) return;
+      try {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (!AudioCtx) return;
+        const ctx = new AudioCtx();
+        const now = ctx.currentTime;
+
+        const notes = [
+          { freq: 987.77, start: 0.00, dur: 0.09 },
+          { freq: 1318.51, start: 0.08, dur: 0.18 },
+          { freq: 1567.98, start: 0.18, dur: 0.24 }
+        ];
+
+        notes.forEach((n) => {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = "triangle";
+          osc.frequency.setValueAtTime(n.freq, now + n.start);
+          gain.gain.setValueAtTime(0.001, now + n.start);
+          gain.gain.exponentialRampToValueAtTime(0.22, now + n.start + 0.02);
+          gain.gain.exponentialRampToValueAtTime(0.0008, now + n.start + n.dur);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start(now + n.start);
+          osc.stop(now + n.start + n.dur + 0.02);
+        });
+      } catch (_) {}
+    }
+
+    function updateSoundUi() {
+      document.getElementById("soundStatusLabel").textContent = soundEnabled ? "ON" : "OFF";
+    }
+
+    document.getElementById("soundToggleBtn").addEventListener("click", () => {
+      soundEnabled = !soundEnabled;
+      localStorage.setItem("rotasabor_sound_on", soundEnabled ? "1" : "0");
+      updateSoundUi();
+      if (soundEnabled) playMoneySound();
+      showToast(soundEnabled ? "Som de grana ativado" : "Som de grana mutado");
+    });
 
     function applyTheme() {
       const saved = localStorage.getItem("rotasabor_motoboy_theme") || "dark";
       const isLight = saved === "light";
       document.body.classList.toggle("theme-light", isLight);
-      document.getElementById("themeIcon").textContent = isLight ? "🌙" : "☀️";
-      document.getElementById("themeLabel").textContent = isLight ? "Preto" : "Claro";
+      document.getElementById("themeStatusLabel").textContent = isLight ? "Claro" : "Escuro";
     }
 
     document.getElementById("themeToggleBtn").addEventListener("click", () => {
@@ -390,22 +500,26 @@
       applyTheme();
     });
 
-    function showToast(msg) {
-      const box = document.getElementById("toastBox");
-      box.textContent = msg;
-      box.style.display = "block";
-      clearTimeout(window._t);
-      window._t = setTimeout(() => { box.style.display = "none"; }, 2600);
+    /* SIDEBAR */
+    const sidebar = document.getElementById("sidebarMenu");
+    const backdrop = document.getElementById("sidebarBackdrop");
+    function setSidebarOpen(open) {
+      sidebar.classList.toggle("open", open);
+      backdrop.classList.toggle("open", open);
     }
+    document.getElementById("openSidebarBtn").addEventListener("click", () => setSidebarOpen(true));
+    document.getElementById("closeSidebarBtn").addEventListener("click", () => setSidebarOpen(false));
+    backdrop.addEventListener("click", () => setSidebarOpen(false));
 
+    /* MAPA EM TELA CHEIA */
     function initMap() {
       if (typeof L === "undefined" || map) return;
-      map = L.map("liveMap", { zoomControl: true }).setView([currentLat, currentLng], 15);
+      map = L.map("fullscreenMap", { zoomControl: false }).setView([currentLat, currentLng], 15);
       L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-        attribution: "&copy; OpenStreetMap"
+        attribution: "© OpenStreetMap"
       }).addTo(map);
       courierMarker = L.circleMarker([currentLat, currentLng], {
-        radius: 10,
+        radius: 11,
         color: "#ffffff",
         weight: 3,
         fillColor: "#10b981",
@@ -413,429 +527,88 @@
       }).addTo(map);
     }
 
-    function updateMapPosition(lat, lng) {
-      currentLat = Number(lat);
-      currentLng = Number(lng);
-      document.getElementById("coordsReadout").textContent =
-        `Lat: ${currentLat.toFixed(6)} | Lng: ${currentLng.toFixed(6)}`;
-      if (map && courierMarker) {
-        courierMarker.setLatLng([currentLat, currentLng]);
-        if (!activeRouteOrder) {
-          map.panTo([currentLat, currentLng], { animate: true });
-        } else {
-          drawRouteToOrder(activeRouteOrder);
-        }
-      }
+    function distanceMeters(lat1, lon1, lat2, lon2) {
+      const R = 6371000;
+      const toRad = (d) => (d * Math.PI) / 180;
+      const dLat = toRad(lat2 - lat1);
+      const dLon = toRad(lon2 - lon1);
+      const a =
+        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+      return 2 * R * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     }
 
     async function geocodeAddress(address) {
-      const query = encodeURIComponent(`${address}, Catanduva, SP, Brasil`);
-      const url = `https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${query}`;
-      const res = await fetch(url, { headers: { "Accept": "application/json" } });
-      if (!res.ok) throw new Error("Falha ao localizar endereço");
-      const data = await res.json();
-      if (!Array.isArray(data) || !data.length) {
-        throw new Error("Endereço não encontrado no mapa");
-      }
-      return { lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) };
-    }
+      const q = encodeURIComponent(`${address}, Catanduva, SP, Brasil`);
+      const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${q}`, { headers: { "Accept": "application/json" } }); if (!res.ok) throw new Error("Falha ao buscar endereço"); const rows = await res.json(); if (!Array.isArray(rows) \vert{}\vert{} !rows.length) throw new Error("Endereço não encontrado"); return { lat: parseFloat(rows[0].lat), lng: parseFloat(rows[0].lon) }; }  async function fetchRoute(fromLat, fromLng, toLat, toLng) { const url = `https://router.project-osrm.org/route/v1/driving/${fromLng},${fromLat};${toLng},${toLat}?overview=full&geometries=geojson`; const res = await fetch(url); if (!res.ok) return null; const data = await res.json(); const r = data?.routes?.[0]; if (!r?.geometry?.coordinates?.length) return null; return { latLngs: r.geometry.coordinates.map(([lng, lat]) => [lat, lng]), km: (Number(r.distance \vert{}\vert{} 0) / 1000).toFixed(1), mins: Math.max(1, Math.round(Number(r.duration \vert{}\vert{} 0) / 60)) }; }  async function enterRouteMode(order) { if (!order) return; activeRouteOrder = order; arrivalTriggeredForOrderId = null;  const code = order.order_code \vert{}\vert{} `RS-${String(order.id).padStart(3, "0")}`;
+      const addr = order.client_address || "Centro, Catanduva - SP";
+      document.getElementById("routeOrderCode").textContent = code;
+      document.getElementById("routeClientTitle").textContent = `Pedido #${order.id} •${order.client_name || "Cliente"}`;
+      document.getElementById("routeAddressText").textContent = addr;
+      document.getElementById("routeFeeText").textContent = fmtBRL(order.delivery_fee || 0);
+      document.getElementById("routeMetricsText").textContent = "Traçando rota no mapa...";
 
-    async function fetchRoadRoute(fromLat, fromLng, toLat, toLng) {
-      const url = `https://router.project-osrm.org/route/v1/driving/${fromLng},${fromLat};${toLng},${toLat}?overview=full&geometries=geojson`;
-      const res = await fetch(url);
-      if (!res.ok) return null;
-      const data = await res.json();
-      const route = data?.routes?.[0];
-      if (!route?.geometry?.coordinates?.length) return null;
-      const latLngs = route.geometry.coordinates.map(([lng, lat]) => [lat, lng]);
-      const km = (Number(route.distance || 0) / 1000).toFixed(1);
-      const mins = Math.max(1, Math.round(Number(route.duration || 0) / 60));
-      return { latLngs, km, mins };
-    }
+      document.getElementById("offersHudCard").classList.add("hidden");
+      document.getElementById("routeHudCard").classList.remove("hidden");
 
-    function clearMapRoute() {
-      activeRouteOrder = null;
-      if (routeLine && map) {
-        map.removeLayer(routeLine);
-        routeLine = null;
-      }
-      if (destMarker && map) {
-        map.removeLayer(destMarker);
-        destMarker = null;
-      }
-      document.getElementById("routeTitleLabel").textContent = "Sem rota ativa";
-      document.getElementById("routeSummaryLabel").textContent = "Aceite uma entrega para traçar o caminho no mapa.";
-    }
-
-    document.getElementById("clearRouteBtn").addEventListener("click", clearMapRoute);
-
-    async function drawRouteToOrder(order) {
-      if (!order || !map) return;
-      activeRouteOrder = order;
-      const code = order.order_code || `RS-${String(order.id).padStart(3, "0")}`;
-      const address = order.client_address || "Centro, Catanduva - SP";
-      document.getElementById("routeTitleLabel").textContent = `Rota #${order.id} (${code}) • ${order.client_name || "Cliente"}`;
-      document.getElementById("routeSummaryLabel").textContent = `Calculando trajeto para: ${address}...`;
+      if (!map) initMap();
+      setTimeout(() => map && map.invalidateSize(), 100);
 
       try {
-        const dest = await geocodeAddress(address);
+        const dest = await geocodeAddress(addr);
+        activeRouteOrder._destLat = dest.lat;
+        activeRouteOrder._destLng = dest.lng;
+
         if (destMarker) map.removeLayer(destMarker);
         destMarker = L.circleMarker([dest.lat, dest.lng], {
-          radius: 10,
+          radius: 11,
           color: "#ffffff",
           weight: 3,
           fillColor: "#38bdf8",
           fillOpacity: 1
         }).addTo(map);
 
-        const road = await fetchRoadRoute(currentLat, currentLng, dest.lat, dest.lng);
+        const road = await fetchRoute(currentLat, currentLng, dest.lat, dest.lng);
         const coords = road ? road.latLngs : [[currentLat, currentLng], [dest.lat, dest.lng]];
-        if (routeLine) map.removeLayer(routeLine);
-        routeLine = L.polyline(coords, { color: "#38bdf8", weight: 5, opacity: 0.92 }).addTo(map);
+        if (routePolyline) map.removeLayer(routePolyline);
+        routePolyline = L.polyline(coords, { color: "#38bdf8", weight: 6, opacity: 0.95 }).addTo(map);
+        map.fitBounds(L.latLngBounds([[currentLat, currentLng], [dest.lat, dest.lng]]), { padding: [48, 48] });
 
-        const bounds = L.latLngBounds([[currentLat, currentLng], [dest.lat, dest.lng]]);
-        map.fitBounds(bounds, { padding: [32, 32] });
-
-        if (road) {
-          document.getElementById("routeSummaryLabel").textContent =
-            `${road.km} km • ~${road.mins} min • ${address}`;
-        } else {
-          document.getElementById("routeSummaryLabel").textContent = `Destino: ${address}`;
-        }
+        document.getElementById("routeMetricsText").textContent = road
+          ? `Rota ativa: ${road.km} km • ~${road.mins} min`
+          : `Rota ativa até ${addr}`;
       } catch (_) {
-        document.getElementById("routeSummaryLabel").textContent = `Destino: ${address}`;
-      }
+        document.getElementById("routeMetricsText").textContent = `Destino: ${addr}`; } }  function exitRouteMode() { activeRouteOrder = null; if (routePolyline && map) { map.removeLayer(routePolyline); routePolyline = null; } if (destMarker && map) { map.removeLayer(destMarker); destMarker = null; } document.getElementById("routeHudCard").classList.add("hidden"); document.getElementById("offersHudCard").classList.remove("hidden"); }  function checkAutoArrival(lat, lng) { if (!activeRouteOrder \vert{}\vert{} typeof activeRouteOrder._destLat !== "number") return; const dist = distanceMeters(lat, lng, activeRouteOrder._destLat, activeRouteOrder._destLng); if (dist <= 45 && arrivalTriggeredForOrderId !== activeRouteOrder.id) { arrivalTriggeredForOrderId = activeRouteOrder.id; onArrivedAtClient(); } }  function onArrivedAtClient() { if (!activeRouteOrder) return; const targetOrder = activeRouteOrder; exitRouteMode(); openPinModal(targetOrder); showToast("Você chegou ao cliente! Informe os 4 dígitos."); }  document.getElementById("arrivedBtn").addEventListener("click", onArrivedAtClient); document.getElementById("openPinFromRouteBtn").addEventListener("click", () => { if (activeRouteOrder) { const target = activeRouteOrder; exitRouteMode(); openPinModal(target); } });  /* MODAL DE 4 DÍGITOS */ function openPinModal(order) { pendingPinOrder = order; const code = order.order_code \vert{}\vert{} `RS-${String(order.id).padStart(3, "0")}`;
+      document.getElementById("pinOrderInfo").textContent =
+        `Pedido #${order.id} (${code}) • ${order.client_name \vert{}\vert{} "Cliente"}`; document.getElementById("pinFeePreview").textContent = `Receber: ${fmtBRL(order.delivery_fee || 0)}`;
+      const inp = document.getElementById("pinCodeInput");
+      inp.value = "";
+      document.getElementById("pinModalBackdrop").classList.add("open");
+      setTimeout(() => inp.focus(), 100);
     }
 
-    function switchTab(id) {
-      document.querySelectorAll("main > section").forEach((s) => s.classList.add("hidden"));
-      document.getElementById(id).classList.remove("hidden");
-      document.querySelectorAll(".nav-btn").forEach((b) => b.classList.toggle("active", b.dataset.tab === id));
-      if (id === "tab-map" && map) {
-        setTimeout(() => {
-          map.invalidateSize();
-          if (activeRouteOrder) drawRouteToOrder(activeRouteOrder);
-        }, 120);
-      }
+    function closePinModal() {
+      pendingPinOrder = null;
+      document.getElementById("pinModalBackdrop").classList.remove("open");
     }
 
-    document.querySelectorAll(".nav-btn").forEach((b) => {
-      b.addEventListener("click", () => switchTab(b.dataset.tab));
-    });
+    document.getElementById("cancelPinBtn").addEventListener("click", closePinModal);
 
-    function syncOnlineUi() {
-      const btn = document.getElementById("toggleOnlineBtn");
-      const badge = document.getElementById("onlineBadge");
-      const headline = document.getElementById("connectionHeadline");
-
-      if (isOnline) {
-        btn.textContent = "■ Ficar Offline";
-        badge.textContent = "Livre / Online";
-        badge.className = "badge";
-        headline.textContent = "Você está livre para rotas";
-      } else {
-        btn.textContent = "▶ Ficar Livre";
-        badge.textContent = "Offline";
-        badge.className = "badge offline";
-        headline.textContent = "Você está desconectado";
-      }
-    }
-
-    document.getElementById("toggleOnlineBtn").addEventListener("click", () => {
-      const courierId = document.getElementById("courierSelect").value;
-      if (!courierId) {
-        showToast("Selecione um entregador primeiro.");
-        return;
-      }
-      isOnline = !isOnline;
-      localStorage.setItem("rotasabor_courier_online", isOnline ? "1" : "0");
-      syncOnlineUi();
-      if (isOnline && watchId === null) {
-        startContinuousGps();
-      }
-      showToast(isOnline ? "Você está livre e rastreando GPS!" : "Você ficou offline");
-    });
-
-    async function loadCouriers() {
-      try {
-        const res = await fetch("/api/couriers");
-        if (res.ok) couriers = await res.json();
-      } catch (_) {}
-
-      const sel = document.getElementById("courierSelect");
-      const currentVal = localStorage.getItem("rotasabor_courier_id") || sel.value;
-      sel.innerHTML = `<option value="">Selecione um entregador...</option>` + couriers.map((c) =>
-        `<option value="${c.id}">${c.name} (${c.vehicle || "Moto"}${c.plate ? " • " + c.plate : ""})</option>`
-      ).join("");
-
-      if (currentVal) sel.value = currentVal;
-      isOnline = localStorage.getItem("rotasabor_courier_online") === "1";
-      syncOnlineUi();
-    }
-
-    document.getElementById("courierSelect").addEventListener("change", (e) => {
-      localStorage.setItem("rotasabor_courier_id", e.target.value);
-      renderOrders();
-    });
-
-    async function sendLocation(lat, lng) {
-      updateMapPosition(lat, lng);
-      const courierId = document.getElementById("courierSelect").value;
-      if (!courierId) return;
-      try {
-        const res = await fetch(`/api/couriers/${courierId}/location`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ lat: Number(lat), lng: Number(lng) })
-        });
-        if (res.ok) {
-          document.getElementById("gpsStatusLabel").textContent =
-            `GPS ao vivo: ${Number(lat).toFixed(4)}, ${Number(lng).toFixed(4)}`;
-        }
-      } catch (_) {}
-    }
-
-    function startContinuousGps() {
-      if (!navigator.geolocation) {
-        showToast("Geolocalização não disponível neste aparelho.");
-        return;
-      }
-      if (watchId !== null) return;
-      watchId = navigator.geolocation.watchPosition(
-        (pos) => sendLocation(pos.coords.latitude, pos.coords.longitude),
-        () => showToast("Permita o acesso à localização no navegador."),
-        { enableHighAccuracy: true, maximumAge: 3000 }
-      );
-      document.getElementById("gpsStatusLabel").textContent = "GPS contínuo ativo";
-    }
-
-    function stopContinuousGps() {
-      if (watchId !== null) {
-        navigator.geolocation.clearWatch(watchId);
-        watchId = null;
-        document.getElementById("gpsStatusLabel").textContent = "GPS contínuo pausado";
-      }
-    }
-
-    document.getElementById("sendOnceGpsBtn").addEventListener("click", () => {
-      if (!navigator.geolocation) {
-        showToast("Geolocalização não suportada.");
-        return;
-      }
-      navigator.geolocation.getCurrentPosition(
-        (pos) => {
-          sendLocation(pos.coords.latitude, pos.coords.longitude);
-          showToast("Localização atualizada no mapa!");
-        },
-        () => showToast("Não foi possível obter sua localização."),
-        { enableHighAccuracy: true }
-      );
-    });
-
-    document.getElementById("toggleGpsBtn").addEventListener("click", () => {
-      if (watchId !== null) {
-        stopContinuousGps();
-        showToast("Rastreamento contínuo pausado");
-      } else {
-        startContinuousGps();
-        showToast("Rastreamento contínuo ativado");
-      }
-    });
-
-    document.getElementById("sendManualGpsBtn").addEventListener("click", () => {
-      const lat = parseFloat(document.getElementById("manualLat").value);
-      const lng = parseFloat(document.getElementById("manualLng").value);
-      if (Number.isNaN(lat) || Number.isNaN(lng)) {
-        showToast("Informe latitude e longitude válidas.");
-        return;
-      }
-      sendLocation(lat, lng);
-      showToast("Coordenadas aplicadas no mapa");
-    });
-
-    async function acceptOrder(orderId) {
-      const courierIdRaw = document.getElementById("courierSelect").value;
-      if (!courierIdRaw) {
-        showToast("Selecione seu perfil de entregador primeiro.");
-        return;
-      }
-      try {
-        const res = await fetch(`/api/orders/${orderId}`, {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            courier_id: Number(courierIdRaw),
-            courier_accepted: true,
-            status: "A caminho da coleta"
-          })
-        });
-        if (res.ok) {
-          const updatedOrder = await res.json().catch(() => null);
-          const matchedOrder = updatedOrder || orders.find((o) => Number(o.id) === Number(orderId)) || { id: orderId };
-          await loadOrders();
-          switchTab("tab-map");
-          await drawRouteToOrder(matchedOrder);
-          showToast(`Entrega #${orderId} aceita! Rota aberta no mapa.`);
-        }
-      } catch (_) {
-        showToast("Erro ao aceitar entrega.");
-      }
-    }
-
-    async function promptAndDeliver(orderId) {
-      const codeInput = prompt("Digite os 4 últimos dígitos do celular do cliente para confirmar a entrega:");
-      if (codeInput === null) return;
-      const cleaned = codeInput.trim();
-      if (cleaned.length !== 4) {
-        showToast("Informe exatamente os 4 últimos dígitos.");
+    document.getElementById("confirmPinBtn").addEventListener("click", async () => {
+      if (!pendingPinOrder) return;
+      const pin = document.getElementById("pinCodeInput").value.trim();
+      if (pin.length !== 4) {
+        showToast("Digite os 4 últimos dígitos.");
         return;
       }
 
       const courierIdRaw = document.getElementById("courierSelect").value;
-      const body = {
+      const payload = {
         status: "Entregue",
-        delivery_code: cleaned,
-        last4: cleaned
+        delivery_code: pin,
+        last4: pin
       };
-      if (courierIdRaw) body.courier_id = Number(courierIdRaw);
+      if (courierIdRaw) payload.courier_id = Number(courierIdRaw);
 
       try {
-        const res = await fetch(`/api/orders/${orderId}`, {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(body)
-        });
-        const data = await res.json().catch(() => ({}));
-        if (!res.ok) {
-          showToast(data.error || "Código inválido para confirmar a entrega.");
-          return;
-        }
-        if (activeRouteOrder && Number(activeRouteOrder.id) === Number(orderId)) {
-          clearMapRoute();
-        }
-        showToast(`Pedido #${orderId} entregue com sucesso!`);
-        await loadOrders();
-      } catch (_) {
-        showToast("Erro ao concluir entrega.");
-      }
-    }
-
-    async function updateOrderStatus(orderId, newStatus) {
-      const courierIdRaw = document.getElementById("courierSelect").value;
-      const body = { status: newStatus };
-      if (courierIdRaw) body.courier_id = Number(courierIdRaw);
-
-      try {
-        const res = await fetch(`/api/orders/${orderId}`, {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(body)
-        });
-        if (res.ok) {
-          showToast(`Pedido #${orderId} → ${newStatus}`);
-          await loadOrders();
-        }
-      } catch (_) {
-        showToast("Erro ao atualizar status");
-      }
-    }
-
-    async function loadOrders() {
-      try {
-        const res = await fetch("/api/orders");
-        if (res.ok) orders = await res.json();
-      } catch (_) {}
-      renderOrders();
-    }
-
-    function renderOrders() {
-      const selectedCourierId = Number(document.getElementById("courierSelect").value || 0);
-      const activeContainer = document.getElementById("activeOrdersList");
-      const doneContainer = document.getElementById("doneOrdersList");
-
-      const filtered = orders.filter((o) => {
-        if (!selectedCourierId) return true;
-        return !o.courier_id || Number(o.courier_id) === selectedCourierId;
-      });
-
-      const activeList = filtered.filter((o) => !String(o.status || "").toLowerCase().includes("entregue"));
-      const doneList = filtered.filter((o) => String(o.status || "").toLowerCase().includes("entregue"));
-
-      const doneFeeSum = doneList.reduce((acc, item) => acc + Number(item.delivery_fee || 0), 0);
-      document.getElementById("doneCountValue").textContent = String(doneList.length);
-      document.getElementById("doneTotalValue").textContent = fmtBRL(doneFeeSum);
-
-      activeContainer.innerHTML = activeList.length ? [...activeList].reverse().map((o) => {
-        const code = o.order_code || `RS-${String(o.id).padStart(3, "0")}`;
-        const deliveryFee = Number(o.delivery_fee || 0);
-        const isReady = Boolean(o.store_ready) || String(o.status || "").toLowerCase().includes("pronto");
-        const isAccepted = Boolean(o.courier_accepted) || String(o.status || "").toLowerCase().includes("caminho") || String(o.status || "").toLowerCase().includes("colet");
-
-        return `
-          <article class="card">
-            <div class="card-top">
-              <div>
-                <span class="code-pill">CÓDIGO: ${code}</span>
-                <h4 class="card-title" style="margin-top:6px;">Pedido #${o.id} • ${o.store_name || "Estabelecimento"}</h4>
-                <div class="meta">Cliente: <strong>${o.client_name}</strong> • ${o.payment || "Pix"}</div>
-                <div class="meta">Destino: ${o.client_address || "Não informado"}</div>
-              </div>
-              <span class="badge warn">${o.status || "Pendente"}</span>
-            </div>
-
-            <div class="fee-highlight">
-              <span style="font-size:0.82rem;font-weight:700;">Valor da entrega a receber:</span>
-              <span class="fee-amount">${fmtBRL(deliveryFee)}</span>
-            </div>
-
-            <div class="meta">
-              ${isReady ? "✓ Loja deu baixa (pronto para retirada)" : "⏳ Aguardando baixa/preparo da loja"}
-            </div>
-
-            <div class="btn-row">
-              ${!isAccepted
-                ? `<button class="btn btn-primary" type="button" onclick="acceptOrder(${o.id})">✓ Aceitar entrega e abrir rota</button>`
-                : `<button class="btn btn-blue" type="button" onclick='switchTab("tab-map");drawRouteToOrder(${JSON.stringify(o)})'>🗺 Ver rota no mapa</button>
-                   <button class="btn btn-outline" type="button" onclick="updateOrderStatus(${o.id}, 'Coletando')">Coletando</button>
-                   <button class="btn btn-outline" type="button" onclick="updateOrderStatus(${o.id}, 'A caminho')">A caminho</button>`
-              }
-              <button class="btn btn-primary" type="button" onclick="promptAndDeliver(${o.id})">Concluir (4 dígitos)</button>
-            </div>
-          </article>
-        `;
-      }).join("") : `<div class="card"><div class="meta">Nenhuma entrega disponível ou em andamento.</div></div>`;
-
-      doneContainer.innerHTML = doneList.length ? [...doneList].reverse().map((o) => {
-        const code = o.order_code || `RS-${String(o.id).padStart(3, "0")}`;
-        return `
-          <article class="card">
-            <div class="card-top">
-              <div>
-                <h4 class="card-title">Pedido #${o.id} (${code}) • ${o.store_name || "Estabelecimento"}</h4>
-                <div class="meta">${o.client_name} • ${o.client_address || ""}</div>
-              </div>
-              <span class="badge">${o.status}</span>
-            </div>
-            <div class="meta" style="margin-top: 6px;">Ganho da entrega: <strong>${fmtBRL(o.delivery_fee || 0)}</strong></div>
-          </article>
-        `;
-      }).join("") : `<div class="card"><div class="meta">Nenhuma entrega concluída ainda.</div></div>`;
-    }
-
-    document.getElementById("refreshBtn").addEventListener("click", async () => {
-      await Promise.all([loadCouriers(), loadOrders()]);
-      showToast("Dados atualizados");
-    });
-
-    if ("serviceWorker" in navigator) {
-      window.addEventListener("load", () => {
-        navigator.serviceWorker.register("/sw.js").catch(() => {});
-      });
-    }
-
-    applyTheme();
-    initMap();
-    Promise.all([loadCouriers(), loadOrders()]);
-  </script>
-</body>
-</html>
+        const res = await fetch(`/api/orders
