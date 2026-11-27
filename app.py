@@ -125,26 +125,47 @@ def _digits(value):
 def _ensure_schema():
     db.create_all()
     inspector = inspect(db.engine)
+    dialect = db.engine.dialect.name
     if "couriers" in inspector.get_table_names():
         existing_cols = {col["name"] for col in inspector.get_columns("couriers")}
         alter_statements = []
         if "full_name" not in existing_cols:
-            alter_statements.append("ALTER TABLE couriers ADD COLUMN full_name VARCHAR(140)")
+            col_type = "VARCHAR(140)" if dialect == "postgresql" else "VARCHAR(140)"
+            alter_statements.append(f"ALTER TABLE couriers ADD COLUMN full_name {col_type}")
         if "cpf" not in existing_cols:
             alter_statements.append("ALTER TABLE couriers ADD COLUMN cpf VARCHAR(20)")
         if "lat" not in existing_cols:
-            alter_statements.append("ALTER TABLE couriers ADD COLUMN lat DOUBLE PRECISION")
+            lat_type = "DOUBLE PRECISION" if dialect == "postgresql" else "FLOAT"
+            alter_statements.append(f"ALTER TABLE couriers ADD COLUMN lat {lat_type}")
         if "lng" not in existing_cols:
-            alter_statements.append("ALTER TABLE couriers ADD COLUMN lng DOUBLE PRECISION")
+            lng_type = "DOUBLE PRECISION" if dialect == "postgresql" else "FLOAT"
+            alter_statements.append(f"ALTER TABLE couriers ADD COLUMN lng {lng_type}")
         if "created_at" not in existing_cols:
-            alter_statements.append("ALTER TABLE couriers ADD COLUMN created_at TIMESTAMP WITHOUT TIME ZONE")
+            dt_type = "TIMESTAMP WITHOUT TIME ZONE" if dialect == "postgresql" else "DATETIME"
+            alter_statements.append(f"ALTER TABLE couriers ADD COLUMN created_at {dt_type}")
+
+        if dialect == "postgresql" and "name" in existing_cols:
+            alter_statements.append("ALTER TABLE couriers ALTER COLUMN name DROP NOT NULL")
 
         if alter_statements:
             with db.engine.begin() as conn:
                 for stmt in alter_statements:
                     conn.execute(text(stmt))
-                if "name" in existing_cols and "full_name" not in existing_cols:
-                    conn.execute(text("UPDATE couriers SET full_name = name WHERE full_name IS NULL"))
+                if "name" in existing_cols and "full_name" in existing_cols:
+                    conn.execute(text("UPDATE couriers SET full_name = name WHERE full_name IS NULL AND name IS NOT NULL"))
+                    conn.execute(text("UPDATE couriers SET name = full_name WHERE name IS NULL AND full_name IS NOT NULL"))
+
+
+def _sync_legacy_courier_name(courier_id, full_name):
+    inspector = inspect(db.engine)
+    if "couriers" in inspector.get_table_names():
+        existing_cols = {col["name"] for col in inspector.get_columns("couriers")}
+        if "name" in existing_cols and courier_id is not None:
+            db.session.execute(
+                text("UPDATE couriers SET name = :full_name WHERE id = :id"),
+                {"full_name": full_name, "id": courier_id},
+            )
+            db.session.commit()
 
 
 with app.app_context():
@@ -247,6 +268,7 @@ def create_courier():
         )
         db.session.add(courier)
         db.session.commit()
+        _sync_legacy_courier_name(courier.id, full_name)
         return jsonify(courier.to_dict()), 201
     except Exception as exc:
         db.session.rollback()
