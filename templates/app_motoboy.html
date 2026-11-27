@@ -96,7 +96,7 @@
   <header>
     <div class="brand">
       <h1>RotaSabor — Motoboy</h1>
-      <span class="badge">v2026.11.25.133400</span>
+      <span class="badge">v2026.11.26.211600</span>
     </div>
     <div style="display:flex;gap:10px;">
       <a class="btn btn-ghost" href="/app-cliente">App Cliente</a>
@@ -171,7 +171,7 @@
     if ("serviceWorker" in navigator) {
       window.addEventListener("load", () => {
         navigator.serviceWorker
-          .register("/static/sw.js", { scope: "/" })
+          .register("/sw.js", { scope: "/" })
           .then((reg) => console.log("SW registado:", reg.scope))
           .catch((err) => console.error("Erro SW:", err));
       });
