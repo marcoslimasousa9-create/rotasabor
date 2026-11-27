@@ -287,14 +287,13 @@
       border: 1px solid var(--border);
       color: var(--text);
       border-radius: 999px;
-      padding: 9px 12px;
-      font-size: 0.78rem;
+      padding: 10px 14px;
+      font-size: 0.82rem;
       font-weight: 800;
       cursor: pointer;
       flex: 1 1 auto;
     }
 
-    .dock-action-pill.gmaps { background: var(--route-cyan); color: #04121d; border-color: transparent; }
     .dock-action-pill.arrive { background: var(--warning); color: #110c02; border-color: transparent; }
     .dock-action-pill.pin { background: var(--money-green); color: #04130d; border-color: transparent; }
 
@@ -517,7 +516,6 @@
         <span class="tag-fee" id="dockFeeText">R$ 0,00</span>
       </div>
       <div class="btn-row">
-        <button class="dock-action-pill gmaps" type="button" id="openGmapsBtn">Maps</button>
         <button class="dock-action-pill arrive" type="button" id="arrivedBtn">Cheguei</button>
         <button class="dock-action-pill pin" type="button" id="openPinBtn">4 dígitos</button>
       </div>
@@ -813,15 +811,6 @@
       const d = new Date(Date.now() + minsToAdd * 60000);
       return d.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
     }
-
-    function openExternalGoogleMaps() {
-      if (!activeRouteOrder) return;
-      const addr = encodeURIComponent(`${activeRouteOrder.client_address || "Centro, Catanduva, SP"}`);
-      const origin = `${currentLat},${currentLng}`;
-      window.open(`https://www.google.com/maps/dir/?api=1&origin=${origin}&destination=${addr}&travelmode=driving`, "_blank");
-    }
-
-    document.getElementById("openGmapsBtn").addEventListener("click", openExternalGoogleMaps);
 
     async function enterAutoRouteMode(order) {
       if (!order) return;
