@@ -441,7 +441,7 @@
     </div>
 
     <div class="promo-strip">
-      <span>🏆 Promoção &amp; extras por entrega</span>
+      <span>🏆 Promoção & extras por entrega</span>
       <strong id="promoExtraLabel">+R$ 0,00</strong>
     </div>
 
@@ -523,7 +523,6 @@
     let marker = null;
     let lat = -21.1378;
     let lng = -48.9726;
-    let hasGps = false;
     let isOnline = false;
     let orders = [];
     let couriers = [];
@@ -574,7 +573,6 @@
         (pos) => {
           lat = pos.coords.latitude;
           lng = pos.coords.longitude;
-          hasGps = true;
           document.getElementById("gpsInfo").textContent = `GPS: ativo (${lat.toFixed(4)}, ${lng.toFixed(4)})`;
           if (map) map.setView([lat, lng], 16);
           if (marker) marker.setLatLng([lat, lng]);
@@ -591,11 +589,38 @@
 
     function openMapsRoute(addressText) {
       const clean = (addressText || "").trim();
-      const dest = clean.toLowerCase().includes("catanduva") ? clean : `${clean}, Catanduva - SP, Brasil`;
-      const origin = hasGps ? `&origin=${lat},${lng}` : "";
-      const url = `https://www.google.com/maps/dir/?api=1${origin}&destination=${encodeURIComponent(dest)}&travelmode=driving&dir_action=navigate`;
-      const win = window.open(url, "_blank");
-      if (!win) window.location.href = url;
+      if (!clean) {
+        toast("Endereço de entrega não informado");
+        return;
+      }
+      const dest = clean.toLowerCase().includes("catanduva")
+        ? clean
+        : `${clean}, Catanduva - SP, Brasil`;
+      const encodedDest = encodeURIComponent(dest);
+
+      // URL web limpa sem parâmetros que forcem vista desktop ou origem duplicada
+      const webMapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodedDest}&travelmode=driving`;
+
+      // No Android, tenta abrir diretamente o app Google Maps em modo navegação
+      const isAndroid = /android/i.test(navigator.userAgent || "");
+      if (isAndroid) {
+        const nativeNavUrl = `google.navigation:q=${encodedDest}&mode=d`;
+        const fallbackTimer = setTimeout(() => {
+          window.location.href = webMapsUrl;
+        }, 900);
+
+        const clearFallback = () => clearTimeout(fallbackTimer);
+        window.addEventListener("pagehide", clearFallback, { once: true });
+        document.addEventListener("visibilitychange", () => {
+          if (document.hidden) clearFallback();
+        }, { once: true });
+
+        window.location.href = nativeNavUrl;
+        return;
+      }
+
+      const win = window.open(webMapsUrl, "_blank", "noopener,noreferrer");
+      if (!win) window.location.href = webMapsUrl;
     }
 
     function setOnline(val) {
@@ -656,7 +681,7 @@
         }
 
         const confirmBtn = stg === "arrived_client" || stg === "to_client"
-          ? `<button class="btn-act btn-green" type="button" onclick='openPin(${JSON.stringify(o)})'>Código &amp; Entrega</button>`
+          ? `<button class="btn-act btn-green" type="button" onclick='openPin(${JSON.stringify(o)})'>Código & Entrega</button>`
           : "";
 
         return `
