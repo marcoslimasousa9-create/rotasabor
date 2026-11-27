@@ -1,5 +1,6 @@
 import json
 import os
+import re
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -32,6 +33,11 @@ app = Flask(
 
 def _now_iso() -> str:
     return datetime.now(timezone.utc).isoformat()
+
+
+def _extract_last4(phone_raw: Any) -> str:
+    digits = re.sub(r"\D", "", str(phone_raw or ""))
+    return digits[-4:] if len(digits) >= 4 else "1234"
 
 
 def _default_data() -> dict[str, list[dict[str, Any]]]:
@@ -109,19 +115,31 @@ def _init_db() -> None:
                     );
                     CREATE TABLE IF NOT EXISTS orders (
                         id SERIAL PRIMARY KEY,
+                        order_code TEXT NOT NULL DEFAULT '',
                         client_id INTEGER,
                         client_name TEXT NOT NULL DEFAULT 'Cliente Balcão',
+                        customer_phone TEXT NOT NULL DEFAULT '',
+                        customer_phone_last4 TEXT NOT NULL DEFAULT '1234',
                         client_address TEXT NOT NULL DEFAULT '',
                         store_id INTEGER,
                         store_name TEXT NOT NULL DEFAULT '',
                         courier_id INTEGER,
                         items_json TEXT NOT NULL DEFAULT '[]',
+                        delivery_fee DOUBLE PRECISION NOT NULL DEFAULT 0,
                         total DOUBLE PRECISION NOT NULL DEFAULT 0,
                         payment TEXT NOT NULL DEFAULT 'Pix',
                         status TEXT NOT NULL DEFAULT 'Pendente',
+                        store_ready BOOLEAN NOT NULL DEFAULT FALSE,
+                        courier_accepted BOOLEAN NOT NULL DEFAULT FALSE,
                         created_at TEXT NOT NULL,
                         updated_at TEXT NOT NULL
                     );
+                    ALTER TABLE orders ADD COLUMN IF NOT EXISTS order_code TEXT NOT NULL DEFAULT '';
+                    ALTER TABLE orders ADD COLUMN IF NOT EXISTS customer_phone TEXT NOT NULL DEFAULT '';
+                    ALTER TABLE orders ADD COLUMN IF NOT EXISTS customer_phone_last4 TEXT NOT NULL DEFAULT '1234';
+                    ALTER TABLE orders ADD COLUMN IF NOT EXISTS delivery_fee DOUBLE PRECISION NOT NULL DEFAULT 0;
+                    ALTER TABLE orders ADD COLUMN IF NOT EXISTS store_ready BOOLEAN NOT NULL DEFAULT FALSE;
+                    ALTER TABLE orders ADD COLUMN IF NOT EXISTS courier_accepted BOOLEAN NOT NULL DEFAULT FALSE;
                     """
                 )
                 cur.execute("SELECT COUNT(*) AS cnt FROM stores;")
@@ -184,19 +202,30 @@ def _format_order_row(row: dict[str, Any]) -> dict[str, Any]:
     elif isinstance(items_raw, list):
         items = items_raw
     else:
-        items = []
+        items = row.get("items") or []
+
+    oid = row.get("id")
+    default_code = f"RS-{int(oid):03d}" if oid is not None else "RS-000"
+    code = str(row.get("order_code") or "").strip() or default_code
+
     return {
-        "id": row.get("id"),
+        "id": oid,
+        "order_code": code,
         "client_id": row.get("client_id"),
         "client_name": row.get("client_name") or "Cliente",
+        "customer_phone": row.get("customer_phone") or "",
+        "customer_phone_last4": str(row.get("customer_phone_last4") or "1234"),
         "client_address": row.get("client_address") or "",
         "store_id": row.get("store_id"),
         "store_name": row.get("store_name") or "",
         "courier_id": row.get("courier_id"),
         "items": items,
+        "delivery_fee": float(row.get("delivery_fee") or 0),
         "total": float(row.get("total") or 0),
         "payment": row.get("payment") or "Pix",
         "status": row.get("status") or "Pendente",
+        "store_ready": bool(row.get("store_ready", False)),
+        "courier_accepted": bool(row.get("courier_accepted", False)),
         "created_at": row.get("created_at") or "",
         "updated_at": row.get("updated_at") or "",
     }
@@ -229,6 +258,11 @@ def app_cliente():
 @app.route("/app-motoboy")
 def app_motoboy():
     return render_template("app_motoboy.html")
+
+
+@app.route("/loja")
+def loja():
+    return render_template("loja.html")
 
 
 @app.route("/manifest.json")
@@ -471,11 +505,18 @@ def orders_collection():
     now = _now_iso()
     client_id = payload.get("client_id")
     client_name = str(payload.get("client_name") or "Cliente").strip()
+    customer_phone = str(payload.get("customer_phone") or payload.get("phone") or "").strip()
+    last4_raw = str(payload.get("customer_phone_last4") or "").strip()
+    last4 = last4_raw if (len(last4_raw) == 4 and last4_raw.isdigit()) else _extract_last4(customer_phone)
     client_address = str(payload.get("client_address") or "").strip()
     store_id = payload.get("store_id")
     store_name = str(payload.get("store_name") or "").strip()
+    delivery_fee = float(payload.get("delivery_fee") or 0)
     total = float(payload.get("total") or 0)
     payment = str(payload.get("payment") or "Pix").strip()
+    store_ready = bool(payload.get("store_ready", False))
+    courier_accepted = bool(payload.get("courier_accepted", False))
+    status_val = str(payload.get("status") or "Pendente").strip()
 
     if USE_POSTGRES:
         with _pg_connect() as conn:
@@ -483,25 +524,40 @@ def orders_collection():
                 cur.execute(
                     """
                     INSERT INTO orders (
-                        client_id, client_name, client_address,
-                        store_id, store_name, courier_id,
-                        items_json, total, payment, status, created_at, updated_at
+                        order_code, client_id, client_name, customer_phone, customer_phone_last4,
+                        client_address, store_id, store_name, courier_id,
+                        items_json, delivery_fee, total, payment, status,
+                        store_ready, courier_accepted, created_at, updated_at
                     )
-                    VALUES (%s, %s, %s, %s, %s, NULL, %s, %s, %s, 'Pendente', %s, %s)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, NULL, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                     RETURNING *;
                     """,
                     (
+                        "",
                         client_id,
                         client_name,
+                        customer_phone,
+                        last4,
                         client_address,
                         store_id,
                         store_name,
                         json.dumps(items, ensure_ascii=False),
+                        delivery_fee,
                         total,
                         payment,
+                        status_val,
+                        store_ready,
+                        courier_accepted,
                         now,
                         now,
                     ),
+                )
+                row = dict(cur.fetchone())
+                oid = int(row["id"])
+                code = str(payload.get("order_code") or "").strip() or f"RS-{oid:03d}"
+                cur.execute(
+                    "UPDATE orders SET order_code = %s WHERE id = %s RETURNING *;",
+                    (code, oid),
                 )
                 created = _format_order_row(dict(cur.fetchone()))
             conn.commit()
@@ -509,18 +565,25 @@ def orders_collection():
 
     db = _read_json_db()
     next_id = max([int(o.get("id", 0)) for o in db["orders"]], default=0) + 1
+    code = str(payload.get("order_code") or "").strip() or f"RS-{next_id:03d}"
     new_order = {
         "id": next_id,
+        "order_code": code,
         "client_id": client_id,
         "client_name": client_name,
+        "customer_phone": customer_phone,
+        "customer_phone_last4": last4,
         "client_address": client_address,
         "store_id": store_id,
         "store_name": store_name,
         "courier_id": None,
         "items_json": json.dumps(items, ensure_ascii=False),
+        "delivery_fee": delivery_fee,
         "total": total,
         "payment": payment,
-        "status": "Pendente",
+        "status": status_val,
+        "store_ready": store_ready,
+        "courier_accepted": courier_accepted,
         "created_at": now,
         "updated_at": now,
     }
@@ -536,6 +599,27 @@ def update_order(order_id: int):
     courier_id = payload.get("courier_id")
     now = _now_iso()
 
+    def _validate_and_apply(current: dict[str, Any]) -> tuple[dict[str, Any] | None, tuple[str, int] | None]:
+        if new_status is not None and str(new_status).strip().lower() == "entregue":
+            expected_code = str(current.get("customer_phone_last4") or "").strip()
+            provided_code = str(payload.get("delivery_code") or payload.get("last4") or "").strip()
+            if expected_code and provided_code != expected_code:
+                return None, ("Código de confirmação (4 últimos dígitos) inválido.", 400)
+
+        updated = dict(current)
+        if new_status is not None and str(new_status).strip():
+            updated["status"] = str(new_status).strip()
+        if courier_id is not None:
+            updated["courier_id"] = courier_id
+        if "store_ready" in payload:
+            updated["store_ready"] = bool(payload["store_ready"])
+        if "courier_accepted" in payload:
+            updated["courier_accepted"] = bool(payload["courier_accepted"])
+        if "delivery_fee" in payload and payload["delivery_fee"] is not None:
+            updated["delivery_fee"] = float(payload["delivery_fee"])
+        updated["updated_at"] = now
+        return updated, None
+
     if USE_POSTGRES:
         with _pg_connect() as conn:
             with conn.cursor() as cur:
@@ -544,32 +628,47 @@ def update_order(order_id: int):
                 if not row:
                     return jsonify({"error": "Pedido não encontrado"}), 404
 
-                status_val = str(new_status).strip() if new_status else row["status"]
-                courier_val = courier_id if courier_id is not None else row["courier_id"]
+                updated, err = _validate_and_apply(dict(row))
+                if err:
+                    msg, code = err
+                    return jsonify({"error": msg}), code
 
                 cur.execute(
                     """
                     UPDATE orders
-                    SET status = %s, courier_id = %s, updated_at = %s
+                    SET status = %s,
+                        courier_id = %s,
+                        store_ready = %s,
+                        courier_accepted = %s,
+                        delivery_fee = %s,
+                        updated_at = %s
                     WHERE id = %s
                     RETURNING *;
                     """,
-                    (status_val, courier_val, now, order_id),
+                    (
+                        updated["status"],
+                        updated["courier_id"],
+                        updated["store_ready"],
+                        updated["courier_accepted"],
+                        updated["delivery_fee"],
+                        updated["updated_at"],
+                        order_id,
+                    ),
                 )
-                updated = _format_order_row(dict(cur.fetchone()))
+                formatted = _format_order_row(dict(cur.fetchone()))
             conn.commit()
-        return jsonify(updated), 200
+        return jsonify(formatted), 200
 
     db = _read_json_db()
-    for o in db["orders"]:
+    for idx, o in enumerate(db["orders"]):
         if int(o.get("id", 0)) == order_id:
-            if new_status:
-                o["status"] = str(new_status).strip()
-            if courier_id is not None:
-                o["courier_id"] = courier_id
-            o["updated_at"] = now
+            updated, err = _validate_and_apply(o)
+            if err:
+                msg, code = err
+                return jsonify({"error": msg}), code
+            db["orders"][idx] = updated
             _write_json_db(db)
-            return jsonify(_format_order_row(o)), 200
+            return jsonify(_format_order_row(updated)), 200
 
     return jsonify({"error": "Pedido não encontrado"}), 404
 
