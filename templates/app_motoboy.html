@@ -11,7 +11,7 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <style>
-    *{
+    * {
       box-sizing: border-box;
       -webkit-tap-highlight-color: transparent;
       -webkit-text-size-adjust: 100%;
@@ -441,7 +441,7 @@
     </div>
 
     <div class="promo-strip">
-      <span>🏆 Promoção & extras por entrega</span>
+      <span>🏆 Promoção &amp; extras por entrega</span>
       <strong id="promoExtraLabel">+R$ 0,00</strong>
     </div>
 
@@ -525,6 +525,7 @@
     let routeLine = null;
     let watchId = null;
     let activeDestCoords = null;
+    let activeDestAddress = "";
     let lat = -21.1378;
     let lng = -48.9726;
     let isOnline = false;
@@ -571,40 +572,65 @@
 
     window.addEventListener("resize", () => { if (map) map.invalidateSize(); });
 
-    function updateMapRouteOverlay() {
+    async function drawRoadRoute() {
       if (!map || !activeDestCoords) return;
+
       const dIcon = L.divIcon({
         className: "dest-pin",
         html: `<div style="width:36px;height:36px;border-radius:999px;background:#16a34a;border:3px solid #ffffff;box-shadow:0 4px 12px rgba(0,0,0,0.4);display:flex;align-items:center;justify-content:center;color:#ffffff;font-size:18px;">📍</div>`,
         iconSize: [36, 36],
         iconAnchor: [18, 18]
       });
+
       if (!destMarker) {
         destMarker = L.marker(activeDestCoords, { icon: dIcon }).addTo(map);
       } else {
         destMarker.setLatLng(activeDestCoords);
       }
-      const pts = [[lat, lng], activeDestCoords];
+
+      let pathCoords = [[lat, lng], activeDestCoords];
+      try {
+        const osrmUrl = `https://router.project-osrm.org/route/v1/driving/${lng},${lat};${activeDestCoords[1]},${activeDestCoords[0]}?overview=full&geometries=geojson`;
+        const res = await fetch(osrmUrl);
+        const data = await res.json();
+        const geom = data?.routes?.[0]?.geometry?.coordinates;
+        if (Array.isArray(geom) && geom.length > 1) {
+          pathCoords = geom.map(([lon, la]) => [la, lon]);
+        }
+      } catch (_) {}
+
       if (!routeLine) {
-        routeLine = L.polyline(pts, { color: "#0284c7", weight: 6, opacity: 0.9 }).addTo(map);
+        routeLine = L.polyline(pathCoords, { color: "#0284c7", weight: 7, opacity: 0.92 }).addTo(map);
       } else {
-        routeLine.setLatLngs(pts);
+        routeLine.setLatLngs(pathCoords);
       }
-      map.fitBounds(L.latLngBounds(pts), { padding: [70, 70] });
+
+      map.fitBounds(L.latLngBounds(pathCoords), { padding: [70, 70] });
     }
 
-    async function focusDestinationOnAppMap(addressText) {
-      if (!map || !addressText) return;
-      const clean = String(addressText).trim();
+    async function navigateInsideApp(addressText, showToast = false) {
+      const clean = (addressText || "").trim();
+      if (!clean) {
+        toast("Endereço de entrega não informado");
+        return;
+      }
+      activeDestAddress = clean;
+      if (showToast) toast("Navegando no mapa do aplicativo...");
+
       const q = clean.toLowerCase().includes("catanduva") ? clean : `${clean}, Catanduva, SP, Brasil`;
       try {
         const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(q)}`);
         const data = await res.json();
         if (Array.isArray(data) && data.length) {
           activeDestCoords = [Number(data[0].lat), Number(data[0].lon)];
-          updateMapRouteOverlay();
+          await drawRoadRoute();
+          return;
         }
       } catch (_) {}
+
+      if (map) {
+        map.setView([lat, lng], 16);
+      }
     }
 
     function applyPosition(pos, showMsg = false) {
@@ -613,7 +639,7 @@
       document.getElementById("gpsInfo").textContent = `GPS: ativo (${lat.toFixed(4)}, ${lng.toFixed(4)})`;
       if (marker) marker.setLatLng([lat, lng]);
       if (activeDestCoords) {
-        updateMapRouteOverlay();
+        drawRoadRoute();
       } else if (map) {
         map.setView([lat, lng], 16);
       }
@@ -642,44 +668,6 @@
     }
 
     document.getElementById("gpsBtn").addEventListener("click", () => locateNow(true));
-
-    function openMapsRoute(addressText) {
-      const clean = (addressText || "").trim();
-      if (!clean) {
-        toast("Endereço de entrega não informado");
-        return;
-      }
-      focusDestinationOnAppMap(clean);
-
-      const dest = clean.toLowerCase().includes("catanduva")
-        ? clean
-        : `${clean}, Catanduva - SP, Brasil`;
-      const encodedDest = encodeURIComponent(dest);
-
-      // URL web limpa sem parâmetros que forcem vista desktop ou origem duplicada
-      const webMapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodedDest}&travelmode=driving`;
-
-      // No Android, tenta abrir diretamente o app Google Maps em modo navegação
-      const isAndroid = /android/i.test(navigator.userAgent || "");
-      if (isAndroid) {
-        const nativeNavUrl = `google.navigation:q=${encodedDest}&mode=d`;
-        const fallbackTimer = setTimeout(() => {
-          window.location.href = webMapsUrl;
-        }, 900);
-
-        const clearFallback = () => clearTimeout(fallbackTimer);
-        window.addEventListener("pagehide", clearFallback, { once: true });
-        document.addEventListener("visibilitychange", () => {
-          if (document.hidden) clearFallback();
-        }, { once: true });
-
-        window.location.href = nativeNavUrl;
-        return;
-      }
-
-      const win = window.open(webMapsUrl, "_blank", "noopener,noreferrer");
-      if (!win) window.location.href = webMapsUrl;
-    }
 
     function setOnline(val) {
       isOnline = Boolean(val);
@@ -713,7 +701,7 @@
     function advanceStage(order, nextStage) {
       stepState[order.id] = nextStage;
       if (nextStage === "to_client") {
-        openMapsRoute(order.client_address);
+        navigateInsideApp(order.client_address, true);
       }
       renderOrders();
     }
@@ -725,8 +713,8 @@
       const myActive = orders.filter((o) => Number(o.courier_id) === cid && String(o.status || "").toLowerCase() !== "entregue");
       const available = isOnline ? orders.filter((o) => !o.courier_accepted && String(o.status || "").toLowerCase() !== "entregue") : [];
 
-      if (myActive.length && myActive[0].client_address && !activeDestCoords) {
-        focusDestinationOnAppMap(myActive[0].client_address);
+      if (myActive.length && myActive[0].client_address && myActive[0].client_address !== activeDestAddress) {
+        navigateInsideApp(myActive[0].client_address, false);
       }
 
       const activeHtml = myActive.map((o) => {
@@ -743,7 +731,7 @@
         }
 
         const confirmBtn = stg === "arrived_client" || stg === "to_client"
-          ? `<button class="btn-act btn-green" type="button" onclick='openPin(${JSON.stringify(o)})'>Código & Entrega</button>`
+          ? `<button class="btn-act btn-green" type="button" onclick='openPin(${JSON.stringify(o)})'>Código &amp; Entrega</button>`
           : "";
 
         return `
@@ -755,7 +743,7 @@
             <div class="order-line">🍽️ Coleta: ${o.store_name || "Estabelecimento"}</div>
             <div class="order-line">📍 Entrega: ${o.client_address || ""}</div>
             <div class="btn-row">
-              <button class="btn-act btn-blue" type="button" onclick='openMapsRoute(${JSON.stringify(o.client_address || "")})'>🧭 Rotas</button>
+              <button class="btn-act btn-blue" type="button" onclick='navigateInsideApp(${JSON.stringify(o.client_address || "")}, true)'>🧭 Rotas</button>
               ${actionBtn}
               ${confirmBtn}
             </div>
@@ -799,10 +787,8 @@
           const updated = await res.json();
           stepState[updated.id] = "to_store";
           locateNow(false);
-          focusDestinationOnAppMap(updated.client_address);
-          toast("Pedido aceito! Iniciando navegação...");
           await fetchOrders();
-          openMapsRoute(updated.client_address);
+          await navigateInsideApp(updated.client_address, true);
         } else {
           toast("Não foi possível aceitar o pedido");
         }
@@ -844,6 +830,7 @@
         }
         delete stepState[pendingPinOrder.id];
         activeDestCoords = null;
+        activeDestAddress = "";
         if (destMarker && map) { map.removeLayer(destMarker); destMarker = null; }
         if (routeLine && map) { map.removeLayer(routeLine); routeLine = null; }
         document.getElementById("pinModal").classList.remove("open");
