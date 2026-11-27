@@ -8,6 +8,8 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <link rel="manifest" href="/static/manifest-motoboy.json" />
   <link rel="icon" type="image/svg+xml" href="/static/icon.svg" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <style>
     :root {
       --bg: #070c16;
@@ -20,7 +22,22 @@
       --accent: #38bdf8;
       --warning: #f59e0b;
       --danger: #ef4444;
+      --topbar-bg: rgba(11, 18, 32, 0.96);
       --radius: 16px;
+    }
+
+    body.theme-light {
+      --bg: #f4f6f9;
+      --surface: #ffffff;
+      --surface-2: #eef2f6;
+      --border: rgba(15, 23, 42, 0.12);
+      --text: #0f172a;
+      --muted: #475569;
+      --primary: #16a34a;
+      --accent: #0284c7;
+      --warning: #d97706;
+      --danger: #dc2626;
+      --topbar-bg: rgba(255, 255, 255, 0.96);
     }
 
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -31,20 +48,21 @@
       background: var(--bg);
       color: var(--text);
       padding-bottom: 84px;
+      transition: background-color 0.2s ease, color 0.2s ease;
     }
 
     .topbar {
       position: sticky;
       top: 0;
-      z-index: 20;
-      background: rgba(11, 18, 32, 0.94);
+      z-index: 25;
+      background: var(--topbar-bg);
       backdrop-filter: blur(12px);
       border-bottom: 1px solid var(--border);
-      padding: 14px 16px;
+      padding: 12px 16px;
     }
 
     .topbar-row {
-      max-width: 900px;
+      max-width: 960px;
       margin: 0 auto;
       display: flex;
       align-items: center;
@@ -52,13 +70,43 @@
       gap: 10px;
     }
 
-    .title { font-size: 1.05rem; font-weight: 800; }
-    .sub { font-size: 0.76rem; color: var(--muted); }
+    .title { font-size: 1.02rem; font-weight: 800; }
+    .sub { font-size: 0.75rem; color: var(--muted); }
+
+    .top-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .pill-btn {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 999px;
+      padding: 6px 11px;
+      font-size: 0.76rem;
+      font-weight: 800;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
 
     .container {
-      max-width: 900px;
+      max-width: 960px;
       margin: 0 auto;
-      padding: 16px;
+      padding: 14px 16px;
+    }
+
+    #liveMap {
+      width: 100%;
+      height: 270px;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      overflow: hidden;
+      background: var(--surface-2);
+      z-index: 1;
     }
 
     .card {
@@ -76,8 +124,8 @@
       gap: 10px;
     }
 
-    .card-title { margin: 0; font-size: 1rem; font-weight: 700; }
-    .meta { color: var(--muted); font-size: 0.83rem; margin-top: 4px; }
+    .card-title { margin: 0; font-size: 1rem; font-weight: 800; }
+    .meta { color: var(--muted); font-size: 0.82rem; margin-top: 4px; }
 
     .stats-grid {
       display: grid;
@@ -94,9 +142,9 @@
     }
 
     .stat-label {
-      font-size: 0.76rem;
+      font-size: 0.75rem;
       color: var(--muted);
-      font-weight: 600;
+      font-weight: 700;
     }
 
     .stat-value {
@@ -110,14 +158,14 @@
       padding: 4px 10px;
       border-radius: 999px;
       font-size: 0.74rem;
-      font-weight: 700;
+      font-weight: 800;
       background: rgba(16, 185, 129, 0.16);
       color: var(--primary);
       white-space: nowrap;
     }
 
     .badge.warn {
-      background: rgba(245, 158, 11, 0.16);
+      background: rgba(245, 158, 11, 0.18);
       color: var(--warning);
     }
 
@@ -137,7 +185,7 @@
       font-size: 0.78rem;
       color: var(--muted);
       margin-bottom: 4px;
-      font-weight: 600;
+      font-weight: 700;
     }
 
     select, input {
@@ -154,21 +202,36 @@
       display: flex;
       flex-wrap: wrap;
       gap: 8px;
-      margin-top: 12px;
+      margin-top: 10px;
     }
 
     .btn {
       border: none;
-      border-radius: 10px;
+      border-radius: 12px;
       padding: 10px 12px;
-      font-weight: 700;
+      font-weight: 800;
       font-size: 0.83rem;
       cursor: pointer;
       flex: 1 1 auto;
+      text-decoration: none;
+      text-align: center;
     }
 
-    .btn-primary { background: var(--primary); color: #04130d; }
-    .btn-blue { background: var(--accent); color: #04101d; }
+    .btn-free-big {
+      width: 100%;
+      padding: 13px 16px;
+      font-size: 0.96rem;
+      margin-top: 12px;
+      background: var(--primary);
+      color: #ffffff;
+    }
+
+    body:not(.theme-light) .btn-free-big { color: #04130d; }
+
+    .btn-primary { background: var(--primary); color: #ffffff; }
+    body:not(.theme-light) .btn-primary { color: #04130d; }
+    .btn-blue { background: var(--accent); color: #ffffff; }
+    body:not(.theme-light) .btn-blue { color: #04101d; }
     .btn-outline { background: var(--surface-2); color: var(--text); border: 1px solid var(--border); }
 
     .bottom-nav {
@@ -176,7 +239,7 @@
       bottom: 0;
       left: 0;
       right: 0;
-      background: rgba(11, 18, 32, 0.96);
+      background: var(--topbar-bg);
       border-top: 1px solid var(--border);
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -188,7 +251,7 @@
       background: transparent;
       border: none;
       color: var(--muted);
-      font-weight: 700;
+      font-weight: 800;
       font-size: 0.78rem;
       padding: 6px;
       cursor: pointer;
@@ -207,7 +270,7 @@
       padding: 10px 16px;
       border-radius: 12px;
       font-size: 0.85rem;
-      font-weight: 600;
+      font-weight: 700;
       z-index: 50;
       display: none;
     }
@@ -222,67 +285,57 @@
         <div class="title">RotaSabor • Entregador</div>
         <div class="sub" id="gpsStatusLabel">GPS: aguardando ativação</div>
       </div>
-      <button class="btn btn-primary" style="flex: 0 0 auto;" id="toggleOnlineBtn" type="button">Ficar Online</button>
+      <div class="top-actions">
+        <button class="pill-btn" type="button" id="themeToggleBtn">
+          <span id="themeIcon">☀️</span>
+          <span id="themeLabel">Claro</span>
+        </button>
+        <button class="pill-btn" type="button" id="refreshBtn">↻</button>
+      </div>
     </div>
   </header>
 
   <div class="toast" id="toastBox"></div>
 
   <main class="container">
-    <div class="card">
-      <div class="card-top" style="margin-bottom: 10px;">
-        <div>
-          <div class="card-title">Status de disponibilidade</div>
-          <div class="meta" id="onlineHint">Selecione o entregador e fique disponível para rotas.</div>
-        </div>
-        <span class="badge offline" id="onlineBadge">Desconectado</span>
-      </div>
-      <div class="grid-2">
-        <div>
-          <label for="courierSelect">Entregador ativo</label>
-          <select id="courierSelect">
-            <option value="">Selecione um entregador cadastrado...</option>
-          </select>
-        </div>
-        <div>
-          <label>Ações rápidas</label>
-          <div class="btn-row" style="margin-top: 0;">
-            <button class="btn btn-blue" type="button" id="sendOnceGpsBtn">Enviar GPS</button>
-            <button class="btn btn-outline" type="button" id="refreshBtn">Atualizar</button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="stats-grid">
-      <div class="stat-box">
-        <div class="stat-label">Entregas concluídas</div>
-        <div class="stat-value" id="doneCountValue">0</div>
-      </div>
-      <div class="stat-box">
-        <div class="stat-label">Valor das concluídas</div>
-        <div class="stat-value" id="doneTotalValue">R$ 0,00</div>
-      </div>
-    </div>
-
-    <section id="tab-active">
-      <h3 style="margin: 8px 0 10px;">Entregas em andamento / disponíveis</h3>
-      <div id="activeOrdersList"></div>
-    </section>
-
-    <section id="tab-history" class="hidden">
-      <h3 style="margin: 8px 0 10px;">Entregas concluídas</h3>
-      <div id="doneOrdersList"></div>
-    </section>
-
-    <section id="tab-gps" class="hidden">
+    <!-- ABA MAPA (ESTILO DEL MATCH / IFOOD / KEETA) -->
+    <section id="tab-map">
       <div class="card">
-        <h3 class="card-title">Rastreamento e coordenadas</h3>
-        <div class="meta" id="coordsReadout">Lat: -- | Lng: --</div>
-        <div class="btn-row">
-          <button class="btn btn-primary" type="button" id="toggleGpsBtn">Ativar GPS contínuo</button>
+        <div class="card-top" style="margin-bottom: 10px;">
+          <div>
+            <div class="card-title" id="connectionHeadline">Você está desconectado</div>
+            <div class="meta" id="coordsReadout">Catanduva - SP • Lat: -21.1378 | Lng: -48.9726</div>
+          </div>
+          <span class="badge offline" id="onlineBadge">Offline</span>
         </div>
-        <div class="grid-2" style="margin-top: 12px;">
+
+        <div id="liveMap"></div>
+
+        <button class="btn btn-free-big" type="button" id="toggleOnlineBtn">▶ Ficar Livre</button>
+
+        <div class="btn-row">
+          <button class="btn btn-blue" type="button" id="toggleGpsBtn">Rastreamento ao vivo: ON/OFF</button>
+          <a class="btn btn-outline" id="openGmapsCurrentBtn" href="https://www.google.com/maps/@-21.1378,-48.9726,15z" target="_blank" rel="noopener">Abrir Google Maps</a>
+        </div>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-box">
+          <div class="stat-label">Entregas concluídas</div>
+          <div class="stat-value" id="doneCountValue">0</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label">Valor das concluídas</div>
+          <div class="stat-value" id="doneTotalValue">R$ 0,00</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <label for="courierSelect">Entregador ativo</label>
+        <select id="courierSelect">
+          <option value="">Selecione um entregador cadastrado...</option>
+        </select>
+        <div class="grid-2" style="margin-top: 10px;">
           <div>
             <label for="manualLat">Latitude manual</label>
             <input type="text" id="manualLat" placeholder="-21.1378" />
@@ -293,16 +346,29 @@
           </div>
         </div>
         <div class="btn-row">
-          <button class="btn btn-blue" type="button" id="sendManualGpsBtn">Salvar coordenadas</button>
+          <button class="btn btn-outline" type="button" id="sendOnceGpsBtn">Enviar GPS agora</button>
+          <button class="btn btn-blue" type="button" id="sendManualGpsBtn">Aplicar coordenadas</button>
         </div>
       </div>
+    </section>
+
+    <!-- ABA ENTREGAS -->
+    <section id="tab-active" class="hidden">
+      <h3 style="margin: 6px 0 10px;">Entregas em andamento / disponíveis</h3>
+      <div id="activeOrdersList"></div>
+    </section>
+
+    <!-- ABA CONCLUÍDAS -->
+    <section id="tab-history" class="hidden">
+      <h3 style="margin: 6px 0 10px;">Entregas concluídas</h3>
+      <div id="doneOrdersList"></div>
     </section>
   </main>
 
   <nav class="bottom-nav">
-    <button class="nav-btn active" data-tab="tab-active" type="button">Entregas</button>
-    <button class="nav-btn" data-tab="tab-history" type="button">Concluídas</button>
-    <button class="nav-btn" data-tab="tab-gps" type="button">GPS</button>
+    <button class="nav-btn active" data-tab="tab-map" type="button">🗺 Mapa</button>
+    <button class="nav-btn" data-tab="tab-active" type="button">🛵 Entregas</button>
+    <button class="nav-btn" data-tab="tab-history" type="button">✓ Concluídas</button>
   </nav>
 
   <script>
@@ -310,8 +376,26 @@
     let couriers = [];
     let orders = [];
     let isOnline = false;
+    let currentLat = -21.1378;
+    let currentLng = -48.9726;
+    let map = null;
+    let courierMarker = null;
 
     const fmtBRL = (v) => Number(v || 0).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+
+    function applyTheme() {
+      const saved = localStorage.getItem("rotasabor_motoboy_theme") || "dark";
+      const isLight = saved === "light";
+      document.body.classList.toggle("theme-light", isLight);
+      document.getElementById("themeIcon").textContent = isLight ? "🌙" : "☀️";
+      document.getElementById("themeLabel").textContent = isLight ? "Preto" : "Claro";
+    }
+
+    document.getElementById("themeToggleBtn").addEventListener("click", () => {
+      const next = document.body.classList.contains("theme-light") ? "dark" : "light";
+      localStorage.setItem("rotasabor_motoboy_theme", next);
+      applyTheme();
+    });
 
     function showToast(msg) {
       const box = document.getElementById("toastBox");
@@ -321,10 +405,51 @@
       window._t = setTimeout(() => { box.style.display = "none"; }, 2600);
     }
 
+    function initMap() {
+      if (typeof L === "undefined" || map) return;
+      map = L.map("liveMap").setView([currentLat, currentLng], 15);
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        attribution: "© OpenStreetMap"
+      }).addTo(map);
+      courierMarker = L.circleMarker([currentLat, currentLng], {
+        radius: 10,
+        color: "#ffffff",
+        weight: 3,
+        fillColor: "#10b981",
+        fillOpacity: 1
+      }).addTo(map).bindPopup("Você está aqui");
+      updateGmapsCurrentLink();
+    }
+
+    function updateMapPosition(lat, lng) {
+      currentLat = Number(lat);
+      currentLng = Number(lng);
+      document.getElementById("coordsReadout").textContent =
+        `Lat: ${currentLat.toFixed(6)} | Lng: ${currentLng.toFixed(6)}`;
+      updateGmapsCurrentLink();
+      if (map && courierMarker) {
+        courierMarker.setLatLng([currentLat, currentLng]);
+        map.panTo([currentLat, currentLng], { animate: true });
+      }
+    }
+
+    function updateGmapsCurrentLink() {
+      const link = document.getElementById("openGmapsCurrentBtn");
+      link.href = `https://www.google.com/maps/search/?api=1&query=${currentLat},${currentLng}`;
+    }
+
+    function buildGoogleMapsRouteUrl(destinationAddress) {
+      const dest = encodeURIComponent(destinationAddress || "Catanduva, SP");
+      return `https://www.google.com/maps/dir/?api=1&origin=${currentLat},${currentLng}&destination=${dest}&travelmode=driving`;
+    }
+
     function switchTab(id) {
       document.querySelectorAll("main > section").forEach((s) => s.classList.add("hidden"));
       document.getElementById(id).classList.remove("hidden");
       document.querySelectorAll(".nav-btn").forEach((b) => b.classList.toggle("active", b.dataset.tab === id));
+      if (id === "tab-map" && map) {
+        setTimeout(() => map.invalidateSize(), 120);
+      }
     }
 
     document.querySelectorAll(".nav-btn").forEach((b) => {
@@ -334,26 +459,18 @@
     function syncOnlineUi() {
       const btn = document.getElementById("toggleOnlineBtn");
       const badge = document.getElementById("onlineBadge");
-      const hint = document.getElementById("onlineHint");
-      const courierId = document.getElementById("courierSelect").value;
-      const found = couriers.find((c) => String(c.id) === String(courierId));
-
-      if (found && String(found.status || "").toLowerCase() === "online") {
-        isOnline = true;
-      }
+      const headline = document.getElementById("connectionHeadline");
 
       if (isOnline) {
-        btn.textContent = "Ficar Offline";
-        btn.className = "btn btn-outline";
-        badge.textContent = "Online / Livre";
+        btn.textContent = "■ Ficar Offline";
+        badge.textContent = "Livre / Online";
         badge.className = "badge";
-        hint.textContent = found ? `${found.name} disponível para receber entregas.` : "Disponível para entregas.";
+        headline.textContent = "Você está livre para rotas";
       } else {
-        btn.textContent = "Ficar Online";
-        btn.className = "btn btn-primary";
-        badge.textContent = "Desconectado";
+        btn.textContent = "▶ Ficar Livre";
+        badge.textContent = "Offline";
         badge.className = "badge offline";
-        hint.textContent = "Selecione o entregador e fique disponível para rotas.";
+        headline.textContent = "Você está desconectado";
       }
     }
 
@@ -366,7 +483,10 @@
       isOnline = !isOnline;
       localStorage.setItem("rotasabor_courier_online", isOnline ? "1" : "0");
       syncOnlineUi();
-      showToast(isOnline ? "Você está online para entregas" : "Você ficou offline");
+      if (isOnline && watchId === null) {
+        startContinuousGps();
+      }
+      showToast(isOnline ? "Você está livre e rastreando GPS!" : "Você ficou offline");
     });
 
     async function loadCouriers() {
@@ -388,17 +508,13 @@
 
     document.getElementById("courierSelect").addEventListener("change", (e) => {
       localStorage.setItem("rotasabor_courier_id", e.target.value);
-      syncOnlineUi();
       renderOrders();
     });
 
     async function sendLocation(lat, lng) {
+      updateMapPosition(lat, lng);
       const courierId = document.getElementById("courierSelect").value;
-      document.getElementById("coordsReadout").textContent = `Lat: ${Number(lat).toFixed(6)} | Lng: ${Number(lng).toFixed(6)}`;
-      if (!courierId) {
-        showToast("Selecione um entregador primeiro.");
-        return;
-      }
+      if (!courierId) return;
       try {
         const res = await fetch(`/api/couriers/${courierId}/location`, {
           method: "POST",
@@ -406,46 +522,57 @@
           body: JSON.stringify({ lat: Number(lat), lng: Number(lng) })
         });
         if (res.ok) {
-          document.getElementById("gpsStatusLabel").textContent = `GPS ativo: ${Number(lat).toFixed(4)}, ${Number(lng).toFixed(4)}`;
-          showToast("Localização enviada ao painel!");
+          document.getElementById("gpsStatusLabel").textContent =
+            `GPS ao vivo: ${Number(lat).toFixed(4)}, ${Number(lng).toFixed(4)}`;
         }
-      } catch (_) {
-        showToast("Erro ao enviar GPS.");
+      } catch (_) {}
+    }
+
+    function startContinuousGps() {
+      if (!navigator.geolocation) {
+        showToast("Geolocalização não disponível neste aparelho.");
+        return;
+      }
+      if (watchId !== null) return;
+      watchId = navigator.geolocation.watchPosition(
+        (pos) => sendLocation(pos.coords.latitude, pos.coords.longitude),
+        () => showToast("Permita o acesso à localização no navegador."),
+        { enableHighAccuracy: true, maximumAge: 3000 }
+      );
+      document.getElementById("gpsStatusLabel").textContent = "GPS contínuo ativo";
+    }
+
+    function stopContinuousGps() {
+      if (watchId !== null) {
+        navigator.geolocation.clearWatch(watchId);
+        watchId = null;
+        document.getElementById("gpsStatusLabel").textContent = "GPS contínuo pausado";
       }
     }
 
     document.getElementById("sendOnceGpsBtn").addEventListener("click", () => {
       if (!navigator.geolocation) {
-        showToast("Geolocalização não suportada neste aparelho.");
+        showToast("Geolocalização não suportada.");
         return;
       }
       navigator.geolocation.getCurrentPosition(
-        (pos) => sendLocation(pos.coords.latitude, pos.coords.longitude),
-        () => showToast("Permissão de GPS negada ou indisponível."),
+        (pos) => {
+          sendLocation(pos.coords.latitude, pos.coords.longitude);
+          showToast("Localização atualizada no mapa!");
+        },
+        () => showToast("Não foi possível obter sua localização."),
         { enableHighAccuracy: true }
       );
     });
 
-    document.getElementById("toggleGpsBtn").addEventListener("click", (e) => {
+    document.getElementById("toggleGpsBtn").addEventListener("click", () => {
       if (watchId !== null) {
-        navigator.geolocation.clearWatch(watchId);
-        watchId = null;
-        e.target.textContent = "Ativar GPS contínuo";
-        document.getElementById("gpsStatusLabel").textContent = "GPS pausado";
-        showToast("Rastreamento GPS pausado");
-        return;
+        stopContinuousGps();
+        showToast("Rastreamento contínuo pausado");
+      } else {
+        startContinuousGps();
+        showToast("Rastreamento contínuo ativado");
       }
-      if (!navigator.geolocation) {
-        showToast("Geolocalização não disponível.");
-        return;
-      }
-      watchId = navigator.geolocation.watchPosition(
-        (pos) => sendLocation(pos.coords.latitude, pos.coords.longitude),
-        () => showToast("Não foi possível ler o GPS contínuo."),
-        { enableHighAccuracy: true, maximumAge: 5000 }
-      );
-      e.target.textContent = "Pausar GPS contínuo";
-      showToast("Rastreamento GPS ligado");
     });
 
     document.getElementById("sendManualGpsBtn").addEventListener("click", () => {
@@ -456,6 +583,7 @@
         return;
       }
       sendLocation(lat, lng);
+      showToast("Coordenadas aplicadas no mapa");
     });
 
     async function updateOrderStatus(orderId, newStatus) {
@@ -503,24 +631,30 @@
       document.getElementById("doneCountValue").textContent = String(doneList.length);
       document.getElementById("doneTotalValue").textContent = fmtBRL(doneSum);
 
-      activeContainer.innerHTML = activeList.length ? [...activeList].reverse().map((o) => `
-        <article class="card">
-          <div class="card-top">
-            <div>
-              <h4 class="card-title">Pedido #${o.id} • ${o.store_name || "Estabelecimento"}</h4>
-              <div class="meta">Cliente: <strong>${o.client_name}</strong> • Pagamento: ${o.payment || "Pix"}</div>
-              <div class="meta">Endereço: ${o.client_address || "Não informado"}</div>
+      activeContainer.innerHTML = activeList.length ? [...activeList].reverse().map((o) => {
+        const gmapsUrl = buildGoogleMapsRouteUrl(o.client_address || o.store_name || "Catanduva, SP");
+        return `
+          <article class="card">
+            <div class="card-top">
+              <div>
+                <h4 class="card-title">Pedido #${o.id} • ${o.store_name || "Estabelecimento"}</h4>
+                <div class="meta">Cliente: <strong>${o.client_name}</strong> • ${o.payment || "Pix"}</div>
+                <div class="meta">Destino: ${o.client_address || "Não informado"}</div>
+              </div>
+              <span class="badge warn">${o.status || "Pendente"}</span>
             </div>
-            <span class="badge warn">${o.status || "Pendente"}</span>
-          </div>
-          <div class="meta" style="margin-top: 8px;">Total: <strong>${fmtBRL(o.total)}</strong></div>
-          <div class="btn-row">
-            <button class="btn btn-outline" type="button" onclick="updateOrderStatus(${o.id}, 'Coletando')">Coletando</button>
-            <button class="btn btn-blue" type="button" onclick="updateOrderStatus(${o.id}, 'A caminho')">A caminho</button>
-            <button class="btn btn-primary" type="button" onclick="updateOrderStatus(${o.id}, 'Entregue')">Entregue</button>
-          </div>
-        </article>
-      `).join("") : `<div class="card"><div class="meta">Nenhuma entrega ativa no momento.</div></div>`;
+            <div class="meta" style="margin-top: 8px;">Total: <strong>${fmtBRL(o.total)}</strong></div>
+            <div class="btn-row">
+              <a class="btn btn-blue" href="${gmapsUrl}" target="_blank" rel="noopener">🗺 Ir no Google Maps</a>
+            </div>
+            <div class="btn-row">
+              <button class="btn btn-outline" type="button" onclick="updateOrderStatus(${o.id}, 'Coletando')">Coletando</button>
+              <button class="btn btn-blue" type="button" onclick="updateOrderStatus(${o.id}, 'A caminho')">A caminho</button>
+              <button class="btn btn-primary" type="button" onclick="updateOrderStatus(${o.id}, 'Entregue')">Entregue</button>
+            </div>
+          </article>
+        `;
+      }).join("") : `<div class="card"><div class="meta">Nenhuma entrega ativa no momento.</div></div>`;
 
       doneContainer.innerHTML = doneList.length ? [...doneList].reverse().map((o) => `
         <article class="card">
@@ -547,6 +681,8 @@
       });
     }
 
+    applyTheme();
+    initMap();
     Promise.all([loadCouriers(), loadOrders()]);
   </script>
 </body>
