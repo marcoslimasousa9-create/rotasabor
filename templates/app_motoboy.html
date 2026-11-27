@@ -15,27 +15,27 @@
       --bg: #071324;
       --nav-banner: #0c4a3e;
       --nav-banner-sub: #09382f;
-      --glass: rgba(11, 20, 36, 0.9);
-      --glass-2: rgba(15, 27, 48, 0.96);
-      --border: rgba(148, 163, 184, 0.22);
+      --glass: rgba(11, 20, 36, 0.92);
+      --glass-2: rgba(15, 27, 48, 0.97);
+      --border: rgba(148, 163, 184, 0.24);
       --text: #f8fafc;
-      --muted: #94a3b8;
+      --muted: #cbd5e1;
       --route-cyan: #22d3ee;
       --money-green: #10b981;
       --warning: #f59e0b;
       --danger: #ef4444;
-      --sidebar-w: 280px;
+      --sidebar-w: 320px;
     }
 
     body.theme-light {
       --bg: #dbe4ee;
       --nav-banner: #0f766e;
       --nav-banner-sub: #115e59;
-      --glass: rgba(255, 255, 255, 0.92);
+      --glass: rgba(255, 255, 255, 0.94);
       --glass-2: rgba(241, 245, 249, 0.98);
-      --border: rgba(15, 23, 42, 0.16);
+      --border: rgba(15, 23, 42, 0.18);
       --text: #0f172a;
-      --muted: #475569;
+      --muted: #334155;
       --route-cyan: #0284c7;
       --money-green: #16a34a;
       --warning: #d97706;
@@ -50,6 +50,7 @@
       width: 100%;
       height: 100%;
       overflow: hidden;
+      font-size: 16px;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       background: var(--bg);
       color: var(--text);
@@ -76,9 +77,9 @@
 
     .nav-instruction-wrap {
       position: fixed;
-      top: 10px;
-      left: 10px;
-      right: 10px;
+      top: 12px;
+      left: 12px;
+      right: 12px;
       z-index: 22;
       pointer-events: none;
     }
@@ -89,8 +90,9 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 8px;
-      margin-bottom: 8px;
+      gap: 10px;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
     }
 
     .hud-chip {
@@ -99,12 +101,12 @@
       border: 1px solid var(--border);
       color: var(--text);
       border-radius: 999px;
-      padding: 7px 12px;
-      font-size: 0.78rem;
+      padding: 10px 16px;
+      font-size: 0.95rem;
       font-weight: 800;
       display: inline-flex;
       align-items: center;
-      gap: 6px;
+      gap: 8px;
       cursor: pointer;
       box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
     }
@@ -112,11 +114,11 @@
     .hud-money {
       background: var(--glass);
       backdrop-filter: blur(12px);
-      border: 1px solid rgba(16, 185, 129, 0.5);
+      border: 1px solid rgba(16, 185, 129, 0.55);
       color: var(--money-green);
       border-radius: 999px;
-      padding: 7px 13px;
-      font-size: 0.84rem;
+      padding: 10px 18px;
+      font-size: 1.12rem;
       font-weight: 900;
       box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
     }
@@ -124,52 +126,52 @@
     .turn-banner {
       background: var(--nav-banner);
       color: #ffffff;
-      border-radius: 16px;
-      padding: 12px 14px;
+      border-radius: 18px;
+      padding: 14px 16px;
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 14px;
       box-shadow: 0 10px 28px rgba(0, 0, 0, 0.42);
-      border: 1px solid rgba(255, 255, 255, 0.14);
+      border: 1px solid rgba(255, 255, 255, 0.16);
     }
 
-    .turn-arrow { font-size: 1.65rem; font-weight: 900; line-height: 1; flex-shrink: 0; }
-    .turn-small { font-size: 0.78rem; opacity: 0.9; font-weight: 700; }
-    .turn-main { font-size: 1.05rem; font-weight: 900; margin-top: 2px; }
+    .turn-arrow { font-size: 2.1rem; font-weight: 900; line-height: 1; flex-shrink: 0; }
+    .turn-small { font-size: 0.92rem; opacity: 0.92; font-weight: 700; }
+    .turn-main { font-size: 1.25rem; font-weight: 900; margin-top: 3px; }
 
     .then-pill {
       display: inline-flex;
       align-items: center;
-      gap: 6px;
-      margin-top: 6px;
+      gap: 8px;
+      margin-top: 8px;
       background: var(--nav-banner-sub);
       color: #ecfdf5;
-      border-radius: 10px;
-      padding: 6px 11px;
-      font-size: 0.8rem;
+      border-radius: 12px;
+      padding: 8px 14px;
+      font-size: 0.94rem;
       font-weight: 800;
       box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3);
     }
 
     .map-side-controls {
       position: fixed;
-      right: 12px;
-      bottom: 185px;
+      right: 14px;
+      bottom: 230px;
       z-index: 21;
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 12px;
     }
 
     .circle-control-btn {
-      width: 44px;
-      height: 44px;
+      width: 54px;
+      height: 54px;
       border-radius: 999px;
       background: var(--glass);
       backdrop-filter: blur(12px);
       border: 1px solid var(--border);
       color: var(--text);
-      font-size: 1rem;
+      font-size: 1.25rem;
       font-weight: 800;
       display: flex;
       align-items: center;
@@ -181,7 +183,7 @@
     .sidebar-backdrop {
       position: fixed;
       inset: 0;
-      background: rgba(0, 0, 0, 0.5);
+      background: rgba(0, 0, 0, 0.55);
       z-index: 35;
       display: none;
     }
@@ -193,28 +195,28 @@
       left: 0;
       bottom: 0;
       width: var(--sidebar-w);
-      max-width: 84vw;
+      max-width: 88vw;
       background: var(--glass-2);
       backdrop-filter: blur(16px);
       border-right: 1px solid var(--border);
       z-index: 40;
       transform: translateX(-100%);
       transition: transform 0.22s ease;
-      padding: 16px 14px;
+      padding: 18px 16px;
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 12px;
       overflow-y: auto;
     }
     .sidebar.open { transform: translateX(0); }
 
     .side-label {
-      font-size: 0.7rem;
+      font-size: 0.84rem;
       font-weight: 800;
       text-transform: uppercase;
-      letter-spacing: 0.06em;
+      letter-spacing: 0.05em;
       color: var(--muted);
-      margin-top: 8px;
+      margin-top: 10px;
     }
 
     .side-btn {
@@ -222,9 +224,9 @@
       background: var(--glass);
       border: 1px solid var(--border);
       color: var(--text);
-      border-radius: 12px;
-      padding: 10px 12px;
-      font-size: 0.84rem;
+      border-radius: 14px;
+      padding: 13px 14px;
+      font-size: 1rem;
       font-weight: 700;
       text-align: left;
       cursor: pointer;
@@ -238,16 +240,16 @@
       background: var(--glass);
       border: 1px solid var(--border);
       color: var(--text);
-      border-radius: 10px;
-      padding: 9px 11px;
-      font-size: 0.86rem;
+      border-radius: 12px;
+      padding: 12px 14px;
+      font-size: 1rem;
     }
 
     .hud-bottom {
       position: fixed;
-      left: 10px;
-      right: 10px;
-      bottom: 10px;
+      left: 12px;
+      right: 12px;
+      bottom: 12px;
       z-index: 22;
       pointer-events: none;
     }
@@ -258,36 +260,36 @@
       background: var(--glass-2);
       backdrop-filter: blur(16px);
       border: 1px solid var(--border);
-      border-radius: 20px;
-      padding: 12px 14px;
+      border-radius: 22px;
+      padding: 16px;
       box-shadow: 0 14px 36px rgba(0, 0, 0, 0.48);
     }
 
-    .dock-top-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .dock-top-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 
     .close-route-x {
-      width: 42px;
-      height: 42px;
+      width: 48px;
+      height: 48px;
       border-radius: 999px;
       border: 1px solid var(--border);
       background: var(--glass);
       color: var(--text);
-      font-size: 1.2rem;
+      font-size: 1.35rem;
       font-weight: 900;
       cursor: pointer;
       flex-shrink: 0;
     }
 
-    .eta-main { font-size: 1.35rem; font-weight: 900; color: var(--money-green); line-height: 1.1; }
-    .eta-sub { font-size: 0.84rem; color: var(--muted); font-weight: 700; margin-top: 2px; }
+    .eta-main { font-size: 1.65rem; font-weight: 900; color: var(--money-green); line-height: 1.1; }
+    .eta-sub { font-size: 0.98rem; color: var(--muted); font-weight: 700; margin-top: 4px; }
 
     .dock-action-pill {
       background: var(--glass);
       border: 1px solid var(--border);
       color: var(--text);
-      border-radius: 999px;
-      padding: 10px 14px;
-      font-size: 0.82rem;
+      border-radius: 14px;
+      padding: 13px 16px;
+      font-size: 1rem;
       font-weight: 800;
       cursor: pointer;
       flex: 1 1 auto;
@@ -300,32 +302,34 @@
       background: var(--glass);
       backdrop-filter: blur(14px);
       border: 1px solid var(--border);
-      border-radius: 18px;
-      padding: 12px 14px;
-      max-height: 44vh;
+      border-radius: 20px;
+      padding: 16px;
+      max-height: 48vh;
       overflow-y: auto;
       box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
     }
 
+    .offer-title { font-size: 1.15rem; font-weight: 900; }
+
     .offer-box {
       border: 1px solid var(--border);
       background: var(--glass-2);
-      border-radius: 14px;
-      padding: 11px 12px;
-      margin-top: 8px;
+      border-radius: 16px;
+      padding: 14px;
+      margin-top: 10px;
     }
 
-    .offer-box.direct { border-color: rgba(245, 158, 11, 0.55); }
-    .offer-box.dispute { border-color: rgba(34, 211, 238, 0.45); }
+    .offer-box.direct { border-color: rgba(245, 158, 11, 0.65); }
+    .offer-box.dispute { border-color: rgba(34, 211, 238, 0.55); }
 
-    .row-between { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
-    .meta { font-size: 0.8rem; color: var(--muted); margin-top: 3px; }
+    .row-between { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+    .meta { font-size: 0.94rem; color: var(--muted); margin-top: 4px; line-height: 1.35; }
 
     .badge-type {
       display: inline-block;
-      border-radius: 8px;
-      padding: 2px 8px;
-      font-size: 0.72rem;
+      border-radius: 10px;
+      padding: 4px 10px;
+      font-size: 0.84rem;
       font-weight: 900;
     }
     .badge-type.dispute { background: rgba(34, 211, 238, 0.18); color: var(--route-cyan); }
@@ -335,9 +339,9 @@
       display: inline-block;
       background: var(--glass);
       border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 2px 8px;
-      font-size: 0.74rem;
+      border-radius: 10px;
+      padding: 4px 10px;
+      font-size: 0.88rem;
       font-weight: 900;
     }
 
@@ -345,19 +349,19 @@
       display: inline-block;
       background: rgba(16, 185, 129, 0.2);
       color: var(--money-green);
-      border-radius: 8px;
-      padding: 4px 10px;
-      font-size: 0.88rem;
+      border-radius: 10px;
+      padding: 6px 12px;
+      font-size: 1.08rem;
       font-weight: 900;
     }
 
-    .btn-row { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+    .btn-row { display: flex; gap: 10px; margin-top: 12px; flex-wrap: wrap; }
 
     .btn {
       border: none;
-      border-radius: 12px;
-      padding: 10px 12px;
-      font-size: 0.84rem;
+      border-radius: 14px;
+      padding: 13px 14px;
+      font-size: 1rem;
       font-weight: 900;
       cursor: pointer;
       flex: 1 1 auto;
@@ -365,13 +369,13 @@
 
     .btn-primary { background: var(--money-green); color: #04130d; }
     .btn-cyan { background: var(--route-cyan); color: #04121d; }
-    .btn-danger { background: rgba(239, 68, 68, 0.18); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.35); flex: 0 0 auto; }
+    .btn-danger { background: rgba(239, 68, 68, 0.2); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.4); flex: 0 0 auto; }
     .btn-outline { background: var(--glass); color: var(--text); border: 1px solid var(--border); }
 
     .pin-backdrop {
       position: fixed;
       inset: 0;
-      background: rgba(2, 6, 23, 0.75);
+      background: rgba(2, 6, 23, 0.78);
       backdrop-filter: blur(6px);
       z-index: 55;
       display: none;
@@ -383,40 +387,41 @@
 
     .pin-card {
       width: 100%;
-      max-width: 350px;
+      max-width: 390px;
       background: var(--glass-2);
       border: 1px solid var(--border);
-      border-radius: 20px;
-      padding: 18px;
+      border-radius: 22px;
+      padding: 20px;
       box-shadow: 0 22px 50px rgba(0, 0, 0, 0.55);
     }
 
     .pin-input {
       width: 100%;
       text-align: center;
-      font-size: 1.55rem;
+      font-size: 1.85rem;
       font-weight: 900;
       letter-spacing: 0.35em;
-      padding: 12px;
-      margin-top: 10px;
-      border-radius: 12px;
+      padding: 14px;
+      margin-top: 12px;
+      border-radius: 14px;
     }
 
     .toast {
       position: fixed;
-      top: 120px;
+      top: 130px;
       left: 50%;
       transform: translateX(-50%);
       background: var(--glass-2);
       border: 1px solid var(--route-cyan);
       color: var(--text);
-      padding: 9px 15px;
-      border-radius: 12px;
-      font-size: 0.82rem;
+      padding: 12px 18px;
+      border-radius: 14px;
+      font-size: 0.96rem;
       font-weight: 800;
       z-index: 65;
       display: none;
-      white-space: nowrap;
+      max-width: 92vw;
+      text-align: center;
     }
 
     .hidden { display: none !important; }
@@ -427,7 +432,7 @@
 
   <div class="nav-instruction-wrap">
     <div class="top-utility-bar">
-      <div style="display:flex;gap:8px;align-items:center;">
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
         <button class="hud-chip" type="button" id="openSidebarBtn">☰ Menu</button>
         <button class="hud-chip" type="button" id="onlineHudBtn">● Offline</button>
       </div>
@@ -459,7 +464,7 @@
   <aside class="sidebar" id="sidebarMenu">
     <div class="row-between">
       <div>
-        <strong style="font-size:1rem;">RotaSabor</strong>
+        <strong style="font-size:1.2rem;">RotaSabor</strong>
         <div class="meta" id="sidebarGpsInfo">GPS: aguardando</div>
         <div class="meta" id="sidebarMapInfo">Mapa: iniciando...</div>
       </div>
@@ -493,7 +498,7 @@
     <div class="meta" id="sidebarStatsText">0 entregas • R$ 0,00</div>
     <div class="meta" id="acceptanceRateText">Taxa de aceitação: 100%</div>
 
-    <div class="side-label">Mais opções (em breve)</div>
+    <div class="side-label">Mais opções</div>
     <button class="side-btn" type="button" onclick="showToast('Histórico em breve')">
       <span>Histórico de rotas</span>
       <span>›</span>
@@ -523,10 +528,10 @@
     <div class="offers-card" id="offersDockCard">
       <div class="row-between">
         <div>
-          <strong style="font-size:0.96rem;">Ofertas de entrega</strong>
+          <div class="offer-title">Ofertas de entrega</div>
           <div class="meta" id="offersSubLabel">Disputa não afeta taxa • Direto afeta se recusar</div>
         </div>
-        <button class="btn btn-outline" style="flex:0 0 auto;padding:6px 10px;font-size:0.78rem;" type="button" id="quickRefreshBtn">↻</button>
+        <button class="btn btn-outline" style="flex:0 0 auto;padding:8px 14px;font-size:0.95rem;" type="button" id="quickRefreshBtn">↻</button>
       </div>
       <div id="offersList"></div>
     </div>
@@ -534,9 +539,9 @@
 
   <div class="pin-backdrop" id="pinModalBackdrop">
     <div class="pin-card">
-      <strong style="font-size:1rem;">Confirmar entrega (4 dígitos)</strong>
+      <strong style="font-size:1.2rem;">Confirmar entrega (4 dígitos)</strong>
       <div class="meta" id="pinOrderSummary">Digite os 4 últimos números do celular do cliente.</div>
-      <div style="margin-top:8px;">
+      <div style="margin-top:10px;">
         <span class="tag-fee" id="pinPayPreview">Receber: R$ 0,00</span>
       </div>
       <input class="pin-input" type="tel" id="pinCodeInput" maxlength="4" inputmode="numeric" placeholder="0000" />
@@ -576,22 +581,12 @@
 
     const fmtBRL = (v) => Number(v || 0).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
-    function extractClientLast4(order) {
-      if (!order || typeof order !== "object") return "";
-      const candidates = [
-        order.client_phone,
-        order.customer_phone,
-        order.phone,
-        order.telefone,
-        order.celular,
-        order.whatsapp
-      ];
-      for (const raw of candidates) {
-        if (!raw) continue;
-        const digits = String(raw).replace(/\D/g, "");
-        if (digits.length >= 4) return digits.slice(-4);
+    function getCourierPayout(order) {
+      if (!order) return 0;
+      if (order.courier_net_earning !== undefined && order.courier_net_earning !== null) {
+        return Number(order.courier_net_earning);
       }
-      return "";
+      return Number(order.delivery_fee || 0);
     }
 
     function showToast(msg) {
@@ -706,11 +701,11 @@
     function makeRiderIcon(deg = 0) {
       return L.divIcon({
         className: "rider-nav-marker",
-        html: `<div style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;transform:rotate(${deg}deg);transition:transform 0.2s linear;">
-          <div style="width:0;height:0;border-left:11px solid transparent;border-right:11px solid transparent;border-bottom:26px solid #22d3ee;filter:drop-shadow(0 0 8px rgba(34,211,238,0.9));"></div>
+        html: `<div style="width:42px;height:42px;display:flex;align-items:center;justify-content:center;transform:rotate(${deg}deg);transition:transform 0.2s linear;">
+          <div style="width:0;height:0;border-left:13px solid transparent;border-right:13px solid transparent;border-bottom:30px solid #22d3ee;filter:drop-shadow(0 0 8px rgba(34,211,238,0.9));"></div>
         </div>`,
-        iconSize: [36, 36],
-        iconAnchor: [18, 18]
+        iconSize: [42, 42],
+        iconAnchor: [21, 21]
       });
     }
 
@@ -835,7 +830,7 @@
       arrivalDoneForId = null;
 
       const addr = order.client_address || "Centro, Catanduva - SP";
-      const fee = Number(order.delivery_fee || 0);
+      const payout = getCourierPayout(order);
 
       document.getElementById("offersDockCard").classList.add("hidden");
       document.getElementById("turnBannerBox").classList.remove("hidden");
@@ -845,7 +840,7 @@
       document.getElementById("turnSubText").textContent = "Em direção a";
       document.getElementById("turnMainText").textContent = addr;
       document.getElementById("thenSubText").textContent = order.client_name || "Cliente";
-      document.getElementById("dockFeeText").textContent = fmtBRL(fee);
+      document.getElementById("dockFeeText").textContent = fmtBRL(payout);
       document.getElementById("etaTimeText").textContent = "Calculando...";
       document.getElementById("etaDistArrivalText").textContent = addr;
 
@@ -861,7 +856,7 @@
         if (map && destMarker) map.removeLayer(destMarker);
         if (map) {
           destMarker = L.circleMarker([dest.lat, dest.lng], {
-            radius: 11,
+            radius: 12,
             color: "#ffffff",
             weight: 3,
             fillColor: "#10b981",
@@ -934,25 +929,267 @@
       openPinModal(target);
     });
 
-    function checkAutoArrival(lat, lng) {
-      if (!activeRouteOrder || typeof activeRouteOrder._destLat !== "number") return;
-      const dist = distanceMeters(lat, lng, activeRouteOrder._destLat, activeRouteOrder._destLng);
-      if (dist <= 40 && arrivalDoneForId !== activeRouteOrder.id) {
-        arrivalDoneForId = activeRouteOrder.id;
-        handleArrival();
+    function updateOnlineStatus(online) {
+      isOnline = Boolean(online);
+      const btn = document.getElementById("onlineHudBtn");
+      btn.textContent = isOnline ? "● Online" : "● Offline";
+      btn.style.color = isOnline ? "var(--money-green)" : "var(--text)";
+      if (isOnline) {
+        initMap();
+        requestLocationPermission(false);
+        loadOrders();
+      }
+    }
+
+    document.getElementById("onlineHudBtn").addEventListener("click", () => {
+      updateOnlineStatus(!isOnline);
+      showToast(isOnline ? "Você está Online para ofertas" : "Você ficou Offline");
+    });
+
+    document.getElementById("recenterCircleBtn").addEventListener("click", () => {
+      initMap();
+      requestLocationPermission(true);
+      focusFirstPersonCamera(currentLat, currentLng, currentHeading);
+    });
+
+    function requestLocationPermission(notifyUser = true) {
+      const gpsLabel = document.getElementById("sidebarGpsInfo");
+      if (!("geolocation" in navigator)) {
+        if (gpsLabel) gpsLabel.textContent = "GPS: indisponível no aparelho";
+        return;
+      }
+      if (gpsLabel) gpsLabel.textContent = "GPS: solicitando permissão...";
+
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          currentLat = pos.coords.latitude;
+          currentLng = pos.coords.longitude;
+          if (typeof pos.coords.heading === "number" && !Number.isNaN(pos.coords.heading)) {
+            currentHeading = pos.coords.heading;
+          }
+          if (gpsLabel) gpsLabel.textContent = `GPS: ativo (${currentLat.toFixed(4)}, ${currentLng.toFixed(4)})`;
+          initMap();
+          focusFirstPersonCamera(currentLat, currentLng, currentHeading);
+          if (notifyUser) showToast("Localização GPS ativada");
+        },
+        () => {
+          if (gpsLabel) gpsLabel.textContent = "GPS: permissão pendente ou negada";
+          initMap();
+          if (notifyUser) showToast("Permita o acesso à localização no navegador");
+        },
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 5000 }
+      );
+
+      if (watchId === null) {
+        watchId = navigator.geolocation.watchPosition(
+          (pos) => {
+            currentLat = pos.coords.latitude;
+            currentLng = pos.coords.longitude;
+            if (typeof pos.coords.heading === "number" && !Number.isNaN(pos.coords.heading)) {
+              currentHeading = pos.coords.heading;
+            }
+            if (gpsLabel) gpsLabel.textContent = `GPS: ativo (${currentLat.toFixed(4)}, ${currentLng.toFixed(4)})`;
+            focusFirstPersonCamera(currentLat, currentLng, currentHeading);
+
+            if (activeRouteOrder && typeof activeRouteOrder._destLat === "number") {
+              const dist = distanceMeters(currentLat, currentLng, activeRouteOrder._destLat, activeRouteOrder._destLng);
+              const mins = Math.max(1, Math.round(dist / 420));
+              document.getElementById("etaTimeText").textContent = `${mins}min`;
+              document.getElementById("etaDistArrivalText").textContent = `${(dist / 1000).toFixed(1)} km • ${formatEtaClock(mins)}`;
+              if (dist <= 45 && arrivalDoneForId !== activeRouteOrder.id) {
+                arrivalDoneForId = activeRouteOrder.id;
+                handleArrival();
+              }
+            }
+          },
+          () => {},
+          { enableHighAccuracy: true, maximumAge: 3000, timeout: 12000 }
+        );
+      }
+    }
+
+    document.getElementById("enableGpsBtn").addEventListener("click", () => requestLocationPermission(true));
+
+    function updateAcceptanceRateUi() {
+      const rate = directSeenCount > 0 ? Math.round((directAcceptedCount / directSeenCount) * 100) : 100;
+      document.getElementById("acceptanceRateText").textContent = `Taxa de aceitação: ${rate}%`;
+    }
+
+    function updateCourierStats() {
+      const cid = Number(document.getElementById("courierSelect").value || 0);
+      const mine = orders.filter((o) => Number(o.courier_id) === cid && String(o.status || "").toLowerCase() === "entregue");
+      const total = mine.reduce((acc, o) => acc + getCourierPayout(o), 0);
+      document.getElementById("hudEarningsBox").textContent = fmtBRL(total);
+      document.getElementById("sidebarStatsText").textContent = `${mine.length} entregas • ${fmtBRL(total)}`;
+      updateAcceptanceRateUi();
+    }
+
+    function getOfferType(order) {
+      const txt = String(order.offer_type || order.dispatch_mode || "").toLowerCase();
+      if (txt.includes("direct") || txt.includes("diret")) return "direct";
+      return "dispute";
+    }
+
+    function ensureOfferTimer(orderId, offerType) {
+      if (offerTimers[orderId] !== undefined) return offerTimers[orderId];
+      const initialSec = offerType === "direct" ? 25 : 40;
+      offerTimers[orderId] = initialSec;
+      return initialSec;
+    }
+
+    function startOfferCountdown() {
+      if (window._offerTimerInterval) clearInterval(window._offerTimerInterval);
+      window._offerTimerInterval = setInterval(() => {
+        let changed = false;
+        Object.keys(offerTimers).forEach((idStr) => {
+          const id = Number(idStr);
+          const stillExists = orders.some((o) => Number(o.id) === id && !o.courier_accepted);
+          if (!stillExists) {
+            delete offerTimers[idStr];
+            changed = true;
+            return;
+          }
+          if (offerTimers[idStr] > 0) {
+            offerTimers[idStr] -= 1;
+            changed = true;
+          }
+        });
+        if (changed && !activeRouteOrder) {
+          renderOffers();
+        }
+      }, 1000);
+    }
+
+    function dismissOffer(orderId, offerType) {
+      if (offerType === "direct") {
+        directSeenCount += 1;
+        localStorage.setItem("rotasabor_direct_seen", String(directSeenCount));
+        updateAcceptanceRateUi();
+      }
+      if (!dismissedIds.includes(orderId)) {
+        dismissedIds.push(orderId);
+        localStorage.setItem("rotasabor_dismissed_offers", JSON.stringify(dismissedIds));
+      }
+      delete offerTimers[orderId];
+      renderOffers();
+      showToast(offerType === "direct" ? "Oferta direta recusada" : "Oferta ocultada");
+    }
+
+    function renderOffers() {
+      const listEl = document.getElementById("offersList");
+      if (!listEl) return;
+
+      const available = orders.filter(
+        (o) => !o.courier_accepted && String(o.status || "").toLowerCase() !== "entregue" && !dismissedIds.includes(Number(o.id))
+      );
+
+      let newlyArrivedDirect = false;
+      let newlyArrivedDispute = false;
+      available.forEach((o) => {
+        const oid = Number(o.id);
+        const otype = getOfferType(o);
+        ensureOfferTimer(oid, otype);
+        if (!knownOfferIds.has(oid)) {
+          knownOfferIds.add(oid);
+          if (otype === "direct") {
+            directSeenCount += 1;
+            localStorage.setItem("rotasabor_direct_seen", String(directSeenCount));
+            newlyArrivedDirect = true;
+          } else {
+            newlyArrivedDispute = true;
+          }
+        }
+      });
+      updateAcceptanceRateUi();
+
+      if (isOnline && !activeRouteOrder) {
+        if (newlyArrivedDirect) {
+          playDirectAlertSound();
+          speakPhrase("Nova chamada direta de entrega!", true);
+        } else if (newlyArrivedDispute) {
+          playDisputeSound();
+          speakPhrase("Nova oferta de entrega disponível", true);
+        }
+      }
+
+      if (!available.length) {
+        listEl.innerHTML = `<div class="meta" style="padding:10px 0;">Nenhuma oferta disponível no momento. Aguardando novas ofertas...</div>`;
+        return;
+      }
+
+      listEl.innerHTML = available.map((o) => {
+        const oid = Number(o.id);
+        const otype = getOfferType(o);
+        const secs = ensureOfferTimer(oid, otype);
+        const badgeLabel = otype === "direct" ? "CHAMADA DIRETA" : "DISPUTA RÁPIDA";
+        const payout = getCourierPayout(o);
+        return `
+          <div class="offer-box ${otype}">
+            <div class="row-between">
+              <div>
+                <span class="badge-type ${otype}">${badgeLabel}</span>
+                <span class="timer-pill">⏱ ${secs}s</span>
+                <strong style="display:block;font-size:1.12rem;margin-top:6px;">${o.order_code || "#" + o.id} • ${o.store_name || "Estabelecimento"}</strong>
+              </div>
+              <span class="tag-fee">${fmtBRL(payout)}</span>
+            </div>
+            <div class="meta">📍 ${o.client_address || "Endereço não informado"}</div>
+            <div class="meta">👤 Cliente: ${o.client_name || "Cliente"}</div>
+            <div class="btn-row">
+              <button class="btn ${otype === "direct" ? "btn-primary" : "btn-cyan"}" type="button" onclick="acceptOrder(${o.id})">
+                ${otype === "direct" ? "Aceitar direta" : "Entrar na disputa"}
+              </button>
+              <button class="btn btn-danger" type="button" onclick="dismissOffer(${o.id}, '${otype}')">Recusar</button>
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    async function acceptOrder(orderId) {
+      const cid = Number(document.getElementById("courierSelect").value || 0);
+      if (!cid) {
+        setSidebarOpen(true);
+        showToast("Selecione seu nome no menu lateral primeiro");
+        return;
+      }
+      const target = orders.find((o) => Number(o.id) === Number(orderId));
+      if (target && getOfferType(target) === "direct") {
+        directAcceptedCount += 1;
+        localStorage.setItem("rotasabor_direct_accepted", String(directAcceptedCount));
+        updateAcceptanceRateUi();
+      }
+      try {
+        const res = await fetch(`/api/orders/${orderId}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ courier_id: cid, courier_accepted: true, status: "Aceito pelo entregador" })
+        });
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}));
+          showToast(err.error || "Não foi possível aceitar");
+          return;
+        }
+        const updated = await res.json();
+        delete offerTimers[Number(orderId)];
+        playMoneySound();
+        showToast("Pedido aceito! Iniciando navegador...");
+        await loadOrders();
+        await enterAutoRouteMode(updated);
+      } catch (_) {
+        showToast("Erro de conexão ao aceitar");
       }
     }
 
     function openPinModal(order) {
       pendingPinOrder = order;
-      const code = order.order_code || `RS-${String(order.id).padStart(3, "0")}`;
+      const payout = getCourierPayout(order);
       document.getElementById("pinOrderSummary").textContent =
-        `Pedido #${order.id} (${code}) • 4 últimos números do celular de ${order.client_name || "Cliente"}`;
-      document.getElementById("pinPayPreview").textContent = `Receber: ${fmtBRL(order.delivery_fee || 0)}`;
-      const input = document.getElementById("pinCodeInput");
-      input.value = "";
+        `Pedido ${order.order_code || "#" + order.id} (${order.client_name || "Cliente"}). Digite os 4 últimos números do celular.`;
+      document.getElementById("pinPayPreview").textContent = `Receber: ${fmtBRL(payout)}`;
+      document.getElementById("pinCodeInput").value = "";
       document.getElementById("pinModalBackdrop").classList.add("open");
-      setTimeout(() => input.focus(), 100);
+      setTimeout(() => document.getElementById("pinCodeInput").focus(), 120);
     }
 
     function closePinModal() {
@@ -964,405 +1201,87 @@
 
     document.getElementById("confirmPinBtn").addEventListener("click", async () => {
       if (!pendingPinOrder) return;
-      const pin = document.getElementById("pinCodeInput").value.trim();
-      if (pin.length !== 4) {
-        showToast("Digite os 4 últimos números do celular do cliente.");
+      const code = String(document.getElementById("pinCodeInput").value || "").replace(/\D/g, "").slice(0, 4);
+      if (code.length < 4) {
+        showToast("Digite os 4 últimos números do celular");
         return;
       }
-
-      const expectedLast4 = extractClientLast4(pendingPinOrder);
-      if (expectedLast4 && pin !== expectedLast4) {
-        showToast("Os 4 dígitos não conferem com o celular do cliente.");
-        return;
-      }
-
-      const cidRaw = document.getElementById("courierSelect").value;
-      const body = {
-        status: "Entregue",
-        delivery_code: pin,
-        last4: pin
-      };
-      if (cidRaw) body.courier_id = Number(cidRaw);
-
       try {
         const res = await fetch(`/api/orders/${pendingPinOrder.id}`, {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(body)
+          body: JSON.stringify({ status: "Entregue", delivery_code: code })
         });
         const data = await res.json().catch(() => ({}));
         if (!res.ok) {
-          showToast(data.error || "Código incorreto para este pedido.");
+          showToast(data.error || "Código incorreto");
           return;
         }
-        const receivedFee = Number(pendingPinOrder.delivery_fee || 0);
+        const received = getCourierPayout(data);
         closePinModal();
         playMoneySound();
-        speakPhrase("Pagamento recebido", true);
-        showToast(`Pagamento recebido: +${fmtBRL(receivedFee)}`);
+        speakPhrase(`Entrega confirmada! Você recebeu ${received.toFixed(2).replace(".", ",")} reais.`, true);
+        showToast(`Entrega confirmada! +${fmtBRL(received)}`);
         await loadOrders();
       } catch (_) {
-        showToast("Erro ao confirmar entrega.");
+        showToast("Erro ao confirmar entrega");
       }
     });
-
-    function syncOnlineUi() {
-      const btn = document.getElementById("onlineHudBtn");
-      btn.textContent = isOnline ? "● Online" : "● Offline";
-      btn.style.color = isOnline ? "var(--money-green)" : "var(--muted)";
-    }
-
-    function requestLocationPermission(centerOnFix = false) {
-      initMap();
-      if (!navigator.geolocation) {
-        showToast("GPS não suportado neste aparelho.");
-        return;
-      }
-      navigator.geolocation.getCurrentPosition(
-        (pos) => {
-          const hdg = typeof pos.coords.heading === "number" && !Number.isNaN(pos.coords.heading) ? pos.coords.heading : null;
-          pushGps(pos.coords.latitude, pos.coords.longitude, hdg);
-          if (centerOnFix && map && !activeRouteOrder) {
-            map.setView([pos.coords.latitude, pos.coords.longitude], 17);
-          }
-          startGpsWatch();
-        },
-        () => {
-          showToast("Ative o GPS do celular e permita a localização.");
-        },
-        { enableHighAccuracy: true, timeout: 10000 }
-      );
-    }
-
-    document.getElementById("enableGpsBtn").addEventListener("click", () => {
-      requestLocationPermission(true);
-      setSidebarOpen(false);
-    });
-
-    document.getElementById("onlineHudBtn").addEventListener("click", () => {
-      const cid = document.getElementById("courierSelect").value;
-      if (!cid) {
-        setSidebarOpen(true);
-        showToast("Selecione o entregador no menu.");
-        return;
-      }
-      isOnline = !isOnline;
-      localStorage.setItem("rotasabor_courier_online", isOnline ? "1" : "0");
-      syncOnlineUi();
-      if (isOnline) {
-        requestLocationPermission(true);
-        showToast("Online e GPS ativo");
-      } else {
-        showToast("Offline");
-      }
-    });
-
-    async function pushGps(lat, lng, headingDeg = null) {
-      const prevLat = currentLat;
-      const prevLng = currentLng;
-      currentLat = Number(lat);
-      currentLng = Number(lng);
-
-      let computedHeading = headingDeg;
-      if (computedHeading === null && distanceMeters(prevLat, prevLng, currentLat, currentLng) > 3) {
-        computedHeading = computeBearing(prevLat, prevLng, currentLat, currentLng);
-      }
-
-      if (activeRouteOrder && typeof activeRouteOrder._destLat === "number") {
-        const road = await fetchRoadRoute(currentLat, currentLng, activeRouteOrder._destLat, activeRouteOrder._destLng);
-        if (road) {
-          activeRouteCoords = road.latLngs;
-          if (routeLine && map) map.removeLayer(routeLine);
-          if (map) routeLine = L.polyline(activeRouteCoords, { color: "#22d3ee", weight: 8, opacity: 0.95 }).addTo(map);
-          if (road.firstStepName) {
-            document.getElementById("turnMainText").textContent = road.firstStepName;
-            speakPhrase(`Siga em direção a ${road.firstStepName}`);
-          }
-          if (road.nextStepName) {
-            document.getElementById("thenSubText").textContent = road.nextStepName;
-          }
-          document.getElementById("etaTimeText").textContent = `${road.mins}min`;
-          document.getElementById("etaDistArrivalText").textContent = `${road.km} km • ${formatEtaClock(road.mins)}`;
-        }
-      }
-
-      focusFirstPersonCamera(currentLat, currentLng, computedHeading);
-      document.getElementById("sidebarGpsInfo").textContent =
-        `GPS: ${currentLat.toFixed(4)}, ${currentLng.toFixed(4)}`;
-      checkAutoArrival(currentLat, currentLng);
-
-      const cid = document.getElementById("courierSelect").value;
-      if (!cid) return;
-      try {
-        await fetch(`/api/couriers/${cid}/location`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ lat: currentLat, lng: currentLng })
-        });
-      } catch (_) {}
-    }
-
-    function startGpsWatch() {
-      if (!navigator.geolocation || watchId !== null) return;
-      watchId = navigator.geolocation.watchPosition(
-        (pos) => {
-          const hdg = typeof pos.coords.heading === "number" && !Number.isNaN(pos.coords.heading) ? pos.coords.heading : null;
-          pushGps(pos.coords.latitude, pos.coords.longitude, hdg);
-        },
-        () => {},
-        { enableHighAccuracy: true, maximumAge: 2500 }
-      );
-    }
-
-    document.getElementById("recenterCircleBtn").addEventListener("click", () => {
-      requestLocationPermission(true);
-    });
-
-    function getOfferMode(order) {
-      const raw = String(order.dispatch_mode || order.offer_type || "").toLowerCase();
-      if (raw.includes("diret") || raw.includes("direct")) return "direct";
-      return Number(order.id || 0) % 2 === 0 ? "direct" : "dispute";
-    }
-
-    function updateAcceptanceRateUi() {
-      const rate = directSeenCount > 0
-        ? Math.max(0, Math.min(100, Math.round((directAcceptedCount / directSeenCount) * 100)))
-        : 100;
-      document.getElementById("acceptanceRateText").textContent = `Taxa de aceitação: ${rate}%`;
-    }
-
-    function rejectOffer(orderId, isDirect) {
-      if (!dismissedIds.includes(orderId)) {
-        dismissedIds.push(orderId);
-        localStorage.setItem("rotasabor_dismissed_offers", JSON.stringify(dismissedIds));
-      }
-      if (offerTimers[orderId]) {
-        clearInterval(offerTimers[orderId]);
-        delete offerTimers[orderId];
-      }
-      if (isDirect) {
-        updateAcceptanceRateUi();
-        showToast("Pedido direto recusado: taxa de aceitação reduzida.");
-      } else {
-        showToast("Disputa ignorada (sem impacto na taxa).");
-      }
-      renderOrders();
-    }
-
-    async function acceptOrderAndRoute(orderId, isDirect = false) {
-      const cidRaw = document.getElementById("courierSelect").value;
-      if (!cidRaw) {
-        setSidebarOpen(true);
-        showToast("Selecione seu entregador no menu.");
-        return;
-      }
-      if (offerTimers[orderId]) {
-        clearInterval(offerTimers[orderId]);
-        delete offerTimers[orderId];
-      }
-      try {
-        const res = await fetch(`/api/orders/${orderId}`, {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            courier_id: Number(cidRaw),
-            courier_accepted: true,
-            status: "A caminho da coleta"
-          })
-        });
-        if (res.ok) {
-          if (isDirect) {
-            directAcceptedCount += 1;
-            localStorage.setItem("rotasabor_direct_accepted", String(directAcceptedCount));
-            updateAcceptanceRateUi();
-          }
-          const updated = await res.json().catch(() => null);
-          const target = updated || orders.find((o) => Number(o.id) === Number(orderId)) || { id: orderId };
-          await loadOrders();
-          await enterAutoRouteMode(target);
-        }
-      } catch (_) {
-        showToast("Erro ao aceitar entrega.");
-      }
-    }
-
-    function startOfferTimers(list) {
-      Object.keys(offerTimers).forEach((k) => {
-        clearInterval(offerTimers[k]);
-        delete offerTimers[k];
-      });
-
-      list.forEach((o) => {
-        const oid = o.id;
-        const mode = getOfferMode(o);
-        const timerEl = document.getElementById(`timer-${oid}`);
-        if (!timerEl) return;
-
-        let secs = mode === "direct" ? 25 : 40;
-        timerEl.textContent = `${secs}s`;
-
-        offerTimers[oid] = setInterval(() => {
-          secs -= 1;
-          const el = document.getElementById(`timer-${oid}`);
-          if (!el) {
-            clearInterval(offerTimers[oid]);
-            delete offerTimers[oid];
-            return;
-          }
-          el.textContent = `${Math.max(0, secs)}s`;
-          if (secs <= 0) {
-            clearInterval(offerTimers[oid]);
-            delete offerTimers[oid];
-            rejectOffer(oid, mode === "direct");
-          }
-        }, 1000);
-      });
-    }
 
     async function loadCouriers() {
       try {
         const res = await fetch("/api/couriers");
-        if (res.ok) couriers = await res.json();
+        if (!res.ok) return;
+        couriers = await res.json();
+        const sel = document.getElementById("courierSelect");
+        const prev = sel.value || localStorage.getItem("rotasabor_courier_id") || "";
+        sel.innerHTML = `<option value="">Selecione o entregador...</option>` +
+          couriers.map((c) => `<option value="${c.id}">${c.full_name} (${c.vehicle || "Moto"})</option>`).join("");
+        if (prev && couriers.some((c) => String(c.id) === String(prev))) {
+          sel.value = prev;
+        } else if (couriers.length) {
+          sel.value = String(couriers[0].id);
+          localStorage.setItem("rotasabor_courier_id", sel.value);
+        }
+        updateCourierStats();
       } catch (_) {}
-      const sel = document.getElementById("courierSelect");
-      const savedId = localStorage.getItem("rotasabor_courier_id") || sel.value;
-      sel.innerHTML = `<option value="">Selecione o entregador...</option>` + couriers.map((c) =>
-        `<option value="${c.id}">${c.name} (${c.vehicle || "Moto"})</option>`
-      ).join("");
-      if (savedId) sel.value = savedId;
-      isOnline = localStorage.getItem("rotasabor_courier_online") === "1";
-      syncOnlineUi();
     }
 
     document.getElementById("courierSelect").addEventListener("change", (e) => {
       localStorage.setItem("rotasabor_courier_id", e.target.value);
-      renderOrders();
+      updateCourierStats();
     });
 
     async function loadOrders() {
       try {
         const res = await fetch("/api/orders");
-        if (res.ok) orders = await res.json();
-      } catch (_) {}
-      renderOrders();
-    }
-
-    function renderOrders() {
-      const selectedCid = Number(document.getElementById("courierSelect").value || 0);
-      const filtered = orders.filter((o) => !selectedCid || !o.courier_id || Number(o.courier_id) === selectedCid);
-      const doneList = filtered.filter((o) => String(o.status || "").toLowerCase().includes("entregue"));
-
-      const activeList = filtered.filter((o) => {
-        if (String(o.status || "").toLowerCase().includes("entregue")) return false;
-        const accepted = Boolean(o.courier_accepted) || String(o.status || "").toLowerCase().includes("caminho") || String(o.status || "").toLowerCase().includes("colet");
-        if (!accepted && dismissedIds.includes(o.id)) return false;
-        return true;
-      });
-
-      const totalEarned = doneList.reduce((acc, item) => acc + Number(item.delivery_fee || 0), 0);
-      document.getElementById("hudEarningsBox").textContent = fmtBRL(totalEarned);
-      document.getElementById("sidebarStatsText").textContent =
-        `${doneList.length} entregas • ${fmtBRL(totalEarned)}`;
-
-      document.getElementById("offersSubLabel").textContent = activeList.length
-        ? `${activeList.length} oferta(s) na tela`
-        : "Nenhuma oferta disponível no momento";
-
-      const box = document.getElementById("offersList");
-      if (!activeList.length) {
-        box.innerHTML = `<div class="meta" style="margin-top:8px;">Aguardando novas ofertas...</div>`;
-        return;
-      }
-
-      let playedNewSound = false;
-      const reversed = [...activeList].reverse();
-
-      box.innerHTML = reversed.map((o) => {
-        const code = o.order_code || `RS-${String(o.id).padStart(3, "0")}`;
-        const fee = Number(o.delivery_fee || 0);
-        const accepted = Boolean(o.courier_accepted) || String(o.status || "").toLowerCase().includes("caminho") || String(o.status || "").toLowerCase().includes("colet");
-        const mode = getOfferMode(o);
-        const isDirect = mode === "direct";
-
-        if (!accepted && !knownOfferIds.has(o.id)) {
-          knownOfferIds.add(o.id);
-          if (isDirect) {
-            directSeenCount += 1;
-            localStorage.setItem("rotasabor_direct_seen", String(directSeenCount));
-            updateAcceptanceRateUi();
-            if (!playedNewSound) {
-              playDirectAlertSound();
-              speakPhrase("Novo pedido direto para você", true);
-              playedNewSound = true;
-            }
-          } else if (!playedNewSound) {
-            playDisputeSound();
-            playedNewSound = true;
-          }
+        if (!res.ok) return;
+        orders = await res.json();
+        updateCourierStats();
+        if (!activeRouteOrder) {
+          renderOffers();
         }
-
-        const watchers = ((Number(o.id || 1) * 3) % 6) + 2;
-
-        return `
-          <div class="offer-box ${isDirect ? "direct" : "dispute"}">
-            <div class="row-between">
-              <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
-                <span class="badge-type ${isDirect ? "direct" : "dispute"}">
-                  ${isDirect ? "PEDIDO DIRETO" : `DISPUTA • ${watchers} DE OLHO`}
-                </span>
-                <span class="tag-code">${code}</span>
-                ${!accepted ? `<span class="timer-pill" id="timer-${o.id}">${isDirect ? "25s" : "40s"}</span>` : ""}
-              </div>
-              <span class="tag-fee">${fmtBRL(fee)}</span>
-            </div>
-            <div style="margin-top:6px;">
-              <strong>#${o.id} • ${o.store_name || "Loja"}</strong>
-              <div class="meta">Cliente: ${o.client_name || "Cliente"} • ${o.client_address || "Sem endereço"}</div>
-              <div class="meta">${isDirect ? "Recusar reduz sua taxa de aceitação" : "Disputa livre — não afeta sua taxa"}</div>
-            </div>
-            <div class="btn-row">
-              ${!accepted
-                ? `<button class="btn btn-primary" type="button" onclick="acceptOrderAndRoute(${o.id}, ${isDirect})">
-                     ${isDirect ? "Aceitar e iniciar rota" : "Pegar e iniciar rota"}
-                   </button>
-                   <button class="btn btn-danger" type="button" onclick="rejectOffer(${o.id}, ${isDirect})">Recusar</button>`
-                : `<button class="btn btn-cyan" type="button" onclick='enterAutoRouteMode(${JSON.stringify(o)})'>Abrir rota</button>
-                   <button class="btn btn-primary" type="button" onclick='openPinModal(${JSON.stringify(o)})'>4 dígitos</button>`
-              }
-            </div>
-          </div>
-        `;
-      }).join("");
-
-      const pendingOffers = reversed.filter((o) => {
-        const accepted = Boolean(o.courier_accepted) || String(o.status || "").toLowerCase().includes("caminho") || String(o.status || "").toLowerCase().includes("colet");
-        return !accepted;
-      });
-      startOfferTimers(pendingOffers);
+      } catch (_) {}
     }
 
-    document.getElementById("quickRefreshBtn").addEventListener("click", loadOrders);
     document.getElementById("refreshAllBtn").addEventListener("click", async () => {
-      await Promise.all([loadCouriers(), loadOrders()]);
-      setSidebarOpen(false);
-      showToast("Atualizado");
+      await loadCouriers();
+      await loadOrders();
+      showToast("Pedidos atualizados");
     });
 
-    if ("serviceWorker" in navigator) {
-      window.addEventListener("load", () => {
-        navigator.serviceWorker.register("/sw.js").catch(() => {});
-      });
-    }
+    document.getElementById("quickRefreshBtn").addEventListener("click", async () => {
+      await loadOrders();
+      showToast("Ofertas atualizadas");
+    });
 
-    updateSoundUi();
-    updateAcceptanceRateUi();
     applyTheme();
+    updateSoundUi();
     initMap();
-    window.addEventListener("load", () => {
-      initMap();
-      setTimeout(() => map && map.invalidateSize(), 250);
-    });
-    Promise.all([loadCouriers(), loadOrders()]);
+    requestLocationPermission(false);
+    startOfferCountdown();
+    loadCouriers().then(loadOrders);
+    setInterval(loadOrders, 4000);
   </script>
 </body>
 </html>
