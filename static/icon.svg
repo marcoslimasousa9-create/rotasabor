@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
-  <rect width="512" height="512" rx="112" fill="#0b1220" />
-  <rect x="24" y="24" width="464" height="464" rx="92" fill="none" stroke="#38bdf8" stroke-width="12" />
-  <text x="256" y="315" text-anchor="middle" fill="#38bdf8" font-family="system-ui, -apple-system, sans-serif" font-size="220" font-weight="800">R</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <rect width="128" height="128" rx="28" fill="#111827" />
+  <circle cx="64" cy="64" r="44" fill="#facc15" />
+  <text x="64" y="76" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="42" font-weight="900" fill="#111827">RS</text>
 </svg>
