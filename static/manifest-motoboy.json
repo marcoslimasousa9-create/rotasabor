@@ -1,19 +1,19 @@
 {
-  "name": "RotaSabor Motoboy — Entregas",
-  "short_name": "RS Motoboy",
-  "description": "Receba chamadas, atualize status e envie GPS em Catanduva.",
-  "start_url": "/app-motoboy",
+  "name": "RotaSabor — Entregador",
+  "short_name": "RotaSabor Moto",
+  "description": "Aplicativo de entregas e rotas do RotaSabor.",
+  "start_url": "/motoboy",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#0b1220",
-  "theme_color": "#10b981",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff",
   "icons": [
     {
       "src": "/static/icon.svg",
       "sizes": "any",
       "type": "image/svg+xml",
-      "purpose": "any maskable"
+      "purpose": "any"
     }
   ]
 }
