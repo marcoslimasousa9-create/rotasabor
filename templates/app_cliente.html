@@ -18,7 +18,7 @@
       --surface-warm: #fefce8;
       --border: #e5e7eb;
       --text: #111827;
-      --muted: #6b7280;
+      --muted: #4b5563;
       --green: #16a34a;
       --yellow: #facc15;
       --yellow-soft: #fef08a;
@@ -34,10 +34,10 @@
     html, body {
       margin: 0;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      font-size: 15px;
+      font-size: 17px;
       background: var(--bg);
       color: var(--text);
-      padding-bottom: 108px;
+      padding-bottom: 124px;
     }
 
     .topbar {
@@ -45,8 +45,8 @@
       top: 0;
       z-index: 30;
       background: rgba(255, 255, 255, 0.98);
-      border-bottom: 1px solid var(--border);
-      padding: 10px 14px;
+      border-bottom: 1.5px solid var(--border);
+      padding: 12px 14px;
     }
 
     .topbar-inner {
@@ -59,56 +59,63 @@
       align-items: center;
       justify-content: space-between;
       gap: 10px;
-      margin-bottom: 8px;
+      margin-bottom: 10px;
     }
 
     .addr-btn {
       background: transparent;
       border: none;
-      padding: 2px 0;
+      padding: 4px 0;
       color: var(--text);
-      font-size: 15px;
-      font-weight: 800;
+      font-size: 17px;
+      font-weight: 900;
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 7px;
       cursor: pointer;
-      max-width: 78%;
+      max-width: 74%;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
     }
 
+    .addr-btn span:first-child { font-size: 22px; }
+
     .cart-top-btn {
       background: var(--surface-soft);
-      border: 1px solid var(--border);
+      border: 1.5px solid var(--border);
       color: var(--text);
       border-radius: 999px;
-      padding: 6px 12px;
-      font-size: 14px;
-      font-weight: 800;
+      padding: 8px 14px;
+      font-size: 16px;
+      font-weight: 900;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
-      gap: 6px;
+      gap: 7px;
       flex-shrink: 0;
     }
+
+    .cart-top-btn span:first-child { font-size: 21px; }
 
     .search-input-wrap {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 10px;
       background: var(--surface-soft);
-      border-radius: 10px;
-      padding: 9px 12px;
+      border-radius: 12px;
+      padding: 11px 14px;
     }
+
+    .search-input-wrap span { font-size: 21px; }
 
     .search-input-wrap input {
       width: 100%;
       border: none;
       background: transparent;
       color: var(--text);
-      font-size: 15px;
+      font-size: 17px;
+      font-weight: 600;
       outline: none;
       padding: 0;
     }
@@ -116,53 +123,53 @@
     .container {
       max-width: 1160px;
       margin: 0 auto;
-      padding: 12px 14px;
+      padding: 14px 14px;
     }
 
     .hero-promo {
       background: linear-gradient(120deg, #052e23 0%, #0d5c42 60%, #15803d 100%);
       color: #ffffff;
-      border-radius: 14px;
-      padding: 16px;
+      border-radius: 16px;
+      padding: 18px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 12px;
-      margin-bottom: 12px;
+      gap: 14px;
+      margin-bottom: 14px;
     }
 
     .hero-tag {
       display: inline-block;
       background: var(--yellow);
       color: #111827;
-      font-size: 11px;
+      font-size: 13px;
       font-weight: 900;
-      padding: 3px 8px;
-      border-radius: 5px;
-      margin-bottom: 6px;
+      padding: 4px 10px;
+      border-radius: 6px;
+      margin-bottom: 8px;
       text-transform: uppercase;
     }
 
-    .hero-title { margin: 0; font-size: 20px; font-weight: 900; line-height: 1.15; }
-    .hero-sub { margin-top: 4px; font-size: 13px; opacity: 0.92; }
+    .hero-title { margin: 0; font-size: 23px; font-weight: 900; line-height: 1.15; }
+    .hero-sub { margin-top: 6px; font-size: 15px; opacity: 0.95; }
 
     .hero-badge-box {
       background: var(--yellow);
       color: #111827;
-      border-radius: 12px;
-      padding: 10px 14px;
+      border-radius: 14px;
+      padding: 12px 16px;
       text-align: center;
       font-weight: 900;
       flex-shrink: 0;
-      line-height: 1.05;
+      line-height: 1.1;
     }
 
     .cat-row {
       display: flex;
-      gap: 12px;
+      gap: 14px;
       overflow-x: auto;
-      padding-bottom: 6px;
-      margin-bottom: 10px;
+      padding-bottom: 8px;
+      margin-bottom: 12px;
       scrollbar-width: none;
     }
     .cat-row::-webkit-scrollbar { display: none; }
@@ -171,74 +178,74 @@
       background: transparent;
       border: none;
       color: var(--text);
-      min-width: 64px;
+      min-width: 86px;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 5px;
+      gap: 7px;
       cursor: pointer;
-      padding: 4px;
-      border-radius: 10px;
+      padding: 6px;
+      border-radius: 14px;
       flex-shrink: 0;
-      font-size: 13px;
-      font-weight: 700;
+      font-size: 16px;
+      font-weight: 800;
     }
 
     .cat-pill-card.active {
       background: var(--surface-mint);
       color: var(--green);
-      font-weight: 800;
+      font-weight: 900;
     }
 
     .cat-thumb {
-      width: 52px;
-      height: 52px;
-      border-radius: 12px;
+      width: 68px;
+      height: 68px;
+      border-radius: 16px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 26px;
-      border: 1px solid var(--border);
+      font-size: 36px;
+      border: 1.5px solid var(--border);
     }
 
     .benefits-strip {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 6px;
+      gap: 8px;
       flex-wrap: wrap;
-      font-size: 12px;
-      font-weight: 700;
-      margin-bottom: 10px;
+      font-size: 14px;
+      font-weight: 800;
+      margin-bottom: 12px;
     }
 
-    .benefits-strip span { color: var(--green); font-weight: 900; }
+    .benefits-strip span { color: var(--green); font-weight: 900; font-size: 16px; }
 
     .coupon-cards-row {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 8px;
-      margin-bottom: 10px;
+      gap: 10px;
+      margin-bottom: 12px;
     }
 
     .coupon-box {
       background: var(--surface-mint);
-      border: 1px solid #bbf7d0;
-      border-radius: 10px;
-      padding: 9px 6px;
+      border: 1.5px solid #bbf7d0;
+      border-radius: 12px;
+      padding: 11px 8px;
       text-align: center;
       cursor: pointer;
     }
 
-    .coupon-off { font-size: 16px; font-weight: 900; color: #15803d; }
-    .coupon-sub { font-size: 11px; color: var(--muted); font-weight: 700; margin-top: 2px; }
+    .coupon-off { font-size: 19px; font-weight: 900; color: #15803d; }
+    .coupon-sub { font-size: 13px; color: var(--muted); font-weight: 800; margin-top: 3px; }
 
     .filter-pills {
       display: flex;
       gap: 8px;
       overflow-x: auto;
       padding-bottom: 8px;
-      margin-bottom: 10px;
+      margin-bottom: 12px;
       scrollbar-width: none;
     }
     .filter-pills::-webkit-scrollbar { display: none; }
@@ -248,9 +255,9 @@
       border: none;
       color: var(--text);
       border-radius: 999px;
-      padding: 7px 14px;
-      font-size: 13px;
-      font-weight: 700;
+      padding: 9px 16px;
+      font-size: 15px;
+      font-weight: 800;
       white-space: nowrap;
       cursor: pointer;
       flex-shrink: 0;
@@ -264,80 +271,80 @@
     .stores-grid-wrap {
       display: grid;
       grid-template-columns: 1fr;
-      gap: 14px;
+      gap: 16px;
     }
 
     @media (min-width: 860px) {
       .stores-grid-wrap {
         grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 16px;
+        gap: 18px;
       }
     }
 
     .store-block {
       background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 12px;
+      border: 1.5px solid var(--border);
+      border-radius: 16px;
+      padding: 14px;
       min-width: 0;
     }
 
     .store-header-row {
       display: flex;
-      gap: 10px;
+      gap: 12px;
       align-items: flex-start;
       cursor: pointer;
-      margin-bottom: 10px;
+      margin-bottom: 12px;
     }
 
     .store-avatar {
-      width: 52px;
-      height: 52px;
-      border-radius: 12px;
+      width: 66px;
+      height: 66px;
+      border-radius: 16px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 24px;
+      font-size: 34px;
       font-weight: 900;
       color: #ffffff;
-      border: 1px solid var(--border);
+      border: 1.5px solid var(--border);
       flex-shrink: 0;
     }
 
-    .store-title { margin: 0; font-size: 16px; font-weight: 800; color: var(--text); }
+    .store-title { margin: 0; font-size: 20px; font-weight: 900; color: var(--text); line-height: 1.2; }
     .store-rating-line {
       display: flex;
       align-items: center;
-      gap: 5px;
+      gap: 6px;
       flex-wrap: wrap;
-      font-size: 13px;
-      margin-top: 3px;
-      font-weight: 700;
+      font-size: 15px;
+      margin-top: 4px;
+      font-weight: 800;
     }
 
-    .star-txt { color: #eab308; font-weight: 900; }
-    .muted-txt { color: var(--muted); font-weight: 600; font-size: 13px; }
-    .strike-price { text-decoration: line-through; color: var(--muted); font-weight: 600; }
+    .star-txt { color: #eab308; font-weight: 900; font-size: 16px; }
+    .muted-txt { color: var(--muted); font-weight: 700; font-size: 15px; }
+    .strike-price { text-decoration: line-through; color: var(--muted); font-weight: 700; }
 
     .promo-tags-row {
       display: flex;
       flex-wrap: wrap;
       gap: 6px;
-      margin-top: 6px;
+      margin-top: 8px;
     }
 
     .tag-yellow {
       background: var(--yellow-soft);
       color: #111827;
-      font-size: 11px;
-      font-weight: 800;
-      padding: 2px 7px;
-      border-radius: 5px;
+      font-size: 13px;
+      font-weight: 900;
+      padding: 3px 9px;
+      border-radius: 6px;
     }
 
     .prod-carousel {
       display: flex;
-      gap: 10px;
+      gap: 12px;
       overflow-x: auto;
       padding-bottom: 4px;
       scrollbar-width: none;
@@ -345,59 +352,59 @@
     .prod-carousel::-webkit-scrollbar { display: none; }
 
     .mini-prod-card {
-      width: 124px;
+      width: 146px;
       flex-shrink: 0;
     }
 
     .mini-img-wrap {
       position: relative;
-      width: 124px;
-      height: 102px;
-      border-radius: 10px;
+      width: 146px;
+      height: 122px;
+      border-radius: 14px;
       overflow: hidden;
-      border: 1px solid var(--border);
+      border: 1.5px solid var(--border);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 38px;
+      font-size: 48px;
     }
 
     .off-badge {
       position: absolute;
-      top: 6px;
-      left: 6px;
+      top: 7px;
+      left: 7px;
       background: var(--yellow);
       color: #111827;
-      font-size: 11px;
+      font-size: 12px;
       font-weight: 900;
-      padding: 2px 6px;
-      border-radius: 5px;
+      padding: 3px 8px;
+      border-radius: 6px;
     }
 
     .plus-circle {
       position: absolute;
-      right: 6px;
-      bottom: 6px;
-      width: 30px;
-      height: 30px;
+      right: 8px;
+      bottom: 8px;
+      width: 38px;
+      height: 38px;
       border-radius: 999px;
-      border: 1px solid #d1d5db;
+      border: 1.5px solid #d1d5db;
       background: #ffffff;
       color: #111827;
-      font-size: 20px;
+      font-size: 24px;
       font-weight: 900;
       line-height: 1;
       cursor: pointer;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.22);
     }
 
-    .mini-price { font-size: 16px; font-weight: 900; color: var(--green); margin-top: 5px; }
-    .mini-old { font-size: 12px; color: var(--muted); text-decoration: line-through; }
+    .mini-price { font-size: 19px; font-weight: 900; color: var(--green); margin-top: 7px; }
+    .mini-old { font-size: 14px; color: var(--muted); text-decoration: line-through; font-weight: 700; }
     .mini-name {
-      font-size: 13px;
-      font-weight: 700;
+      font-size: 16px;
+      font-weight: 800;
       color: var(--text);
-      margin-top: 2px;
+      margin-top: 3px;
       line-height: 1.25;
       display: -webkit-box;
       -webkit-line-clamp: 2;
@@ -407,48 +414,48 @@
 
     .store-detail-banner {
       width: 100%;
-      height: 160px;
-      border-radius: 14px;
+      height: 184px;
+      border-radius: 16px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 56px;
+      font-size: 72px;
       color: #ffffff;
       position: relative;
-      margin-bottom: 10px;
+      margin-bottom: 12px;
     }
 
     .detail-top-overlay {
       position: absolute;
-      top: 10px;
-      left: 10px;
-      right: 10px;
+      top: 12px;
+      left: 12px;
+      right: 12px;
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
 
     .circle-icon-btn {
-      width: 36px;
-      height: 36px;
+      width: 44px;
+      height: 44px;
       border-radius: 999px;
-      border: 1px solid var(--border);
-      background: rgba(255, 255, 255, 0.95);
+      border: 1.5px solid var(--border);
+      background: rgba(255, 255, 255, 0.96);
       color: #111827;
-      font-size: 18px;
+      font-size: 22px;
       font-weight: 900;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.14);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.16);
     }
 
     .detail-store-card {
       background: #ffffff;
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 12px;
+      border: 1.5px solid var(--border);
+      border-radius: 16px;
+      padding: 14px;
     }
 
     .detail-metrics-box {
@@ -456,20 +463,20 @@
       grid-template-columns: repeat(3, 1fr);
       gap: 8px;
       background: var(--surface-soft);
-      border-radius: 10px;
-      padding: 10px;
-      margin-top: 10px;
+      border-radius: 12px;
+      padding: 12px;
+      margin-top: 12px;
       text-align: center;
     }
 
-    .metric-val { font-size: 14px; font-weight: 800; color: var(--text); }
-    .metric-lbl { font-size: 11px; color: var(--muted); font-weight: 700; margin-top: 2px; }
+    .metric-val { font-size: 16px; font-weight: 900; color: var(--text); }
+    .metric-lbl { font-size: 13px; color: var(--muted); font-weight: 800; margin-top: 2px; }
 
     .detail-tabs {
       display: flex;
-      gap: 16px;
-      border-bottom: 1px solid var(--border);
-      margin: 12px 0 8px;
+      gap: 18px;
+      border-bottom: 1.5px solid var(--border);
+      margin: 14px 0 8px;
       overflow-x: auto;
       scrollbar-width: none;
     }
@@ -478,10 +485,10 @@
     .d-tab-btn {
       background: transparent;
       border: none;
-      border-bottom: 3px solid transparent;
-      padding: 8px 2px;
-      font-size: 14px;
-      font-weight: 800;
+      border-bottom: 3.5px solid transparent;
+      padding: 10px 2px;
+      font-size: 16px;
+      font-weight: 900;
       color: var(--muted);
       white-space: nowrap;
       cursor: pointer;
@@ -497,82 +504,83 @@
       justify-content: space-between;
       align-items: center;
       gap: 12px;
-      padding: 12px 0;
-      border-bottom: 1px solid var(--border);
+      padding: 14px 0;
+      border-bottom: 1.5px solid var(--border);
     }
 
     .menu-row-thumb-wrap {
       position: relative;
-      width: 86px;
-      height: 86px;
+      width: 104px;
+      height: 104px;
       flex-shrink: 0;
     }
 
     .menu-row-thumb {
-      width: 86px;
-      height: 86px;
-      border-radius: 10px;
+      width: 104px;
+      height: 104px;
+      border-radius: 14px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 34px;
-      border: 1px solid var(--border);
+      font-size: 44px;
+      border: 1.5px solid var(--border);
     }
 
     .card-box {
       background: #ffffff;
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 14px;
-      margin-bottom: 12px;
+      border: 1.5px solid var(--border);
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 14px;
     }
 
-    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; }
+    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
 
-    label { display: block; font-size: 13px; font-weight: 700; color: var(--muted); margin-bottom: 4px; }
+    label { display: block; font-size: 15px; font-weight: 800; color: var(--muted); margin-bottom: 5px; }
 
     input, select {
       width: 100%;
       background: var(--surface-soft);
-      border: 1px solid var(--border);
+      border: 1.5px solid var(--border);
       color: var(--text);
-      border-radius: 10px;
-      padding: 10px 12px;
-      font-size: 15px;
+      border-radius: 12px;
+      padding: 12px 14px;
+      font-size: 17px;
+      font-weight: 600;
     }
 
     .btn-primary-green {
       width: 100%;
       border: none;
-      border-radius: 12px;
+      border-radius: 14px;
       background: var(--green);
       color: #ffffff;
-      font-size: 16px;
+      font-size: 19px;
       font-weight: 900;
-      padding: 13px 16px;
+      padding: 15px 18px;
       cursor: pointer;
-      margin-top: 12px;
+      margin-top: 14px;
     }
 
     .floating-promo-bar {
       position: fixed;
       left: 12px;
       right: 12px;
-      bottom: 66px;
+      bottom: 78px;
       max-width: 1140px;
       margin: 0 auto;
       z-index: 25;
       background: var(--surface-warm);
-      border: 1px solid var(--yellow);
-      border-radius: 10px;
-      padding: 8px 12px;
+      border: 1.5px solid var(--yellow);
+      border-radius: 12px;
+      padding: 10px 14px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 8px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-      font-size: 13px;
-      font-weight: 800;
+      gap: 10px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+      font-size: 15px;
+      font-weight: 900;
     }
 
     .bottom-bar {
@@ -582,40 +590,40 @@
       right: 0;
       z-index: 30;
       background: #ffffff;
-      border-top: 1px solid var(--border);
+      border-top: 1.5px solid var(--border);
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      padding: 7px 6px;
+      padding: 8px 6px;
     }
 
     .b-nav-btn {
       background: transparent;
       border: none;
       color: var(--muted);
-      font-size: 12px;
-      font-weight: 700;
-      padding: 3px;
+      font-size: 14px;
+      font-weight: 800;
+      padding: 4px;
       cursor: pointer;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 2px;
+      gap: 3px;
     }
 
-    .b-nav-btn span:first-child { font-size: 19px; }
+    .b-nav-btn span:first-child { font-size: 26px; }
     .b-nav-btn.active { color: #111827; font-weight: 900; }
 
     .toast {
       position: fixed;
-      top: 98px;
+      top: 112px;
       left: 50%;
       transform: translateX(-50%);
       background: #111827;
       color: #ffffff;
-      padding: 10px 16px;
-      border-radius: 10px;
-      font-size: 14px;
-      font-weight: 800;
+      padding: 12px 18px;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 900;
       z-index: 60;
       display: none;
       max-width: 92vw;
@@ -658,8 +666,8 @@
             <div class="hero-sub">Escolha seu restaurante, aproveite cupons e peça em segundos.</div>
           </div>
           <div class="hero-badge-box">
-            <div style="font-size:11px;">ATÉ</div>
-            <div style="font-size:18px;">R$ 9,90</div>
+            <div style="font-size:12px;">ATÉ</div>
+            <div style="font-size:22px;">R$ 9,90</div>
           </div>
         </div>
 
@@ -701,20 +709,20 @@
 
     <section id="tab-orders" class="hidden">
       <div class="card-box">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-          <h3 style="margin:0;font-size:17px;">Sua sacola</h3>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+          <h3 style="margin:0;font-size:20px;font-weight:900;">Sua sacola</h3>
           <button class="f-pill" type="button" onclick="switchMainTab('tab-home')">+ Itens</button>
         </div>
         <div id="cartBox"></div>
-        <div style="margin-top:10px;padding-top:8px;border-top:1px solid var(--border);">
+        <div style="margin-top:12px;padding-top:10px;border-top:1.5px solid var(--border);">
           <div class="muted-txt" id="subTotalText">Itens: R$ 0,00</div>
           <div class="muted-txt" id="deliveryFeeText">Taxa de entrega: R$ 0,00</div>
-          <div style="font-size:17px;font-weight:900;margin-top:4px;" id="totalOrderText">Total: R$ 0,00</div>
+          <div style="font-size:21px;font-weight:900;margin-top:6px;" id="totalOrderText">Total: R$ 0,00</div>
         </div>
       </div>
 
       <div class="card-box">
-        <h3 style="margin:0 0 8px;font-size:17px;">Dados para entrega</h3>
+        <h3 style="margin:0 0 10px;font-size:20px;font-weight:900;">Dados para entrega</h3>
         <div class="grid-2">
           <div>
             <label for="cliName">Seu nome</label>
@@ -725,7 +733,7 @@
             <input type="tel" id="cliPhone" placeholder="(17) 99999-1234" />
           </div>
         </div>
-        <div class="grid-2" style="margin-top:8px;">
+        <div class="grid-2" style="margin-top:10px;">
           <div>
             <label for="cliPayment">Pagamento</label>
             <select id="cliPayment">
@@ -742,8 +750,8 @@
         <button class="btn-primary-green" type="button" id="sendOrderBtn">Finalizar pedido</button>
       </div>
 
-      <div style="display:flex;justify-content:space-between;align-items:center;margin:10px 0 6px;">
-        <h3 style="margin:0;font-size:17px;">Meus pedidos</h3>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin:12px 0 8px;">
+        <h3 style="margin:0;font-size:20px;font-weight:900;">Meus pedidos</h3>
         <button class="f-pill" type="button" id="refreshOrdersBtn">Atualizar</button>
       </div>
       <div id="myOrdersList"></div>
@@ -751,7 +759,7 @@
 
     <section id="tab-account" class="hidden">
       <div class="card-box">
-        <h3 style="margin:0 0 8px;font-size:17px;">Minha conta e endereço</h3>
+        <h3 style="margin:0 0 10px;font-size:20px;font-weight:900;">Minha conta e endereço</h3>
         <div class="grid-2">
           <div>
             <label for="accName">Nome</label>
@@ -762,7 +770,7 @@
             <input type="tel" id="accPhone" placeholder="(17) 99999-0000" />
           </div>
         </div>
-        <div style="margin-top:8px;">
+        <div style="margin-top:10px;">
           <label for="accAddress">Endereço padrão</label>
           <input type="text" id="accAddress" placeholder="Rua, número, bairro — Catanduva/SP" />
         </div>
@@ -773,7 +781,7 @@
 
   <div class="floating-promo-bar" id="floatingPromoBar">
     <span>🎁 R$ 7,99 OFF na entrega acima de R$ 20</span>
-    <button class="f-pill active" style="padding:4px 10px;font-size:12px;background:var(--yellow);color:#111827;" type="button" onclick="applyQuickFilter('free')">Ver</button>
+    <button class="f-pill active" style="padding:6px 14px;font-size:14px;background:var(--yellow);color:#111827;" type="button" onclick="applyQuickFilter('free')">Ver</button>
   </div>
 
   <nav class="bottom-bar">
@@ -1026,7 +1034,7 @@
         </div>
 
         <div class="detail-store-card">
-          <div style="display:flex;gap:10px;align-items:center;">
+          <div style="display:flex;gap:12px;align-items:center;">
             <div class="store-avatar" style="background:${st.logoBg || "#111827"};">${st.logoEmoji || "🍽️"}</div>
             <div style="flex:1;min-width:0;">
               <h2 class="store-title">${st.name} ›</h2>
@@ -1065,9 +1073,9 @@
           ${filteredItems.map((it) => `
             <div class="menu-row-item">
               <div style="flex:1;min-width:0;">
-                <div style="font-size:15px;font-weight:800;">${it.name}</div>
-                <div class="muted-txt" style="margin-top:2px;">${it.desc || ""}</div>
-                <div style="margin-top:6px;display:flex;align-items:center;gap:8px;">
+                <div style="font-size:18px;font-weight:900;">${it.name}</div>
+                <div class="muted-txt" style="margin-top:3px;">${it.desc || ""}</div>
+                <div style="margin-top:8px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
                   <span class="mini-price" style="margin:0;">${brl(it.price)}</span>
                   ${it.oldPrice ? `<span class="mini-old">${brl(it.oldPrice)}</span>` : ""}
                   ${it.tag ? `<span class="tag-yellow">${it.tag}</span>` : ""}
@@ -1164,14 +1172,14 @@
       }
 
       box.innerHTML = cart.map((it, i) => `
-        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--border);">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 0;border-bottom:1.5px solid var(--border);">
           <div>
-            <div style="font-weight:800;">${it.name}</div>
+            <div style="font-size:18px;font-weight:900;">${it.name}</div>
             <div class="muted-txt">${brl(it.price)} cada</div>
           </div>
-          <div style="display:flex;align-items:center;gap:8px;">
+          <div style="display:flex;align-items:center;gap:10px;">
             <button class="f-pill" type="button" onclick="changeQty(${i}, -1)">-</button>
-            <strong>${it.qty}</strong>
+            <strong style="font-size:18px;">${it.qty}</strong>
             <button class="f-pill" type="button" onclick="changeQty(${i}, 1)">+</button>
           </div>
         </div>
@@ -1194,12 +1202,12 @@
         const list = phoneFilter ? rows.filter((r) => String(r.client_phone || "").includes(phoneFilter)) : rows.slice(0, 5);
         box.innerHTML = list.map((o) => `
           <div class="card-box">
-            <div style="display:flex;justify-content:space-between;align-items:center;">
-              <strong>${o.order_code || "#" + o.id} • ${o.store_name || "Estabelecimento"}</strong>
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;">
+              <strong style="font-size:18px;">${o.order_code || "#" + o.id} • ${o.store_name || "Estabelecimento"}</strong>
               <span class="tag-yellow">${o.status || "Em andamento"}</span>
             </div>
-            <div class="muted-txt" style="margin-top:4px;">${o.client_address || ""}</div>
-            <div style="font-weight:800;margin-top:6px;">Total: ${brl(Number(o.items_total || 0) + Number(o.delivery_fee || 0))}</div>
+            <div class="muted-txt" style="margin-top:5px;">${o.client_address || ""}</div>
+            <div style="font-size:18px;font-weight:900;margin-top:8px;">Total: ${brl(Number(o.items_total || 0) + Number(o.delivery_fee || 0))}</div>
           </div>
         `).join("") || `<div class="muted-txt">Nenhum pedido recente.</div>`;
       } catch (_) {}
