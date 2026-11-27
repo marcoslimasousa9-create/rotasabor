@@ -3,6 +3,7 @@ import re
 from datetime import datetime
 from flask import Flask, jsonify, render_template, request
 from flask_sqlalchemy import SQLAlchemy
+from jinja2 import TemplateNotFound
 from sqlalchemy import inspect, text
 
 app = Flask(__name__)
@@ -167,6 +168,19 @@ def _sync_legacy_courier_name(courier_id, full_name):
             db.session.commit()
 
 
+def _render_safe(template_name):
+    try:
+        return render_template(template_name)
+    except TemplateNotFound:
+        templates_dir = os.path.join(app.root_path, "templates")
+        found = os.listdir(templates_dir) if os.path.isdir(templates_dir) else []
+        return (
+            f"Template '{template_name}' nao encontrado em '{templates_dir}'. "
+            f"Arquivos encontrados: {found}",
+            404,
+        )
+
+
 with app.app_context():
     _ensure_schema()
 
@@ -174,20 +188,20 @@ with app.app_context():
 @app.get("/")
 @app.get("/painel")
 def index():
-    return render_template("painel_gestao.html")
+    return _render_safe("painel_gestao.html")
 
 
 @app.get("/cliente")
 @app.get("/app_cliente")
 def app_cliente():
-    return render_template("app_cliente.html")
+    return _render_safe("app_cliente.html")
 
 
 @app.get("/motoboy")
 @app.get("/app_motoboy")
 @app.get("/entregador")
 def app_motoboy():
-    return render_template("app_motoboy.html")
+    return _render_safe("app_motoboy.html")
 
 
 @app.get("/api/establishments")
