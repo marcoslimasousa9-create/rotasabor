@@ -1,1 +1,300 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#10b981" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="RS Motoboy" />
+  <link rel="manifest" href="/static/manifest-motoboy.json" />
+  <link rel="icon" type="image/svg+xml" href="/static/icon.svg" />
+  <link rel="apple-touch-icon" href="/static/icon.svg" />
+  <title>RotaSabor Motoboy — Entregas</title>
+  <style>
+    :root {
+      --bg: #0b1220;
+      --panel: #111827;
+      --panel-2: #0f172a;
+      --card: #131c2e;
+      --ink: #f8fafc;
+      --muted: #94a3b8;
+      --line: #1e293b;
+      --green: #10b981;
+      --green-dark: #059669;
+      --green-soft: rgba(16, 185, 129, 0.15);
+      --blue: #2563eb;
+      --amber: #f59e0b;
+      --amber-soft: rgba(245, 158, 11, 0.15);
+      --red: #ef4444;
+      --red-soft: rgba(239, 68, 68, 0.15);
+      --shadow: 0 12px 28px rgba(0, 0, 0, 0.28);
+    }
+    * { box-sizing: border-box; font-family: "Segoe UI", system-ui, -apple-system, Arial, sans-serif; }
+    body { margin: 0; background: var(--bg); color: var(--ink); padding-bottom: 40px; }
 
+    .topbar {
+      position: sticky; top: 0; z-index: 40;
+      background: rgba(11, 18, 32, 0.92); backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--line);
+    }
+    .topbar-inner {
+      max-width: 960px; margin: 0 auto; padding: 14px 18px;
+      display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px;
+    }
+    .brand-box { display: flex; align-items: center; gap: 10px; }
+    .logo {
+      background: linear-gradient(135deg, var(--green), #34d399);
+      color: #052e16; font-weight: 900; padding: 8px 12px; border-radius: 12px; font-size: 13px;
+    }
+    .btn-install {
+      display: none;
+      background: var(--green); color: #052e16; border: none;
+      font-size: 12px; font-weight: 900; padding: 8px 13px; border-radius: 999px; cursor: pointer;
+    }
+    .container { max-width: 960px; margin: 0 auto; padding: 18px; }
+
+    .card {
+      background: var(--card); border: 1px solid var(--line); border-radius: 18px;
+      padding: 18px; margin-bottom: 16px; box-shadow: var(--shadow);
+    }
+    .row-top {
+      display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px;
+    }
+    select {
+      background: var(--panel-2); color: var(--ink); border: 1px solid #283548;
+      border-radius: 11px; padding: 9px 12px; font-size: 13px; font-weight: 700;
+    }
+    .btn {
+      border: none; border-radius: 11px; padding: 10px 14px; font-weight: 800; font-size: 13px; cursor: pointer;
+    }
+    .btn-online { background: var(--green); color: #052e16; }
+    .btn-offline { background: var(--red-soft); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.35); }
+    .btn-primary { background: var(--blue); color: #fff; }
+    .btn-ghost { background: var(--panel-2); color: var(--ink); border: 1px solid #283548; }
+    .btn-sm { padding: 7px 11px; font-size: 12px; }
+
+    .stats-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-top: 14px;
+    }
+    .stat-box {
+      background: var(--panel-2); border: 1px solid var(--line); border-radius: 14px; padding: 12px;
+    }
+    .stat-label { font-size: 11px; color: var(--muted); font-weight: 700; }
+    .stat-val { font-size: 18px; font-weight: 900; margin-top: 4px; }
+
+    .call-card {
+      background: var(--panel-2); border: 1px solid var(--line); border-radius: 16px;
+      padding: 15px; margin-bottom: 12px;
+    }
+    .badge {
+      font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 999px;
+      background: var(--amber-soft); color: #fbbf24;
+    }
+    .badge.ok { background: var(--green-soft); color: #34d399; }
+    .muted { color: var(--muted); font-size: 12px; }
+    .actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand-box">
+        <span class="logo">RS MOTOBOY</span>
+        <div>
+          <div style="font-weight:900; font-size:15px;">RotaSabor Motoboy</div>
+          <div class="muted">Catanduva • SP — Chamadas e GPS</div>
+        </div>
+      </div>
+      <div style="display:flex; align-items:center; gap:8px;">
+        <button type="button" class="btn-install" id="btn-instalar-app" onclick="instalarApp()">Instalar app</button>
+        <select id="select-motoboy" onchange="trocarMotoboy()"></select>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="card">
+      <div class="row-top">
+        <div>
+          <h2 style="margin:0; font-size:18px;" id="mb-nome">Carregando entregador...</h2>
+          <div class="muted" id="mb-gps">GPS: aguardando atualização</div>
+        </div>
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+          <button type="button" class="btn btn-online" id="btn-toggle-online" onclick="alternarOnline()">Ficar Online</button>
+          <button type="button" class="btn btn-ghost" onclick="enviarGPS()">Atualizar GPS</button>
+        </div>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-box">
+          <div class="stat-label">GANHOS HOJE</div>
+          <div class="stat-val" id="ganhos-hoje" style="color:#34d399;">R$ 0,00</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label">CORRIDAS CONCLUÍDAS</div>
+          <div class="stat-val" id="corridas-ok">0</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label">STATUS</div>
+          <div class="stat-val" id="mb-status-txt">Offline</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2 style="margin:0 0 4px 0; font-size:17px;">Chamadas e entregas</h2>
+      <div class="muted" style="margin-bottom:14px;">Atualização automática a cada 3s</div>
+      <div id="lista-chamadas"><div class="muted">Carregando chamadas...</div></div>
+    </section>
+  </main>
+
+  <script>
+    let motoboyId = Number(localStorage.getItem("rotasabor_mb_id") || 1);
+    let motoboyAtual = null;
+    let deferredInstallPrompt = null;
+
+    window.addEventListener("beforeinstallprompt", (e) => {
+      e.preventDefault();
+      deferredInstallPrompt = e;
+      const btn = document.getElementById("btn-instalar-app");
+      if (btn) btn.style.display = "inline-block";
+    });
+
+    async function instalarApp() {
+      if (!deferredInstallPrompt) return;
+      deferredInstallPrompt.prompt();
+      await deferredInstallPrompt.userChoice;
+      deferredInstallPrompt = null;
+      const btn = document.getElementById("btn-instalar-app");
+      if (btn) btn.style.display = "none";
+    }
+
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("/sw.js").catch(() => {});
+      });
+    }
+
+    function fmtBRL(v) {
+      return "R$ " + Number(v || 0).toFixed(2).replace(".", ",");
+    }
+
+    function trocarMotoboy() {
+      const sel = document.getElementById("select-motoboy");
+      motoboyId = Number(sel.value || 1);
+      localStorage.setItem("rotasabor_mb_id", String(motoboyId));
+      carregarStatus();
+    }
+
+    async function alternarOnline() {
+      const prox = !(motoboyAtual && motoboyAtual.online);
+      await fetch("/api/motoboy/online", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ motoboy_id: motoboyId, online: prox }),
+      });
+      await carregarStatus();
+      if (prox) enviarGPS();
+    }
+
+    function enviarGPS() {
+      if (!navigator.geolocation) return;
+      navigator.geolocation.getCurrentPosition(async (pos) => {
+        await fetch("/api/motoboy/localizacao", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            motoboy_id: motoboyId,
+            lat: pos.coords.latitude,
+            lng: pos.coords.longitude,
+          }),
+        });
+        carregarStatus();
+      }, () => {}, { enableHighAccuracy: true, timeout: 8000 });
+    }
+
+    async function acaoChamada(id, rota) {
+      const res = await fetch(`/api/chamadas/${id}/${rota}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ motoboy_id: motoboyId }),
+      });
+      const data = await res.json();
+      if (!data.ok && data.erro) alert(data.erro);
+      carregarStatus();
+    }
+
+    function renderChamadas(chamadas) {
+      const box = document.getElementById("lista-chamadas");
+      if (!chamadas || !chamadas.length) {
+        box.innerHTML = '<div class="muted">Nenhuma chamada no momento.</div>';
+        return;
+      }
+      box.innerHTML = chamadas.map(c => {
+        const isMeu = Number(c.motoboy_id) === Number(motoboyId);
+        let botoes = "";
+        if (c.status === "disponivel") {
+          botoes = `<button type="button" class="btn btn-online btn-sm" onclick="acaoChamada(${c.id}, 'aceitar')">Aceitar (${fmtBRL(c.total_corrida)})</button>`;
+        } else if (c.status === "indo_coleta" && isMeu) {
+          botoes = `
+            <button type="button" class="btn btn-primary btn-sm" onclick="acaoChamada(${c.id}, 'coletar')">Confirmar Coleta</button>
+            <button type="button" class="btn btn-offline btn-sm" onclick="acaoChamada(${c.id}, 'liberar-motoboy')">Liberar</button>
+          `;
+        } else if (c.status === "indo_entrega" && isMeu) {
+          botoes = `<button type="button" class="btn btn-online btn-sm" onclick="acaoChamada(${c.id}, 'concluir')">Concluir Entrega</button>`;
+        }
+        return `
+          <div class="call-card">
+            <div class="row-top">
+              <strong>#${c.id} • ${c.estabelecimento} (${c.distancia_coleta_km} km)</strong>
+              <span class="badge ${c.status === "concluida" ? "ok" : ""}">${c.status}</span>
+            </div>
+            <div class="muted" style="margin-top:6px; color:#e2e8f0;">Coleta: ${c.origem_endereco}</div>
+            <div class="muted" style="margin-top:2px; color:#e2e8f0;">Entrega: ${c.destino_endereco} (${c.cliente_nome})</div>
+            <div class="muted" style="margin-top:4px;">Repasse: <strong style="color:#34d399;">${fmtBRL(c.total_corrida)}</strong> • Pagamento: ${c.pagamento_metodo || "pix"}</div>
+            ${botoes ? `<div class="actions">${botoes}</div>` : ""}
+          </div>
+        `;
+      }).join("");
+    }
+
+    async function carregarStatus() {
+      try {
+        const res = await fetch(`/api/status?motoboy_id=${motoboyId}`, { cache: "no-store" });
+        const data = await res.json();
+        motoboyAtual = data.motoboy;
+
+        const sel = document.getElementById("select-motoboy");
+        if (Array.isArray(data.motoboys) && data.motoboys.length) {
+          sel.innerHTML = data.motoboys.map(m =>
+            `<option value="${m.id}" ${Number(m.id) === Number(motoboyId) ? "selected" : ""}>${m.nome}</option>`
+          ).join("");
+        }
+
+        document.getElementById("mb-nome").textContent = motoboyAtual.nome;
+        document.getElementById("mb-status-txt").textContent = motoboyAtual.online ? "Online" : "Offline";
+        document.getElementById("mb-status-txt").style.color = motoboyAtual.online ? "#34d399" : "#fca5a5";
+        document.getElementById("mb-gps").textContent =
+          `GPS: ${Number(motoboyAtual.lat).toFixed(5)}, ${Number(motoboyAtual.lng).toFixed(5)} (${motoboyAtual.atualizado_em || "sem envio"})`;
+
+        const btnOn = document.getElementById("btn-toggle-online");
+        btnOn.textContent = motoboyAtual.online ? "Ficar Offline" : "Ficar Online";
+        btnOn.className = "btn " + (motoboyAtual.online ? "btn-offline" : "btn-online");
+
+        document.getElementById("ganhos-hoje").textContent = fmtBRL(data.ganhos?.hoje || 0);
+        document.getElementById("corridas-ok").textContent = String(data.ganhos?.corridas_concluidas || 0);
+
+        renderChamadas(data.chamadas || []);
+      } catch (_) {}
+    }
+
+    carregarStatus();
+    setInterval(carregarStatus, 3000);
+    setInterval(() => {
+      if (motoboyAtual && motoboyAtual.online) enviarGPS();
+    }, 15000);
+  </script>
+</body>
+</html>
