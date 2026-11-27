@@ -11,358 +11,304 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <style>
-    :root {
-      --bg: #f8fafc;
-      --surface: #ffffff;
-      --surface-soft: #f1f5f9;
-      --border: #cbd5e1;
-      --text: #0f172a;
-      --muted: #475569;
-      --green: #16a34a;
-      --orange: #ea580c;
-      --amber: #d97706;
-      --red: #dc2626;
-      --cyan: #0284c7;
-    }
-
-    body.theme-dark {
-      --bg: #0b1320;
-      --surface: #111c2e;
-      --surface-soft: #1a2840;
-      --border: rgba(148, 163, 184, 0.28);
-      --text: #f8fafc;
-      --muted: #cbd5e1;
-    }
-
     * {
       box-sizing: border-box;
       -webkit-tap-highlight-color: transparent;
       -webkit-text-size-adjust: 100%;
-    }
-
-    html {
-      font-size: 17px;
-    }
-
-    /* Garante letras e botões bem grandes no celular mesmo em WebView */
-    @media (max-width: 768px) {
-      html {
-        font-size: clamp(18px, 4.5vw, 21px);
-      }
+      text-size-adjust: 100%;
     }
 
     html, body {
       margin: 0;
       padding: 0;
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-    }
-
-    /* Layout adaptativo: tela cheia no celular, painel dividido e ajustado no computador */
-    .app-shell {
-      display: flex;
-      flex-direction: column;
       width: 100vw;
       height: 100dvh;
-      max-width: 100%;
-    }
-
-    @media (min-width: 900px) {
-      .app-shell {
-        flex-direction: row;
-      }
-    }
-
-    .map-stage {
-      position: relative;
-      flex: 1 1 54%;
-      min-height: 240px;
-      background: #e2e8f0;
       overflow: hidden;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      font-size: 18px;
+      color: #111827;
+      background: #e5e7eb;
     }
 
-    @media (min-width: 900px) {
-      .map-stage {
-        flex: 1 1 60%;
-        height: 100dvh;
-      }
-    }
-
+    /* Mapa ocupa 100% da tela inteira */
     #courierMap {
-      position: absolute;
+      position: fixed;
       inset: 0;
-      width: 100%;
-      height: 100%;
+      width: 100vw;
+      height: 100dvh;
       z-index: 1;
     }
 
-    body.theme-dark .leaflet-tile-pane {
-      filter: invert(90%) hue-rotate(180deg) brightness(92%) contrast(104%);
-    }
-
-    .top-float-bar {
-      position: absolute;
-      top: 12px;
-      left: 12px;
-      right: 12px;
-      z-index: 15;
+    /* Topo flutuante: Menu à esquerda e Saldo à direita */
+    .float-top {
+      position: fixed;
+      top: 14px;
+      left: 14px;
+      right: 14px;
+      z-index: 20;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 10px;
+      gap: 12px;
       pointer-events: none;
     }
 
-    .top-float-bar > * { pointer-events: auto; }
+    .float-top > * {
+      pointer-events: auto;
+    }
 
-    .brand-menu-pill {
-      background: var(--surface);
-      border: 2px solid var(--border);
+    .pill-menu {
+      background: #ffffff;
+      color: #111827;
+      border: 2px solid #d1d5db;
       border-radius: 999px;
-      padding: 6px 16px 6px 6px;
+      height: 54px;
+      padding: 4px 18px 4px 6px;
       display: inline-flex;
       align-items: center;
       gap: 10px;
-      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.16);
+      font-size: 24px;
+      font-weight: 900;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
       cursor: pointer;
     }
 
-    .brand-badge-icon {
-      width: 2.3rem;
-      height: 2.3rem;
+    .pill-logo {
+      width: 44px;
+      height: 44px;
       border-radius: 999px;
-      background: var(--orange);
+      background: #ea580c;
       color: #ffffff;
+      font-size: 16px;
       font-weight: 900;
-      font-size: 1rem;
-      display: flex;
+      display: inline-flex;
       align-items: center;
       justify-content: center;
     }
 
-    .earnings-pill {
-      background: var(--surface);
-      border: 2px solid var(--border);
+    .pill-saldo {
+      background: #ffffff;
+      color: #111827;
+      border: 2px solid #d1d5db;
       border-radius: 999px;
-      padding: 10px 18px;
-      font-size: 1.15rem;
+      height: 54px;
+      padding: 0 20px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 20px;
       font-weight: 900;
-      color: var(--text);
-      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.16);
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
       cursor: pointer;
     }
 
-    .bell-float-btn {
-      position: absolute;
-      top: 74px;
-      right: 12px;
-      z-index: 15;
-      width: 2.8rem;
-      height: 2.8rem;
+    /* Botão sino flutuante */
+    .float-bell {
+      position: fixed;
+      top: 82px;
+      right: 14px;
+      z-index: 20;
+      width: 52px;
+      height: 52px;
       border-radius: 999px;
-      background: var(--surface);
-      border: 2px solid var(--border);
-      color: var(--text);
-      font-size: 1.2rem;
-      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.16);
+      background: #ffffff;
+      color: #111827;
+      border: 2px solid #d1d5db;
+      font-size: 24px;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
       cursor: pointer;
     }
 
-    .filter-float-btn {
-      position: absolute;
-      right: 12px;
-      bottom: 86px;
-      z-index: 15;
-      width: 2.9rem;
-      height: 2.9rem;
-      border-radius: 999px;
-      background: var(--surface);
-      border: 2px solid var(--border);
-      color: var(--text);
-      font-size: 1.25rem;
-      font-weight: 800;
-      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
-      cursor: pointer;
-    }
-
-    .center-go-wrap {
-      position: absolute;
-      left: 0;
-      right: 0;
-      bottom: 16px;
-      z-index: 15;
-      display: flex;
-      justify-content: center;
-      padding: 0 14px;
-      pointer-events: none;
-    }
-
-    .go-free-btn {
-      pointer-events: auto;
-      background: var(--green);
+    /* Botão central flutuante ▶ Ficar Livre */
+    .float-go {
+      position: fixed;
+      left: 50%;
+      bottom: 138px;
+      transform: translateX(-50%);
+      z-index: 22;
+      background: #16a34a;
       color: #ffffff;
       border: none;
       border-radius: 999px;
-      padding: 14px 30px;
-      font-size: 1.18rem;
+      height: 60px;
+      padding: 0 34px;
+      font-size: 22px;
       font-weight: 900;
-      box-shadow: 0 10px 24px rgba(22, 163, 74, 0.38);
-      cursor: pointer;
       display: inline-flex;
       align-items: center;
       gap: 10px;
+      white-space: nowrap;
+      box-shadow: 0 10px 26px rgba(22, 163, 74, 0.45);
+      cursor: pointer;
     }
 
-    .go-free-btn.online {
-      background: var(--red);
-      box-shadow: 0 10px 24px rgba(220, 38, 38, 0.34);
+    .float-go.online {
+      background: #dc2626;
+      box-shadow: 0 10px 26px rgba(220, 38, 38, 0.45);
     }
 
-    .bottom-panel {
-      background: var(--surface);
-      border-top: 2px solid var(--border);
-      padding: 12px 14px 18px;
-      z-index: 16;
-      flex: 0 0 auto;
-      max-height: 52dvh;
+    /* Botão GPS flutuante à direita */
+    .float-gps {
+      position: fixed;
+      right: 14px;
+      bottom: 142px;
+      z-index: 22;
+      width: 52px;
+      height: 52px;
+      border-radius: 999px;
+      background: #ffffff;
+      color: #111827;
+      border: 2px solid #d1d5db;
+      font-size: 24px;
+      font-weight: 900;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.22);
+      cursor: pointer;
+    }
+
+    /* Barra inferior flutuante sobre o mapa */
+    .float-bottom-bar {
+      position: fixed;
+      left: 10px;
+      right: 10px;
+      bottom: 10px;
+      z-index: 25;
+      background: rgba(255, 255, 255, 0.97);
+      border: 2px solid #d1d5db;
+      border-radius: 20px;
+      padding: 10px 14px 12px;
+      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.22);
+      max-height: 64dvh;
       overflow-y: auto;
     }
 
     @media (min-width: 900px) {
-      .bottom-panel {
-        flex: 0 0 440px;
-        max-width: 440px;
-        max-height: 100dvh;
-        height: 100dvh;
-        border-top: none;
-        border-left: 2px solid var(--border);
-        padding: 18px;
+      .float-bottom-bar {
+        left: 50%;
+        right: auto;
+        transform: translateX(-50%);
+        width: 680px;
+        max-width: 92vw;
+      }
+      .float-go {
+        bottom: 146px;
+        height: 64px;
+        font-size: 23px;
+      }
+      .float-gps {
+        right: 28px;
+        bottom: 150px;
+        width: 56px;
+        height: 56px;
       }
     }
 
-    .mode-switch-row {
+    .status-strip {
       display: grid;
-      grid-template-columns: 1fr auto 1fr;
+      grid-template-columns: 76px 1fr 76px;
       align-items: center;
-      gap: 8px;
-      padding-bottom: 10px;
-      border-bottom: 1px solid var(--border);
+      gap: 6px;
     }
 
-    .mode-tab-btn {
+    .nav-mini-btn {
       background: transparent;
       border: none;
-      color: var(--muted);
-      font-size: 0.96rem;
+      color: #6b7280;
+      font-size: 14px;
       font-weight: 800;
+      padding: 4px;
       cursor: pointer;
       display: flex;
       flex-direction: column;
       align-items: center;
       gap: 2px;
-      padding: 4px;
     }
 
-    .mode-tab-btn.active { color: var(--cyan); }
+    .nav-mini-btn span:first-child {
+      font-size: 22px;
+    }
 
-    .conn-status-center {
+    .nav-mini-btn.active {
+      color: #0284c7;
+    }
+
+    .status-label {
       text-align: center;
-      font-size: 1rem;
+      font-size: 18px;
       font-weight: 900;
-      color: var(--text);
+      color: #111827;
     }
 
-    .active-nav-card {
-      margin-top: 12px;
-      border: 2px solid var(--green);
-      background: #ecfdf5;
-      color: #064e3b;
-      border-radius: 16px;
-      padding: 14px;
-    }
-
-    body.theme-dark .active-nav-card {
-      background: #064e3b;
-      color: #ecfdf5;
-    }
-
-    .offer-card {
-      margin-top: 12px;
-      border: 1.5px solid var(--border);
-      background: var(--surface-soft);
-      border-radius: 16px;
-      padding: 14px;
-    }
-
-    .offer-title {
-      font-size: 1.1rem;
-      font-weight: 900;
-    }
-
-    .offer-addr {
-      font-size: 0.98rem;
-      color: var(--muted);
-      margin-top: 5px;
-      line-height: 1.35;
-      font-weight: 600;
-    }
-
-    .promo-banner-card {
-      margin-top: 12px;
-      background: linear-gradient(90deg, #111827 0%, #c2410c 60%, #ea580c 100%);
-      color: #ffffff;
+    .offer-box {
+      margin-top: 10px;
+      background: #f8fafc;
+      border: 2px solid #cbd5e1;
       border-radius: 14px;
-      padding: 14px 16px;
+      padding: 12px;
+    }
+
+    .offer-box.active-race {
+      background: #ecfdf5;
+      border-color: #16a34a;
+    }
+
+    .offer-head {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      gap: 10px;
-    }
-
-    .promo-headline {
-      font-size: 1.08rem;
+      gap: 8px;
+      font-size: 18px;
       font-weight: 900;
-      text-transform: uppercase;
-      line-height: 1.15;
     }
 
-    .btn-row { display: flex; gap: 10px; margin-top: 12px; flex-wrap: wrap; }
+    .offer-sub {
+      font-size: 16px;
+      color: #374151;
+      margin-top: 4px;
+      font-weight: 600;
+    }
 
-    .btn {
+    .btn-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+      flex-wrap: wrap;
+    }
+
+    .btn-act {
+      flex: 1 1 140px;
       border: none;
       border-radius: 12px;
       padding: 13px 14px;
-      font-size: 1rem;
+      font-size: 17px;
       font-weight: 900;
       cursor: pointer;
-      flex: 1 1 auto;
+      color: #ffffff;
     }
 
-    .btn-green { background: var(--green); color: #ffffff; }
-    .btn-blue { background: var(--cyan); color: #ffffff; }
-    .btn-gray { background: var(--surface); color: var(--text); border: 1.5px solid var(--border); }
+    .btn-green { background: #16a34a; }
+    .btn-blue { background: #0284c7; }
+    .btn-gray { background: #ffffff; color: #111827; border: 2px solid #cbd5e1; }
 
-    /* Tela cheia de Menu */
-    .full-menu-screen {
+    /* Menu completo flutuante */
+    .menu-overlay {
       position: fixed;
       inset: 0;
       z-index: 40;
-      background: var(--surface);
+      background: #ffffff;
       display: none;
       flex-direction: column;
       overflow-y: auto;
     }
-    .full-menu-screen.open { display: flex; }
 
-    .menu-topbar {
+    .menu-overlay.open {
+      display: flex;
+    }
+
+    .menu-header {
       position: sticky;
       top: 0;
-      background: var(--surface);
-      border-bottom: 1px solid var(--border);
+      background: #ffffff;
+      border-bottom: 2px solid #e5e7eb;
       padding: 14px 16px;
       display: flex;
       align-items: center;
@@ -370,31 +316,28 @@
       z-index: 2;
     }
 
-    .back-arrow-btn {
+    .btn-back {
       background: transparent;
       border: none;
-      color: var(--text);
-      font-size: 1.5rem;
+      color: #111827;
+      font-size: 28px;
       font-weight: 900;
       cursor: pointer;
-      padding: 2px 8px;
+      padding: 0 8px;
     }
 
-    .menu-group {
-      padding: 6px 0;
-      border-bottom: 8px solid var(--surface-soft);
-      max-width: 760px;
-      width: 100%;
-      margin: 0 auto;
+    .menu-section {
+      border-bottom: 8px solid #f3f4f6;
     }
 
-    .menu-item-row {
+    .menu-row {
       width: 100%;
-      background: transparent;
+      background: #ffffff;
       border: none;
-      color: var(--text);
-      padding: 16px 20px;
-      font-size: 1.08rem;
+      border-bottom: 1px solid #f3f4f6;
+      color: #111827;
+      padding: 18px 20px;
+      font-size: 19px;
       font-weight: 800;
       display: flex;
       justify-content: space-between;
@@ -403,66 +346,68 @@
       cursor: pointer;
     }
 
-    .menu-subpanel {
+    .menu-detail {
       padding: 14px 20px;
-      background: var(--surface-soft);
-      border-top: 1px solid var(--border);
+      background: #f9fafb;
+      font-size: 16px;
     }
 
     select, input {
       width: 100%;
-      background: var(--surface);
-      border: 1.5px solid var(--border);
-      color: var(--text);
+      font-size: 18px;
+      padding: 12px;
       border-radius: 10px;
-      padding: 12px 14px;
-      font-size: 1rem;
+      border: 2px solid #cbd5e1;
+      background: #ffffff;
+      color: #111827;
       margin-top: 6px;
     }
 
-    .pin-backdrop {
+    /* Modal 4 dígitos */
+    .modal-bg {
       position: fixed;
       inset: 0;
-      background: rgba(15, 23, 42, 0.72);
       z-index: 60;
+      background: rgba(0, 0, 0, 0.65);
       display: none;
       align-items: center;
       justify-content: center;
       padding: 16px;
     }
-    .pin-backdrop.open { display: flex; }
 
-    .pin-box {
-      width: 100%;
-      max-width: 400px;
-      background: var(--surface);
-      border: 1.5px solid var(--border);
-      border-radius: 18px;
-      padding: 20px;
+    .modal-bg.open {
+      display: flex;
     }
 
-    .pin-digits {
+    .modal-card {
       width: 100%;
+      max-width: 400px;
+      background: #ffffff;
+      border-radius: 18px;
+      padding: 20px;
+      font-size: 17px;
+    }
+
+    .pin-box-input {
       text-align: center;
-      font-size: 1.8rem;
+      font-size: 32px;
       font-weight: 900;
-      letter-spacing: 0.35em;
-      padding: 12px;
+      letter-spacing: 12px;
       margin-top: 12px;
     }
 
-    .toast {
+    .toast-msg {
       position: fixed;
-      top: 84px;
+      top: 142px;
       left: 50%;
       transform: translateX(-50%);
-      background: #0f172a;
+      z-index: 70;
+      background: #111827;
       color: #ffffff;
       padding: 12px 18px;
       border-radius: 12px;
-      font-size: 0.96rem;
+      font-size: 16px;
       font-weight: 800;
-      z-index: 70;
       display: none;
       max-width: 92vw;
       text-align: center;
@@ -472,358 +417,324 @@
   </style>
 </head>
 <body>
-  <div class="app-shell">
-    <div class="map-stage">
-      <div id="courierMap"></div>
+  <!-- MAPA EM 100% DA TELA -->
+  <div id="courierMap"></div>
 
-      <div class="top-float-bar">
-        <button class="brand-menu-pill" type="button" id="openMenuBtn">
-          <span class="brand-badge-icon">RS</span>
-          <span style="font-size:1.25rem;font-weight:900;color:var(--text);">☰</span>
-        </button>
+  <!-- ELEMENTOS FLUTUANTES SOBRE O MAPA -->
+  <div class="float-top">
+    <button class="pill-menu" type="button" id="openMenuBtn">
+      <span class="pill-logo">RS</span>
+      <span>☰</span>
+    </button>
 
-        <button class="earnings-pill" type="button" id="topEarningsBtn">
-          <span id="topBalanceLabel">R$ 0,00</span>
-          <span style="margin-left:6px;color:var(--muted);">›</span>
-        </button>
-      </div>
-
-      <button class="bell-float-btn" type="button" id="bellBtn" title="Alertas">🔔</button>
-
-      <div class="center-go-wrap">
-        <button class="go-free-btn" type="button" id="toggleFreeBtn">
-          <span id="goIcon">▶</span>
-          <span id="goLabel">Ficar Livre</span>
-        </button>
-      </div>
-
-      <button class="filter-float-btn" type="button" id="gpsCenterBtn" title="Centralizar GPS">📍</button>
-    </div>
-
-    <div class="bottom-panel">
-      <div class="mode-switch-row">
-        <button class="mode-tab-btn active" id="tabMapBtn" type="button" onclick="setBottomView('map')">
-          <span>📍</span>
-          <span>Mapa</span>
-        </button>
-        <div class="conn-status-center" id="connectionStateText">Você está desconectado</div>
-        <button class="mode-tab-btn" id="tabDeliveriesBtn" type="button" onclick="setBottomView('deliveries')">
-          <span>🛵</span>
-          <span>Entregas</span>
-        </button>
-      </div>
-
-      <div id="offersFeedArea"></div>
-
-      <div class="promo-banner-card" onclick="setBottomView('deliveries')" style="cursor:pointer;">
-        <div>
-          <div class="promo-headline">RECEBA SUAS ENTREGAS NA HORA</div>
-          <div style="font-size:0.88rem;opacity:0.92;margin-top:4px;">Ao aceitar, abre a rota no Google Maps automaticamente</div>
-        </div>
-        <div style="background:#ffffff;color:#111827;border-radius:10px;padding:8px 12px;font-weight:900;font-size:0.86rem;flex-shrink:0;">
-          MAPS
-        </div>
-      </div>
-    </div>
+    <button class="pill-saldo" type="button" id="topSaldoBtn">
+      <span id="saldoText">R$ 0,00</span>
+      <span>›</span>
+    </button>
   </div>
 
-  <!-- TELA COMPLETA DO MENU -->
-  <div class="full-menu-screen" id="fullMenuScreen">
-    <div class="menu-topbar">
-      <button class="back-arrow-btn" type="button" id="closeMenuBtn">←</button>
-      <strong style="font-size:1.25rem;">Menu</strong>
+  <button class="float-bell" type="button" id="bellBtn" title="Mensagens">🔔</button>
+
+  <button class="float-go" type="button" id="toggleFreeBtn">
+    <span id="goSymbol">▶</span>
+    <span id="goText">Ficar Livre</span>
+  </button>
+
+  <button class="float-gps" type="button" id="gpsBtn" title="Minha localização">📍</button>
+
+  <div class="float-bottom-bar" id="bottomFloatingBar">
+    <div class="status-strip">
+      <button class="nav-mini-btn active" id="btnViewMap" type="button" onclick="setViewMode('map')">
+        <span>📍</span>
+        <span>Mapa</span>
+      </button>
+
+      <div class="status-label" id="statusLabel">Você está desconectado</div>
+
+      <button class="nav-mini-btn" id="btnViewDeliveries" type="button" onclick="setViewMode('deliveries')">
+        <span>🛵</span>
+        <span>Entregas</span>
+      </button>
     </div>
 
-    <div class="menu-group">
-      <button class="menu-item-row" type="button" onclick="toggleSubpanel('panelMessages')">
+    <div id="offersContainer"></div>
+  </div>
+
+  <!-- MENU COMPLETO FLUTUANTE -->
+  <div class="menu-overlay" id="menuOverlay">
+    <div class="menu-header">
+      <button class="btn-back" type="button" id="closeMenuBtn">←</button>
+      <strong style="font-size:22px;">Menu</strong>
+    </div>
+
+    <div class="menu-section">
+      <button class="menu-row" type="button" onclick="toggleDetail('detMsg')">
         <span>Mensagens</span>
         <span>›</span>
       </button>
-      <div class="menu-subpanel hidden" id="panelMessages">
-        <div style="font-weight:700;color:var(--muted);">Nenhuma mensagem pendente no momento.</div>
-      </div>
+      <div class="menu-detail hidden" id="detMsg">Sem mensagens novas no momento.</div>
 
-      <button class="menu-item-row" type="button" onclick="toggleSubpanel('panelProfile')">
+      <button class="menu-row" type="button" onclick="toggleDetail('detCad')">
         <span>Cadastro</span>
         <span>›</span>
       </button>
-      <div class="menu-subpanel hidden" id="panelProfile">
-        <label for="courierPicker">Entregador ativo</label>
-        <select id="courierPicker">
+      <div class="menu-detail hidden" id="detCad">
+        <label for="courierSelect">Entregador ativo</label>
+        <select id="courierSelect">
           <option value="">Selecione o entregador...</option>
         </select>
-        <div style="margin-top:10px;font-size:0.94rem;color:var(--muted);" id="gpsStatusLine">GPS: aguardando ativação</div>
+        <div id="gpsCoordsText" style="margin-top:8px;color:#4b5563;">GPS: aguardando ativação</div>
       </div>
 
-      <button class="menu-item-row" type="button" onclick="toggleSubpanel('panelPassword')">
+      <button class="menu-row" type="button" onclick="toggleDetail('detPass')">
         <span>Trocar senha</span>
         <span>›</span>
       </button>
-      <div class="menu-subpanel hidden" id="panelPassword">
-        <label for="newPassInput">Nova senha</label>
-        <input type="password" id="newPassInput" placeholder="Digite a nova senha" />
-        <button class="btn btn-green" style="margin-top:10px;width:100%;" type="button" onclick="showToast('Senha salva');toggleSubpanel('panelPassword')">Salvar senha</button>
+      <div class="menu-detail hidden" id="detPass">
+        <input type="password" id="passInput" placeholder="Nova senha" />
+        <button class="btn-act btn-green" style="margin-top:10px;width:100%;" type="button" onclick="toast('Senha salva');toggleDetail('detPass')">Salvar</button>
       </div>
     </div>
 
-    <div class="menu-group">
-      <button class="menu-item-row" type="button" onclick="toggleSubpanel('panelHistory')">
+    <div class="menu-section">
+      <button class="menu-row" type="button" onclick="toggleDetail('detHist')">
         <span>Histórico</span>
         <span>›</span>
       </button>
-      <div class="menu-subpanel hidden" id="panelHistory">
-        <div id="courierHistoryBox" style="font-weight:800;">0 entregas concluídas • R$ 0,00</div>
+      <div class="menu-detail hidden" id="detHist">
+        <div id="histSummary">0 entregas concluídas • R$ 0,00</div>
       </div>
 
-      <button class="menu-item-row" type="button" onclick="toggleSubpanel('panelChallenges')">
+      <button class="menu-row" type="button" onclick="toggleDetail('detDes')">
         <span>Desafios</span>
         <span>›</span>
       </button>
-      <div class="menu-subpanel hidden" id="panelChallenges">
-        <div style="font-weight:700;">Acompanhe suas metas diárias e ganhos por entrega.</div>
-      </div>
+      <div class="menu-detail hidden" id="detDes">Acompanhe suas entregas e ganhos do dia em Catanduva.</div>
 
-      <button class="menu-item-row" type="button" onclick="toggleSubpanel('panelAreas')">
+      <button class="menu-row" type="button" onclick="toggleDetail('detArea')">
         <span>Viaturas por PA/Áreas</span>
         <span>›</span>
       </button>
-      <div class="menu-subpanel hidden" id="panelAreas">
-        <div style="font-weight:800;">Área ativa: Catanduva - SP</div>
-      </div>
+      <div class="menu-detail hidden" id="detArea">Área ativa: Catanduva - SP</div>
     </div>
 
-    <div class="menu-group">
-      <button class="menu-item-row" type="button" onclick="toggleSubpanel('panelConfig')">
+    <div class="menu-section">
+      <button class="menu-row" type="button" onclick="toggleDetail('detCfg')">
         <span>Configurações</span>
         <span>›</span>
       </button>
-      <div class="menu-subpanel hidden" id="panelConfig">
+      <div class="menu-detail hidden" id="detCfg">
         <div class="btn-row" style="margin-top:0;">
-          <button class="btn btn-gray" type="button" id="btnGps">Ativar GPS</button>
-          <button class="btn btn-gray" type="button" id="btnTheme">Alternar Tema</button>
+          <button class="btn-act btn-blue" type="button" onclick="locateNow(true)">Atualizar GPS</button>
+          <button class="btn-act btn-gray" type="button" onclick="setViewMode('deliveries');closeMenu()">Ver Entregas</button>
         </div>
       </div>
 
-      <button class="menu-item-row" type="button" onclick="showToast('Suporte RotaSabor — Catanduva/SP')">
+      <button class="menu-row" type="button" onclick="toast('Suporte RotaSabor — Catanduva/SP')">
         <span>Fale conosco</span>
         <span>›</span>
       </button>
 
-      <button class="menu-item-row" type="button" onclick="showToast('Dados de GPS usados apenas para navegação de entrega')">
+      <button class="menu-row" type="button" onclick="toast('Localização usada apenas para rotas de entrega')">
         <span>Política de Privacidade</span>
         <span>›</span>
       </button>
 
-      <button class="menu-item-row" type="button" onclick="toggleSubpanel('panelSchedule')">
+      <button class="menu-row" type="button" onclick="toggleDetail('detAgenda')">
         <span>Agendamentos e Antecipações</span>
         <span>›</span>
       </button>
-      <div class="menu-subpanel hidden" id="panelSchedule">
-        <div style="font-weight:700;">Repasses atualizados após confirmação dos 4 dígitos.</div>
-      </div>
+      <div class="menu-detail hidden" id="detAgenda">Ganhos contabilizados ao confirmar os 4 dígitos na entrega.</div>
 
-      <button class="menu-item-row" type="button" onclick="showToast('Benefícios do entregador RotaSabor')">
+      <button class="menu-row" type="button" onclick="toast('Benefícios do entregador RotaSabor')">
         <span>Benefícios</span>
         <span>›</span>
       </button>
     </div>
   </div>
 
-  <!-- MODAL 4 ÚLTIMOS DÍGITOS -->
-  <div class="pin-backdrop" id="pinBackdrop">
-    <div class="pin-box">
-      <strong style="font-size:1.15rem;">Confirmar entrega (4 dígitos)</strong>
-      <div style="color:var(--muted);font-size:0.95rem;margin-top:6px;" id="pinDesc">Informe os 4 últimos números do celular do cliente.</div>
-      <div style="margin-top:8px;font-weight:900;color:var(--green);" id="pinReceiveLabel">Receber: R$ 0,00</div>
-      <input class="pin-digits" type="tel" id="pinInput" maxlength="4" inputmode="numeric" placeholder="0000" />
+  <!-- MODAL DE CONFIRMAÇÃO DOS 4 ÚLTIMOS DÍGITOS -->
+  <div class="modal-bg" id="pinModal">
+    <div class="modal-card">
+      <strong style="font-size:20px;">Confirmar entrega (4 dígitos)</strong>
+      <div id="pinInfo" style="color:#4b5563;margin-top:6px;">Digite os 4 últimos números do celular do cliente.</div>
+      <div id="pinAmount" style="font-weight:900;color:#16a34a;margin-top:8px;">Receber: R$ 0,00</div>
+      <input class="pin-box-input" type="tel" id="pinDigits" maxlength="4" inputmode="numeric" placeholder="0000" />
       <div class="btn-row">
-        <button class="btn btn-gray" type="button" id="cancelPinBtn">Cancelar</button>
-        <button class="btn btn-green" type="button" id="submitPinBtn">Confirmar</button>
+        <button class="btn-act btn-gray" type="button" id="pinCancel">Cancelar</button>
+        <button class="btn-act btn-green" type="button" id="pinConfirm">Confirmar</button>
       </div>
     </div>
   </div>
 
-  <div class="toast" id="toastBox"></div>
+  <div class="toast-msg" id="toastEl"></div>
 
   <script>
     let map = null;
     let marker = null;
     let lat = -21.1378;
     let lng = -48.9726;
-    let hasRealGps = false;
-    let isFree = false;
-    let orders = [];
-    let couriers = [];
-    let bottomView = "map";
-    let activePinOrder = null;
+    let hasGps = false;
+    let freeMode = false;
+    let viewMode = "map";
+    let ordersList = [];
+    let couriersList = [];
+    let pinOrder = null;
 
-    const fmtBRL = (v) => Number(v || 0).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+    const money = (n) => Number(n || 0).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
-    function showToast(msg) {
-      const el = document.getElementById("toastBox");
-      el.textContent = msg;
+    function toast(txt) {
+      const el = document.getElementById("toastEl");
+      el.textContent = txt;
       el.style.display = "block";
-      clearTimeout(window._toast);
-      window._toast = setTimeout(() => { el.style.display = "none"; }, 2800);
+      clearTimeout(window._tt);
+      window._tt = setTimeout(() => { el.style.display = "none"; }, 2600);
     }
 
-    function toggleSubpanel(id) {
+    function openMenu() { document.getElementById("menuOverlay").classList.add("open"); }
+    function closeMenu() { document.getElementById("menuOverlay").classList.remove("open"); }
+
+    function toggleDetail(id) {
       const el = document.getElementById(id);
       if (el) el.classList.toggle("hidden");
     }
 
-    document.getElementById("openMenuBtn").addEventListener("click", () => {
-      document.getElementById("fullMenuScreen").classList.add("open");
-    });
-    document.getElementById("closeMenuBtn").addEventListener("click", () => {
-      document.getElementById("fullMenuScreen").classList.remove("open");
-    });
+    document.getElementById("openMenuBtn").addEventListener("click", openMenu);
+    document.getElementById("closeMenuBtn").addEventListener("click", closeMenu);
+    document.getElementById("bellBtn").addEventListener("click", () => { openMenu(); toggleDetail("detMsg"); });
+    document.getElementById("topSaldoBtn").addEventListener("click", () => { openMenu(); toggleDetail("detHist"); });
 
     function initMap() {
       if (typeof L === "undefined" || map) return;
       map = L.map("courierMap", { zoomControl: false, attributionControl: false }).setView([lat, lng], 16);
       L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 19 }).addTo(map);
-      const pinIcon = L.divIcon({
-        className: "rider-pin",
-        html: `<div style="width:36px;height:36px;border-radius:999px;background:#0f172a;border:4px solid #ffffff;box-shadow:0 4px 12px rgba(0,0,0,0.35);display:flex;align-items:center;justify-content:center;color:#ffffff;font-size:15px;">▲</div>`,
-        iconSize: [36, 36],
-        iconAnchor: [18, 18]
+      const icon = L.divIcon({
+        className: "rider-marker",
+        html: `<div style="width:38px;height:38px;border-radius:999px;background:#111827;border:4px solid #ffffff;box-shadow:0 4px 14px rgba(0,0,0,0.4);display:flex;align-items:center;justify-content:center;color:#ffffff;font-size:16px;">▲</div>`,
+        iconSize: [38, 38],
+        iconAnchor: [19, 19]
       });
-      marker = L.marker([lat, lng], { icon: pinIcon }).addTo(map);
+      marker = L.marker([lat, lng], { icon }).addTo(map);
       setTimeout(() => map.invalidateSize(), 200);
     }
 
     window.addEventListener("resize", () => { if (map) map.invalidateSize(); });
 
-    function locateRider(notify = false) {
+    function locateNow(showMsg = false) {
       if (!("geolocation" in navigator)) return;
       navigator.geolocation.getCurrentPosition(
         (pos) => {
           lat = pos.coords.latitude;
           lng = pos.coords.longitude;
-          hasRealGps = true;
-          document.getElementById("gpsStatusLine").textContent = `GPS: ativo (${lat.toFixed(4)}, ${lng.toFixed(4)})`;
+          hasGps = true;
+          document.getElementById("gpsCoordsText").textContent = `GPS: ativo (${lat.toFixed(4)}, ${lng.toFixed(4)})`;
           if (map) map.setView([lat, lng], 16);
           if (marker) marker.setLatLng([lat, lng]);
-          if (notify) showToast("Localização GPS atualizada");
+          if (showMsg) toast("Localização atualizada");
         },
         () => {
-          if (notify) showToast("Permita o acesso ao GPS no aparelho");
+          if (showMsg) toast("Ative a localização no aparelho");
         },
         { enableHighAccuracy: true, timeout: 8000 }
       );
     }
 
-    document.getElementById("gpsCenterBtn").addEventListener("click", () => locateRider(true));
-    document.getElementById("btnGps").addEventListener("click", () => locateRider(true));
-    document.getElementById("btnTheme").addEventListener("click", () => {
-      document.body.classList.toggle("theme-dark");
-      showToast("Tema atualizado");
-    });
+    document.getElementById("gpsBtn").addEventListener("click", () => locateNow(true));
 
-    // Abre automaticamente a rota de navegação curva-a-curva no Google Maps
-    function openGoogleMapsNavigation(order) {
+    // Abre automaticamente a rota de navegação no Google Maps ao aceitar corrida
+    function startGoogleMapsRoute(order) {
       if (!order) return;
-      const rawAddress = (order.client_address || "").trim();
-      const fullDestination = rawAddress.toLowerCase().includes("catanduva")
-        ? rawAddress
-        : `${rawAddress}, Catanduva - SP, Brasil`;
-      const destEncoded = encodeURIComponent(fullDestination);
-
-      const originParam = hasRealGps ? `&origin=${lat},${lng}` : "";
-      const mapsTurnByTurnUrl = `https://www.google.com/maps/dir/?api=1${originParam}&destination=${destEncoded}&travelmode=driving&dir_action=navigate`;
-
-      const win = window.open(mapsTurnByTurnUrl, "_blank");
-      if (!win) {
-        window.location.href = mapsTurnByTurnUrl;
-      }
+      const addr = (order.client_address || "").trim();
+      const fullDest = addr.toLowerCase().includes("catanduva") ? addr : `${addr}, Catanduva - SP, Brasil`;
+      const originStr = hasGps ? `&origin=${lat},${lng}` : "";
+      const url = `https://www.google.com/maps/dir/?api=1${originStr}&destination=${encodeURIComponent(fullDest)}&travelmode=driving&dir_action=navigate`;
+      const opened = window.open(url, "_blank");
+      if (!opened) window.location.href = url;
     }
 
-    function setConnectionState(free) {
-      isFree = Boolean(free);
+    function setFreeMode(val) {
+      freeMode = Boolean(val);
       const btn = document.getElementById("toggleFreeBtn");
-      document.getElementById("goIcon").textContent = isFree ? "■" : "▶";
-      document.getElementById("goLabel").textContent = isFree ? "Ocupado" : "Ficar Livre";
-      btn.classList.toggle("online", isFree);
-      document.getElementById("connectionStateText").textContent = isFree ? "Você está livre" : "Você está desconectado";
-      if (isFree) {
-        locateRider(false);
-        loadOrders();
+      document.getElementById("goSymbol").textContent = freeMode ? "■" : "▶";
+      document.getElementById("goText").textContent = freeMode ? "Ocupado" : "Ficar Livre";
+      btn.classList.toggle("online", freeMode);
+      document.getElementById("statusLabel").textContent = freeMode ? "Você está livre" : "Você está desconectado";
+      if (freeMode) {
+        locateNow(false);
+        fetchOrders();
       }
-      renderOffersFeed();
+      renderOffers();
     }
 
-    document.getElementById("toggleFreeBtn").addEventListener("click", () => {
-      setConnectionState(!isFree);
-    });
+    document.getElementById("toggleFreeBtn").addEventListener("click", () => setFreeMode(!freeMode));
 
-    function setBottomView(view) {
-      bottomView = view;
-      document.getElementById("tabMapBtn").classList.toggle("active", view === "map");
-      document.getElementById("tabDeliveriesBtn").classList.toggle("active", view === "deliveries");
-      renderOffersFeed();
+    function setViewMode(mode) {
+      viewMode = mode;
+      document.getElementById("btnViewMap").classList.toggle("active", mode === "map");
+      document.getElementById("btnViewDeliveries").classList.toggle("active", mode === "deliveries");
+      renderOffers();
     }
 
-    function getNetEarning(o) {
+    function getGain(o) {
       if (o.courier_net_earning !== undefined && o.courier_net_earning !== null) return Number(o.courier_net_earning);
       return Number(o.delivery_fee || 0);
     }
 
-    function updateEarnings() {
-      const cid = Number(document.getElementById("courierPicker").value || 0);
-      const done = orders.filter((o) => Number(o.courier_id) === cid && String(o.status || "").toLowerCase() === "entregue");
-      const total = done.reduce((acc, o) => acc + getNetEarning(o), 0);
-      document.getElementById("topBalanceLabel").textContent = fmtBRL(total);
-      document.getElementById("courierHistoryBox").textContent = `${done.length} entregas concluídas • ${fmtBRL(total)}`;
+    function refreshBalance() {
+      const cid = Number(document.getElementById("courierSelect").value || 0);
+      const done = ordersList.filter((o) => Number(o.courier_id) === cid && String(o.status || "").toLowerCase() === "entregue");
+      const total = done.reduce((acc, o) => acc + getGain(o), 0);
+      document.getElementById("saldoText").textContent = money(total);
+      document.getElementById("histSummary").textContent = `${done.length} entregas concluídas • ${money(total)}`;
     }
 
-    function renderOffersFeed() {
-      const area = document.getElementById("offersFeedArea");
-      const cid = Number(document.getElementById("courierPicker").value || 0);
-      const myActive = orders.filter((o) => Number(o.courier_id) === cid && String(o.status || "").toLowerCase() !== "entregue");
-      const available = isFree ? orders.filter((o) => !o.courier_accepted && String(o.status || "").toLowerCase() !== "entregue") : [];
+    function renderOffers() {
+      const box = document.getElementById("offersContainer");
+      const cid = Number(document.getElementById("courierSelect").value || 0);
+      const active = ordersList.filter((o) => Number(o.courier_id) === cid && String(o.status || "").toLowerCase() !== "entregue");
+      const avail = freeMode ? ordersList.filter((o) => !o.courier_accepted && String(o.status || "").toLowerCase() !== "entregue") : [];
 
-      if (bottomView !== "deliveries" && !myActive.length && !available.length) {
-        area.innerHTML = "";
+      if (viewMode !== "deliveries" && !active.length && !avail.length) {
+        box.innerHTML = "";
         return;
       }
 
-      const activeHtml = myActive.map((o) => `
-        <div class="active-nav-card">
-          <div style="font-size:0.86rem;font-weight:900;text-transform:uppercase;opacity:0.85;">Corrida em andamento</div>
-          <div class="offer-title" style="margin-top:4px;">${o.order_code || "#" + o.id} • ${o.store_name || "Estabelecimento"}</div>
-          <div style="font-size:0.98rem;margin-top:4px;font-weight:700;">📍 ${o.client_address || ""}</div>
-          <div style="font-size:1.05rem;font-weight:900;margin-top:6px;">Receber: ${fmtBRL(getNetEarning(o))}</div>
+      const activeHtml = active.map((o) => `
+        <div class="offer-box active-race">
+          <div class="offer-head">
+            <span>${o.order_code || "#" + o.id} • ${o.store_name || "Estabelecimento"}</span>
+            <span>${money(getGain(o))}</span>
+          </div>
+          <div class="offer-sub">📍 ${o.client_address || ""}</div>
           <div class="btn-row">
-            <button class="btn btn-blue" type="button" onclick='openGoogleMapsNavigation(${JSON.stringify(o)})'>🧭 Abrir Rota Maps</button>
-            <button class="btn btn-green" type="button" onclick='openPin(${JSON.stringify(o)})'>✅ 4 dígitos</button>
+            <button class="btn-act btn-blue" type="button" onclick='startGoogleMapsRoute(${JSON.stringify(o)})'>🧭 Rota Maps</button>
+            <button class="btn-act btn-green" type="button" onclick='openPinModal(${JSON.stringify(o)})'>✅ 4 dígitos</button>
           </div>
         </div>
       `).join("");
 
-      const availHtml = available.map((o) => `
-        <div class="offer-card">
-          <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
-            <span class="offer-title">${o.order_code || "#" + o.id} • ${o.store_name || "Estabelecimento"}</span>
-            <span style="font-size:1.12rem;font-weight:900;color:var(--green);">${fmtBRL(getNetEarning(o))}</span>
+      const availHtml = avail.map((o) => `
+        <div class="offer-box">
+          <div class="offer-head">
+            <span>${o.order_code || "#" + o.id} • ${o.store_name || "Estabelecimento"}</span>
+            <span style="color:#16a34a;">${money(getGain(o))}</span>
           </div>
-          <div class="offer-addr">📍 ${o.client_address || "Endereço não informado"}</div>
-          <div class="offer-addr">👤 ${o.client_name || "Cliente"}</div>
+          <div class="offer-sub">📍 ${o.client_address || "Endereço não informado"}</div>
           <div class="btn-row">
-            <button class="btn btn-green" type="button" onclick="acceptDelivery(${o.id})">Aceitar e Abrir Rota Maps</button>
+            <button class="btn-act btn-green" type="button" onclick="acceptRace(${o.id})">Aceitar e Abrir Rota Maps</button>
           </div>
         </div>
       `).join("");
 
-      area.innerHTML = activeHtml + availHtml;
+      box.innerHTML = activeHtml + availHtml;
     }
 
-    async function acceptDelivery(orderId) {
-      const cid = Number(document.getElementById("courierPicker").value || 0);
+    async function acceptRace(orderId) {
+      const cid = Number(document.getElementById("courierSelect").value || 0);
       if (!cid) {
-        document.getElementById("fullMenuScreen").classList.add("open");
-        toggleSubpanel("panelProfile");
-        showToast("Selecione o entregador no menu Cadastro");
+        openMenu();
+        toggleDetail("detCad");
+        toast("Selecione o entregador em Cadastro");
         return;
       }
       try {
@@ -833,97 +744,93 @@
           body: JSON.stringify({ courier_id: cid, courier_accepted: true, status: "Aceito pelo entregador" })
         });
         if (res.ok) {
-          const acceptedOrder = await res.json();
-          showToast("Corrida aceita! Abrindo rota no Google Maps...");
-          await loadOrders();
-          openGoogleMapsNavigation(acceptedOrder);
+          const updated = await res.json();
+          toast("Corrida aceita! Abrindo rota no Google Maps...");
+          await fetchOrders();
+          startGoogleMapsRoute(updated);
         } else {
-          const err = await res.json().catch(() => ({}));
-          showToast(err.error || "Não foi possível aceitar");
+          toast("Não foi possível aceitar a corrida");
         }
       } catch (_) {
-        showToast("Erro de conexão ao aceitar entrega");
+        toast("Erro de conexão ao aceitar");
       }
     }
 
-    function openPin(order) {
-      activePinOrder = order;
-      document.getElementById("pinDesc").textContent = `Pedido ${order.order_code || "#" + order.id} (${order.client_name || "Cliente"}). Digite os 4 últimos números do celular.`;
-      document.getElementById("pinReceiveLabel").textContent = `Receber: ${fmtBRL(getNetEarning(order))}`;
-      document.getElementById("pinInput").value = "";
-      document.getElementById("pinBackdrop").classList.add("open");
+    function openPinModal(o) {
+      pinOrder = o;
+      document.getElementById("pinInfo").textContent = `Pedido ${o.order_code || "#" + o.id} (${o.client_name || "Cliente"}). Digite os 4 últimos números do celular.`;
+      document.getElementById("pinAmount").textContent = `Receber: ${money(getGain(o))}`;
+      document.getElementById("pinDigits").value = "";
+      document.getElementById("pinModal").classList.add("open");
     }
 
-    document.getElementById("cancelPinBtn").addEventListener("click", () => {
-      activePinOrder = null;
-      document.getElementById("pinBackdrop").classList.remove("open");
+    document.getElementById("pinCancel").addEventListener("click", () => {
+      pinOrder = null;
+      document.getElementById("pinModal").classList.remove("open");
     });
 
-    document.getElementById("submitPinBtn").addEventListener("click", async () => {
-      if (!activePinOrder) return;
-      const code = String(document.getElementById("pinInput").value || "").replace(/\D/g, "").slice(0, 4);
+    document.getElementById("pinConfirm").addEventListener("click", async () => {
+      if (!pinOrder) return;
+      const code = String(document.getElementById("pinDigits").value || "").replace(/\D/g, "").slice(0, 4);
       if (code.length < 4) {
-        showToast("Digite os 4 últimos números");
+        toast("Digite os 4 últimos números");
         return;
       }
       try {
-        const res = await fetch(`/api/orders/${activePinOrder.id}`, {
+        const res = await fetch(`/api/orders/${pinOrder.id}`, {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ status: "Entregue", delivery_code: code })
         });
         const data = await res.json().catch(() => ({}));
         if (!res.ok) {
-          showToast(data.error || "Código incorreto");
+          toast(data.error || "Código incorreto");
           return;
         }
-        document.getElementById("pinBackdrop").classList.remove("open");
-        activePinOrder = null;
-        showToast("Entrega confirmada!");
-        await loadOrders();
+        document.getElementById("pinModal").classList.remove("open");
+        pinOrder = null;
+        toast("Entrega confirmada!");
+        await fetchOrders();
       } catch (_) {
-        showToast("Erro ao confirmar entrega");
+        toast("Erro ao confirmar entrega");
       }
     });
 
-    async function loadCouriers() {
+    async function fetchCouriers() {
       try {
         const res = await fetch("/api/couriers");
         if (!res.ok) return;
-        couriers = await res.json();
-        const sel = document.getElementById("courierPicker");
+        couriersList = await res.json();
+        const sel = document.getElementById("courierSelect");
         const saved = localStorage.getItem("rotasabor_courier_id") || "";
         sel.innerHTML = `<option value="">Selecione o entregador...</option>` +
-          couriers.map((c) => `<option value="${c.id}">${c.full_name}</option>`).join("");
-        if (saved && couriers.some((c) => String(c.id) === String(saved))) {
-          sel.value = saved;
-        } else if (couriers.length) {
-          sel.value = String(couriers[0].id);
-        }
-        updateEarnings();
+          couriersList.map((c) => `<option value="${c.id}">${c.full_name}</option>`).join("");
+        if (saved && couriersList.some((c) => String(c.id) === String(saved))) sel.value = saved;
+        else if (couriersList.length) sel.value = String(couriersList[0].id);
+        refreshBalance();
       } catch (_) {}
     }
 
-    document.getElementById("courierPicker").addEventListener("change", (e) => {
+    document.getElementById("courierSelect").addEventListener("change", (e) => {
       localStorage.setItem("rotasabor_courier_id", e.target.value);
-      updateEarnings();
-      renderOffersFeed();
+      refreshBalance();
+      renderOffers();
     });
 
-    async function loadOrders() {
+    async function fetchOrders() {
       try {
         const res = await fetch("/api/orders");
         if (!res.ok) return;
-        orders = await res.json();
-        updateEarnings();
-        renderOffersFeed();
+        ordersList = await res.json();
+        refreshBalance();
+        renderOffers();
       } catch (_) {}
     }
 
     initMap();
-    locateRider(false);
-    loadCouriers().then(loadOrders);
-    setInterval(loadOrders, 4000);
+    locateNow(false);
+    fetchCouriers().then(fetchOrders);
+    setInterval(fetchOrders, 4000);
   </script>
 </body>
 </html>
