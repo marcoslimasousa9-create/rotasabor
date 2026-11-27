@@ -3,224 +3,452 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>RotaSabor — App Motoboy</title>
-  <link rel="manifest" href="/static/manifest-motoboy.json" />
+  <title>RotaSabor — App do Entregador</title>
   <meta name="theme-color" content="#0b1220" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <link rel="manifest" href="/static/manifest-motoboy.json" />
+  <link rel="icon" type="image/svg+xml" href="/static/icon.svg" />
   <style>
     :root {
-      --bg: #0b1220;
-      --card: #111a2e;
-      --border: #1e2d4a;
+      --bg: #070c16;
+      --surface: #0f172a;
+      --surface-2: #162033;
+      --border: rgba(148, 163, 184, 0.16);
       --text: #f8fafc;
       --muted: #94a3b8;
-      --accent: #10b981;
-      --info: #38bdf8;
-      --warn: #f59e0b;
+      --primary: #10b981;
+      --accent: #38bdf8;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --radius: 16px;
     }
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
-    body { background: var(--bg); color: var(--text); min-height: 100vh; padding: 16px; }
-    .container { max-width: 520px; margin: 0 auto; display: flex; flex-direction: column; gap: 14px; }
-    .header {
-      background: var(--card); border: 1px solid var(--border); border-radius: 14px;
-      padding: 16px; display: flex; justify-content: space-between; align-items: center;
+
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      padding-bottom: 82px;
     }
-    .brand { font-size: 1.15rem; font-weight: 700; color: var(--accent); }
-    .subtitle { font-size: 0.8rem; color: var(--muted); }
-    .badge {
-      font-size: 0.72rem; font-weight: 700; padding: 5px 10px; border-radius: 999px;
-      background: rgba(16, 185, 129, 0.14); color: var(--accent); border: 1px solid rgba(16, 185, 129, 0.35);
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: rgba(11, 18, 32, 0.94);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 16px;
     }
+
+    .topbar-row {
+      max-width: 900px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .title { font-size: 1.05rem; font-weight: 800; }
+    .sub { font-size: 0.76rem; color: var(--muted); }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 16px;
+    }
+
     .card {
-      background: var(--card); border: 1px solid var(--border); border-radius: 14px;
-      padding: 16px; display: flex; flex-direction: column; gap: 12px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px;
+      margin-bottom: 12px;
     }
-    .card-title { font-size: 0.95rem; font-weight: 700; }
-    label { font-size: 0.8rem; color: var(--muted); display: block; margin-bottom: 4px; }
-    input, select {
-      width: 100%; background: var(--bg); color: var(--text); border: 1px solid var(--border);
-      border-radius: 10px; padding: 10px 12px; font-size: 0.92rem; outline: none;
+
+    .card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 10px;
     }
-    input:focus, select:focus { border-color: var(--accent); }
+
+    .card-title { margin: 0; font-size: 1rem; font-weight: 700; }
+    .meta { color: var(--muted); font-size: 0.83rem; margin-top: 4px; }
+
+    .badge {
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 0.74rem;
+      font-weight: 700;
+      background: rgba(16, 185, 129, 0.16);
+      color: var(--primary);
+      white-space: nowrap;
+    }
+
+    .badge.warn {
+      background: rgba(245, 158, 11, 0.16);
+      color: var(--warning);
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 10px;
+    }
+
+    label {
+      display: block;
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-bottom: 4px;
+      font-weight: 600;
+    }
+
+    select, input {
+      width: 100%;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 10px 12px;
+      border-radius: 10px;
+      font-size: 0.9rem;
+    }
+
+    .btn-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
     .btn {
-      width: 100%; border: none; border-radius: 10px; padding: 12px 14px;
-      font-size: 0.92rem; font-weight: 700; cursor: pointer; transition: opacity 0.15s;
+      border: none;
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-weight: 700;
+      font-size: 0.83rem;
+      cursor: pointer;
+      flex: 1 1 auto;
     }
-    .btn:active { opacity: 0.85; }
-    .btn-green { background: var(--accent); color: #052016; }
-    .btn-blue { background: var(--info); color: #061322; }
-    .btn-outline { background: #1a2640; color: var(--text); border: 1px solid var(--border); }
-    .row { display: flex; gap: 10px; }
-    .row > * { flex: 1; }
-    .log-box {
-      background: var(--bg); border: 1px solid var(--border); border-radius: 10px;
-      padding: 12px; font-size: 0.85rem; line-height: 1.45; color: var(--muted);
+
+    .btn-primary { background: var(--primary); color: #04130d; }
+    .btn-blue { background: var(--accent); color: #04101d; }
+    .btn-outline { background: var(--surface-2); color: var(--text); border: 1px solid var(--border); }
+
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(11, 18, 32, 0.96);
+      border-top: 1px solid var(--border);
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      padding: 8px 6px;
+      z-index: 30;
     }
-    .ok { color: var(--accent); font-weight: 700; }
-    .warn { color: var(--warn); font-weight: 700; }
+
+    .nav-btn {
+      background: transparent;
+      border: none;
+      color: var(--muted);
+      font-weight: 700;
+      font-size: 0.78rem;
+      padding: 6px;
+      cursor: pointer;
+    }
+
+    .nav-btn.active { color: var(--primary); }
+
+    .toast {
+      position: fixed;
+      top: 72px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--surface-2);
+      border: 1px solid var(--primary);
+      color: var(--text);
+      padding: 10px 16px;
+      border-radius: 12px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      z-index: 50;
+      display: none;
+    }
+
+    .hidden { display: none !important; }
   </style>
 </head>
 <body>
-  <div class="container">
-    <div class="header">
+  <header class="topbar">
+    <div class="topbar-row">
       <div>
-        <div class="brand">RotaSabor Motoboy</div>
-        <div class="subtitle">Chamadas, status e GPS em Catanduva</div>
+        <div class="title">RotaSabor • Entregador</div>
+        <div class="sub" id="gpsStatusLabel">GPS: aguardando ativação</div>
       </div>
-      <span class="badge">PWA MOTOBOY</span>
+      <button class="btn btn-primary" style="flex: 0 0 auto;" id="toggleGpsBtn" type="button">Ativar GPS</button>
     </div>
+  </header>
 
+  <div class="toast" id="toastBox"></div>
+
+  <main class="container">
     <div class="card">
-      <div class="card-title">Disponibilidade e entrega</div>
-      <div class="row">
+      <div class="grid-2">
         <div>
-          <label for="motoboyNome">Entregador</label>
-          <input id="motoboyNome" type="text" placeholder="Seu nome" />
-        </div>
-        <div>
-          <label for="statusEntrega">Status atual</label>
-          <select id="statusEntrega">
-            <option value="disponivel">Disponível</option>
-            <option value="coletando">Coletando pedido</option>
-            <option value="a_caminho">A caminho da entrega</option>
-            <option value="entregue">Entregue</option>
+          <label for="courierSelect">Entregador ativo</label>
+          <select id="courierSelect">
+            <option value="">Selecione um entregador cadastrado...</option>
           </select>
         </div>
+        <div>
+          <label>Ações rápidas</label>
+          <div class="btn-row" style="margin-top: 0;">
+            <button class="btn btn-blue" type="button" id="sendOnceGpsBtn">Enviar posição agora</button>
+            <button class="btn btn-outline" type="button" id="refreshBtn">Atualizar</button>
+          </div>
+        </div>
       </div>
-      <div>
-        <label for="codigoEntrega">Código / ID do pedido (opcional)</label>
-        <input id="codigoEntrega" type="text" placeholder="Ex.: 104" />
-      </div>
-      <button class="btn btn-green" id="btnAtualizarStatus" type="button">Atualizar status</button>
     </div>
 
-    <div class="card">
-      <div class="card-title">Localização GPS</div>
-      <div class="row">
-        <button class="btn btn-blue" id="btnEnviarGps" type="button">Enviar GPS agora</button>
-        <button class="btn btn-outline" id="btnRastreioAuto" type="button">Rastreio auto: OFF</button>
+    <section id="tab-active">
+      <h3 style="margin: 8px 0 10px;">Entregas em andamento / disponíveis</h3>
+      <div id="activeOrdersList"></div>
+    </section>
+
+    <section id="tab-history" class="hidden">
+      <h3 style="margin: 8px 0 10px;">Entregas concluídas</h3>
+      <div id="doneOrdersList"></div>
+    </section>
+
+    <section id="tab-gps" class="hidden">
+      <div class="card">
+        <h3 class="card-title">Coordenadas atuais</h3>
+        <div class="meta" id="coordsReadout">Lat: -- | Lng: --</div>
+        <div class="grid-2" style="margin-top: 12px;">
+          <div>
+            <label for="manualLat">Latitude manual</label>
+            <input type="text" id="manualLat" placeholder="-21.1378" />
+          </div>
+          <div>
+            <label for="manualLng">Longitude manual</label>
+            <input type="text" id="manualLng" placeholder="-48.9726" />
+          </div>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-primary" type="button" id="sendManualGpsBtn">Salvar coordenadas</button>
+        </div>
       </div>
-      <div class="log-box" id="logBox">
-        Pronto para operar. Use <strong>Enviar GPS agora</strong> ou ative o rastreio automático durante as entregas.
-      </div>
-    </div>
-  </div>
+    </section>
+  </main>
+
+  <nav class="bottom-nav">
+    <button class="nav-btn active" data-tab="tab-active" type="button">Entregas</button>
+    <button class="nav-btn" data-tab="tab-history" type="button">Concluídas</button>
+    <button class="nav-btn" data-tab="tab-gps" type="button">GPS</button>
+  </nav>
 
   <script>
-    if ("serviceWorker" in navigator) {
-      window.addEventListener("load", () => {
-        navigator.serviceWorker.register("/sw.js").catch(() => {
-          navigator.serviceWorker.register("/static/sw.js").catch(() => {});
-        });
-      });
-    }
-
-    const logBox = document.getElementById("logBox");
-    const btnRastreio = document.getElementById("btnRastreioAuto");
     let watchId = null;
+    let couriers = [];
+    let orders = [];
 
-    function escreverLog(html) {
-      const hora = new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
-      logBox.innerHTML = `<div><span class="ok">[${hora}]</span> ${html}</div>`;
+    const fmtBRL = (v) => Number(v || 0).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+
+    function showToast(msg) {
+      const box = document.getElementById("toastBox");
+      box.textContent = msg;
+      box.style.display = "block";
+      clearTimeout(window._t);
+      window._t = setTimeout(() => { box.style.display = "none"; }, 2600);
     }
 
-    async function atualizarStatus() {
-      const payload = {
-        motoboy: document.getElementById("motoboyNome").value.trim() || "Entregador",
-        status: document.getElementById("statusEntrega").value,
-        pedido_id: document.getElementById("codigoEntrega").value.trim() || null
-      };
-
-      const endpoints = ["/api/motoboy/status", "/motoboy/status", "/api/status-entrega"];
-      for (const url of endpoints) {
-        try {
-          const resp = await fetch(url, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(payload)
-          });
-          if (resp.ok) {
-            escreverLog(`Status atualizado para <span class="ok">${payload.status}</span>${payload.pedido_id ? ` (Pedido #${payload.pedido_id})` : ""}.`);
-            return;
-          }
-        } catch (_) {}
-      }
-
-      escreverLog(`<span class="warn">Status selecionado:</span> ${payload.status} (sem confirmação do servidor no momento).`);
+    function switchTab(id) {
+      document.querySelectorAll("main > section").forEach((s) => s.classList.add("hidden"));
+      document.getElementById(id).classList.remove("hidden");
+      document.querySelectorAll(".nav-btn").forEach((b) => b.classList.toggle("active", b.dataset.tab === id));
     }
 
-    async function enviarCoordenadas(pos) {
-      const { latitude, longitude, accuracy } = pos.coords;
-      const payload = {
-        motoboy: document.getElementById("motoboyNome").value.trim() || "Entregador",
-        pedido_id: document.getElementById("codigoEntrega").value.trim() || null,
-        lat: latitude,
-        lng: longitude,
-        accuracy
-      };
+    document.querySelectorAll(".nav-btn").forEach((b) => {
+      b.addEventListener("click", () => switchTab(b.dataset.tab));
+    });
 
-      const endpoints = ["/api/motoboy/gps", "/motoboy/gps", "/api/gps"];
-      for (const url of endpoints) {
-        try {
-          const resp = await fetch(url, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(payload)
-          });
-          if (resp.ok) {
-            escreverLog(`GPS enviado: <span class="ok">${latitude.toFixed(5)}, ${longitude.toFixed(5)}</span> (±${Math.round(accuracy)}m)`);
-            return;
-          }
-        } catch (_) {}
-      }
+    async function loadCouriers() {
+      try {
+        const res = await fetch("/api/couriers");
+        if (res.ok) couriers = await res.json();
+      } catch (_) {}
 
-      escreverLog(`GPS capturado: <strong>${latitude.toFixed(5)}, ${longitude.toFixed(5)}</strong> (±${Math.round(accuracy)}m)`);
+      const sel = document.getElementById("courierSelect");
+      const currentVal = localStorage.getItem("rotasabor_courier_id") || sel.value;
+      sel.innerHTML = `<option value="">Selecione um entregador...</option>` + couriers.map((c) =>
+        `<option value="${c.id}">${c.name} (${c.vehicle || "Moto"}${c.plate ? " • " + c.plate : ""})</option>`
+      ).join("");
+
+      if (currentVal) sel.value = currentVal;
     }
 
-    function erroGps(err) {
-      escreverLog(`<span class="warn">Erro de GPS:</span> ${err.message || "Permissão negada ou indisponível"}`);
-    }
+    document.getElementById("courierSelect").addEventListener("change", (e) => {
+      localStorage.setItem("rotasabor_courier_id", e.target.value);
+      renderOrders();
+    });
 
-    function enviarGpsAgora() {
-      if (!("geolocation" in navigator)) {
-        escreverLog(`<span class="warn">Geolocalização não suportada neste aparelho.</span>`);
+    async function sendLocation(lat, lng) {
+      const courierId = document.getElementById("courierSelect").value;
+      document.getElementById("coordsReadout").textContent = `Lat: ${Number(lat).toFixed(6)} | Lng: ${Number(lng).toFixed(6)}`;
+      if (!courierId) {
+        showToast("Selecione um entregador primeiro.");
         return;
       }
-      escreverLog("Capturando localização GPS...");
-      navigator.geolocation.getCurrentPosition(enviarCoordenadas, erroGps, {
-        enableHighAccuracy: true,
-        timeout: 10000,
-        maximumAge: 0
-      });
+      try {
+        const res = await fetch(`/api/couriers/${courierId}/location`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ lat: Number(lat), lng: Number(lng) })
+        });
+        if (res.ok) {
+          document.getElementById("gpsStatusLabel").textContent = `GPS ativo: ${Number(lat).toFixed(4)}, ${Number(lng).toFixed(4)}`;
+          showToast("Localização enviada ao painel!");
+        }
+      } catch (_) {
+        showToast("Erro ao enviar GPS.");
+      }
     }
 
-    function alternarRastreioAuto() {
-      if (!("geolocation" in navigator)) {
-        escreverLog(`<span class="warn">Geolocalização não suportada neste aparelho.</span>`);
+    document.getElementById("sendOnceGpsBtn").addEventListener("click", () => {
+      if (!navigator.geolocation) {
+        showToast("Geolocalização não suportada neste aparelho.");
         return;
       }
+      navigator.geolocation.getCurrentPosition(
+        (pos) => sendLocation(pos.coords.latitude, pos.coords.longitude),
+        () => showToast("Permissão de GPS negada ou indisponível."),
+        { enableHighAccuracy: true }
+      );
+    });
 
+    document.getElementById("toggleGpsBtn").addEventListener("click", (e) => {
       if (watchId !== null) {
         navigator.geolocation.clearWatch(watchId);
         watchId = null;
-        btnRastreio.textContent = "Rastreio auto: OFF";
-        escreverLog("Rastreio automático desligado.");
+        e.target.textContent = "Ativar GPS";
+        document.getElementById("gpsStatusLabel").textContent = "GPS pausado";
+        showToast("Rastreamento GPS pausado");
         return;
       }
+      if (!navigator.geolocation) {
+        showToast("Geolocalização não disponível.");
+        return;
+      }
+      watchId = navigator.geolocation.watchPosition(
+        (pos) => sendLocation(pos.coords.latitude, pos.coords.longitude),
+        () => showToast("Não foi possível ler o GPS contínuo."),
+        { enableHighAccuracy: true, maximumAge: 5000 }
+      );
+      e.target.textContent = "Pausar GPS";
+      showToast("Rastreamento GPS ligado");
+    });
 
-      watchId = navigator.geolocation.watchPosition(enviarCoordenadas, erroGps, {
-        enableHighAccuracy: true,
-        timeout: 15000,
-        maximumAge: 5000
-      });
-      btnRastreio.textContent = "Rastreio auto: ON";
-      escreverLog(`<span class="ok">Rastreio automático ativado.</span>`);
+    document.getElementById("sendManualGpsBtn").addEventListener("click", () => {
+      const lat = parseFloat(document.getElementById("manualLat").value);
+      const lng = parseFloat(document.getElementById("manualLng").value);
+      if (Number.isNaN(lat) || Number.isNaN(lng)) {
+        showToast("Informe latitude e longitude válidas.");
+        return;
+      }
+      sendLocation(lat, lng);
+    });
+
+    async function updateOrderStatus(orderId, newStatus) {
+      const courierIdRaw = document.getElementById("courierSelect").value;
+      const body = { status: newStatus };
+      if (courierIdRaw) body.courier_id = Number(courierIdRaw);
+
+      try {
+        const res = await fetch(`/api/orders/${orderId}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body)
+        });
+        if (res.ok) {
+          showToast(`Pedido #${orderId} → ${newStatus}`);
+          await loadOrders();
+        }
+      } catch (_) {
+        showToast("Erro ao atualizar status");
+      }
     }
 
-    document.getElementById("btnAtualizarStatus").addEventListener("click", atualizarStatus);
-    document.getElementById("btnEnviarGps").addEventListener("click", enviarGpsAgora);
-    document.getElementById("btnRastreioAuto").addEventListener("click", alternarRastreioAuto);
+    async function loadOrders() {
+      try {
+        const res = await fetch("/api/orders");
+        if (res.ok) orders = await res.json();
+      } catch (_) {}
+      renderOrders();
+    }
+
+    function renderOrders() {
+      const selectedCourierId = Number(document.getElementById("courierSelect").value || 0);
+      const activeContainer = document.getElementById("activeOrdersList");
+      const doneContainer = document.getElementById("doneOrdersList");
+
+      const filtered = orders.filter((o) => {
+        if (!selectedCourierId) return true;
+        return !o.courier_id || Number(o.courier_id) === selectedCourierId;
+      });
+
+      const activeList = filtered.filter((o) => !String(o.status || "").toLowerCase().includes("entregue"));
+      const doneList = filtered.filter((o) => String(o.status || "").toLowerCase().includes("entregue"));
+
+      activeContainer.innerHTML = activeList.length ? [...activeList].reverse().map((o) => `
+        <article class="card">
+          <div class="card-top">
+            <div>
+              <h4 class="card-title">Pedido #${o.id} • ${o.store_name || "Estabelecimento"}</h4>
+              <div class="meta">Cliente: <strong>${o.client_name}</strong> • Pagamento: ${o.payment || "Pix"}</div>
+              <div class="meta">Endereço: ${o.client_address || "Não informado"}</div>
+            </div>
+            <span class="badge warn">${o.status || "Pendente"}</span>
+          </div>
+          <div class="meta" style="margin-top: 8px;">Total: <strong>${fmtBRL(o.total)}</strong></div>
+          <div class="btn-row">
+            <button class="btn btn-outline" type="button" onclick="updateOrderStatus(${o.id}, 'Coletando')">Coletando</button>
+            <button class="btn btn-blue" type="button" onclick="updateOrderStatus(${o.id}, 'A caminho')">A caminho</button>
+            <button class="btn btn-primary" type="button" onclick="updateOrderStatus(${o.id}, 'Entregue')">Entregue</button>
+          </div>
+        </article>
+      `).join("") : `<div class="card"><div class="meta">Nenhuma entrega ativa no momento.</div></div>`;
+
+      doneContainer.innerHTML = doneList.length ? [...doneList].reverse().map((o) => `
+        <article class="card">
+          <div class="card-top">
+            <div>
+              <h4 class="card-title">Pedido #${o.id} • ${o.store_name || "Estabelecimento"}</h4>
+              <div class="meta">${o.client_name} • ${o.client_address || ""}</div>
+            </div>
+            <span class="badge">${o.status}</span>
+          </div>
+          <div class="meta" style="margin-top: 6px;">Total: <strong>${fmtBRL(o.total)}</strong></div>
+        </article>
+      `).join("") : `<div class="card"><div class="meta">Nenhuma entrega concluída ainda.</div></div>`;
+    }
+
+    document.getElementById("refreshBtn").addEventListener("click", async () => {
+      await Promise.all([loadCouriers(), loadOrders()]);
+      showToast("Dados atualizados");
+    });
+
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("/sw.js").catch(() => {});
+      });
+    }
+
+    Promise.all([loadCouriers(), loadOrders()]);
   </script>
 </body>
 </html>
