@@ -127,7 +127,7 @@ with app.app_context():
 
 @app.get("/")
 def index():
-    return render_template("index.html")
+    return render_template("painel_gestao.html")
 
 
 @app.get("/cliente")
