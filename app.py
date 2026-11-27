@@ -10,6 +10,7 @@ BASE_DIR = Path(__file__).resolve().parent
 DATA_FILE = Path(os.environ.get("ROTASABOR_DATA_FILE", str(BASE_DIR / "rotasabor_db.json")))
 DATABASE_URL = os.environ.get("DATABASE_URL", "").strip()
 
+# O Render costuma fornecer postgres://; bibliotecas modernas preferem postgresql://
 if DATABASE_URL.startswith("postgres://"):
     DATABASE_URL = "postgresql://" + DATABASE_URL[len("postgres://") :]
 
@@ -40,7 +41,7 @@ def _default_data() -> dict[str, list[dict[str, Any]]]:
             {
                 "id": 1,
                 "name": "Hamburgueria Centro",
-                "category": "Lanches & Smash",
+                "category": "Lanches & Pizzas",
                 "city": "Catanduva - SP",
                 "delivery_fee": 8.0,
                 "prep_time": "25-35 min",
@@ -50,7 +51,7 @@ def _default_data() -> dict[str, list[dict[str, Any]]]:
             {
                 "id": 2,
                 "name": "Marmitaria Sabor da Casa",
-                "category": "Refeicoes Caseiras",
+                "category": "Refeições & Marmitas",
                 "city": "Catanduva - SP",
                 "delivery_fee": 7.0,
                 "prep_time": "30-45 min",
@@ -207,6 +208,9 @@ except Exception as exc:
     app.logger.warning("Aviso na inicialização do banco: %s", exc)
 
 
+# --- Rotas de Páginas ---
+
+
 @app.route("/")
 def index():
     return render_template("painel_gestao.html")
@@ -237,6 +241,9 @@ def service_worker_js():
     response = send_from_directory(app.static_folder, "sw.js", mimetype="application/javascript")
     response.headers["Service-Worker-Allowed"] = "/"
     return response
+
+
+# --- API: Clientes ---
 
 
 @app.route("/api/clients", methods=["GET", "POST"])
@@ -285,6 +292,9 @@ def clients_collection():
     db["clients"].append(client)
     _write_json_db(db)
     return jsonify(client), 201
+
+
+# --- API: Estabelecimentos ---
 
 
 @app.route("/api/stores", methods=["GET", "POST"])
@@ -340,6 +350,9 @@ def stores_collection():
     db["stores"].append(store)
     _write_json_db(db)
     return jsonify(store), 201
+
+
+# --- API: Entregadores ---
 
 
 @app.route("/api/couriers", methods=["GET", "POST"])
@@ -436,6 +449,9 @@ def update_courier_location(courier_id: int):
     return jsonify({"error": "Entregador não encontrado"}), 404
 
 
+# --- API: Pedidos / Entregas ---
+
+
 @app.route("/api/orders", methods=["GET", "POST"])
 def orders_collection():
     if request.method == "GET":
@@ -476,4 +492,88 @@ def orders_collection():
                     """,
                     (
                         client_id,
-                        client
+                        client_name,
+                        client_address,
+                        store_id,
+                        store_name,
+                        json.dumps(items, ensure_ascii=False),
+                        total,
+                        payment,
+                        now,
+                        now,
+                    ),
+                )
+                created = _format_order_row(dict(cur.fetchone()))
+            conn.commit()
+        return jsonify(created), 201
+
+    db = _read_json_db()
+    next_id = max([int(o.get("id", 0)) for o in db["orders"]], default=0) + 1
+    new_order = {
+        "id": next_id,
+        "client_id": client_id,
+        "client_name": client_name,
+        "client_address": client_address,
+        "store_id": store_id,
+        "store_name": store_name,
+        "courier_id": None,
+        "items_json": json.dumps(items, ensure_ascii=False),
+        "total": total,
+        "payment": payment,
+        "status": "Pendente",
+        "created_at": now,
+        "updated_at": now,
+    }
+    db["orders"].append(new_order)
+    _write_json_db(db)
+    return jsonify(_format_order_row(new_order)), 201
+
+
+@app.route("/api/orders/<int:order_id>", methods=["PATCH"])
+def update_order(order_id: int):
+    payload = request.get_json(silent=True) or {}
+    new_status = payload.get("status")
+    courier_id = payload.get("courier_id")
+    now = _now_iso()
+
+    if USE_POSTGRES:
+        with _pg_connect() as conn:
+            with conn.cursor() as cur:
+                cur.execute("SELECT * FROM orders WHERE id = %s;", (order_id,))
+                row = cur.fetchone()
+                if not row:
+                    return jsonify({"error": "Pedido não encontrado"}), 404
+
+                status_val = str(new_status).strip() if new_status else row["status"]
+                courier_val = courier_id if courier_id is not None else row["courier_id"]
+
+                cur.execute(
+                    """
+                    UPDATE orders
+                    SET status = %s, courier_id = %s, updated_at = %s
+                    WHERE id = %s
+                    RETURNING *;
+                    """,
+                    (status_val, courier_val, now, order_id),
+                )
+                updated = _format_order_row(dict(cur.fetchone()))
+            conn.commit()
+        return jsonify(updated), 200
+
+    db = _read_json_db()
+    for o in db["orders"]:
+        if int(o.get("id", 0)) == order_id:
+            if new_status:
+                o["status"] = str(new_status).strip()
+            if courier_id is not None:
+                o["courier_id"] = courier_id
+            o["updated_at"] = now
+            _write_json_db(db)
+            return jsonify(_format_order_row(o)), 200
+
+    return jsonify({"error": "Pedido não encontrado"}), 404
+
+
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port, debug=True)
