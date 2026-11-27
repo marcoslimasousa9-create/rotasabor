@@ -1,359 +1,152 @@
-import os
-import re
-from datetime import datetime
-from flask import Flask, jsonify, render_template, request
-from flask_sqlalchemy import SQLAlchemy
-from jinja2 import TemplateNotFound
-from sqlalchemy import inspect, text
+"""Aplica as alterações das telas (templates/*.html) para o novo app.py.
 
-app = Flask(__name__)
+Uso (na pasta do repositório, onde fica a pasta templates):  python patch_frontend.py
+Rode UMA vez. Se algum trecho não for encontrado, o arquivo correspondente NÃO é alterado.
+"""
+import pathlib
+import sys
 
-database_url = os.environ.get("DATABASE_URL", "sqlite:///rotasabor.db")
-if database_url.startswith("postgres://"):
-    database_url = database_url.replace("postgres://", "postgresql://", 1)
+PRODUCTS_SECTION = r'''<section id="sec-products" class="grid-2 hidden">
+      <div class="card">
+        <h2>Cadastrar Produto</h2>
+        <div class="muted">Itens que aparecem no app do cliente.</div>
+        <form id="productForm">
+          <label for="prodStore">Estabelecimento</label>
+          <select id="prodStore" required></select>
+          <label for="prodName">Nome do produto</label>
+          <input type="text" id="prodName" required />
+          <label for="prodPrice">Preço (R$)</label>
+          <input type="number" step="0.01" min="0.5" id="prodPrice" required />
+          <label for="prodDesc">Descrição</label>
+          <input type="text" id="prodDesc" />
+          <div class="submit-wrap">
+            <button class="btn btn-success" type="submit">Salvar Produto</button>
+          </div>
+        </form>
+      </div>
+      <div class="card">
+        <h2>Produtos Cadastrados</h2>
+        <div class="muted">Só estes itens podem ser pedidos pelos clientes.</div>
+        <div id="productsList">Carregando...</div>
+      </div>
+    </section>'''
 
-app.config["SQLALCHEMY_DATABASE_URI"] = database_url
-app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+PRODUCTS_JS = r'''async function loadProducts() {
+      const [pr, sr] = await Promise.all([fetch("/api/products"), fetch("/api/establishments")]);
+      const prods = pr.ok ? await pr.json() : [];
+      const stores = sr.ok ? await sr.json() : [];
+      document.getElementById("prodStore").innerHTML = stores.map((s) => `<option value="${s.id}">${s.store_name}</option>`).join("");
+      const names = Object.fromEntries(stores.map((s) => [s.id, s.store_name]));
+      document.getElementById("productsList").innerHTML = prods.map((p) => `
+        <div class="item-row">
+          <strong>${p.name}</strong> • ${fmtBRL(p.price)}
+          <div class="muted" style="margin:4px 0 0;">${names[p.establishment_id] || "Sem loja"}${p.description ? " • " + p.description : ""}</div>
+        </div>
+      `).join("") || `<div class="muted">Nenhum produto cadastrado ainda.</div>`;
+    }
 
-db = SQLAlchemy(app)
+    document.getElementById("productForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const res = await fetch("/api/products", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          establishment_id: Number(document.getElementById("prodStore").value),
+          name: document.getElementById("prodName").value.trim(),
+          price: document.getElementById("prodPrice").value,
+          description: document.getElementById("prodDesc").value.trim()
+        })
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) { alert(data.error || "Erro ao salvar produto."); return; }
+      e.target.reset();
+      loadProducts();
+    });'''
 
+CLIENTE = [
+    ("let storesData = [...SEED_STORES];", "let storesData = [];"),
+    (": seedFallback.items;", ": [];"),
+    ('rating: "4.9",', 'rating: "Novo",'),
+    ('reviews: "100+",', 'reviews: "sem avaliações",'),
+    ("items_total: itemsTotal,", '''payment_method: document.getElementById("cliPayment").value,
+            items: cart.map((x) => ({ id: x.id, qty: x.qty })),'''),
+    ('toast(`Pedido ${data.order_code || ""} enviado!`);', '''try {
+          const tk = JSON.parse(localStorage.getItem("rotasabor_tokens") || "[]");
+          tk.unshift(data.tracking_token);
+          localStorage.setItem("rotasabor_tokens", JSON.stringify(tk.slice(0, 20)));
+        } catch (_) {}
+        toast(`Pedido ${data.order_code || ""} enviado! Código de entrega: ${data.delivery_code}`);'''),
+    ('const res = await fetchWithTimeout("/api/orders");', '''const tokens = JSON.parse(localStorage.getItem("rotasabor_tokens") || "[]");
+        if (!tokens.length) { box.innerHTML = `<div class="muted-txt">Nenhum pedido recente.</div>`; return; }
+        const res = await fetchWithTimeout("/api/orders/track?tokens=" + encodeURIComponent(tokens.join(",")));'''),
+    ('const list = phoneFilter ? rows.filter((r) => String(r.client_phone || "").includes(phoneFilter)) : rows.slice(0, 5);',
+     "const list = rows;"),
+    ('<div class="muted-txt" style="margin-top:5px;">${o.client_address || ""}</div>',
+     '''<div class="muted-txt" style="margin-top:5px;">${o.client_address || ""}</div>
+            ${o.status !== "Entregue" && o.delivery_code ? `<div style="font-size:19px;font-weight:900;margin-top:6px;">Código de entrega: ${o.delivery_code}</div>` : ""}'''),
+    ("Celular (4 últimos dígitos confirmam na entrega)", "Celular / WhatsApp (com DDD)"),
+    ('<option value="Pix">Pix</option>', ""),
+]
 
-class Establishment(db.Model):
-    __tablename__ = "establishments"
-    id = db.Column(db.Integer, primary_key=True)
-    store_name = db.Column(db.String(140), nullable=False)
-    category = db.Column(db.String(80), default="Lanches & Refeições")
-    default_delivery_fee = db.Column(db.Float, default=8.0)
-    estimated_time = db.Column(db.String(40), default="25-35 min")
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+MOTOBOY = [
+    ("let map = null;", '''fetch("/api/me").then((r) => r.json()).then((m) => { if (m.role !== "courier") location.href = "/login"; }).catch(() => {});
+    let map = null;'''),
+    ("Peça os 4 últimos números do celular do cliente.", "Peça ao cliente o código de 4 dígitos que aparece no app dele."),
+    ("Digite os 4 últimos números do celular.", "Digite o código de 4 dígitos do cliente."),
+    ('toast("Digite os 4 últimos números");', 'toast("Digite o código de 4 dígitos");'),
+    ("stepState[order.id] = nextStage;", '''stepState[order.id] = nextStage;
+      if (nextStage === "to_client") {
+        fetch(`/api/orders/${order.id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ status: "Em rota" }) }).catch(() => {});
+      }'''),
+    ('''<button class="menu-row" type="button" onclick="toast('Suporte RotaSabor — Catanduva/SP')">''',
+     '''<button class="menu-row" type="button" onclick="fetch('/api/logout', { method: 'POST' }).then(() => { location.href = '/login'; })">
+      <span>Sair</span>
+      <span>›</span>
+    </button>
 
-    def to_dict(self):
-        return {
-            "id": self.id,
-            "store_name": self.store_name,
-            "category": self.category,
-            "default_delivery_fee": self.default_delivery_fee,
-            "estimated_time": self.estimated_time,
-        }
+    <button class="menu-row" type="button" onclick="toast('Suporte RotaSabor — Catanduva/SP')">'''),
+]
 
+PAINEL = [
+    ('["sec-clients", "sec-stores", "sec-couriers", "sec-orders"].forEach((id) => {',
+     '["sec-clients", "sec-stores", "sec-couriers", "sec-products", "sec-orders"].forEach((id) => {'),
+    ('<button class="tab-btn" data-section="sec-orders" type="button">4. Entregas</button>',
+     '''<button class="tab-btn" data-section="sec-orders" type="button">4. Entregas</button>
+      <button class="tab-btn" data-section="sec-products" type="button">5. Produtos</button>'''),
+    ('<section id="sec-orders" class="card hidden">', PRODUCTS_SECTION + '\n\n    <section id="sec-orders" class="card hidden">'),
+    ('alert("Entregador salvo com sucesso!");',
+     'alert("Entregador salvo! Login: o telefone dele. Senha de acesso (anote, aparece só agora): " + data.initial_password);'),
+    ('<button class="btn btn-primary" type="button" id="refreshAllBtn">Atualizar Tudo</button>',
+     '''<button class="btn" type="button" onclick="fetch('/api/logout', { method: 'POST' }).then(() => { location.href = '/login'; })">Sair</button>
+        <button class="btn btn-primary" type="button" id="refreshAllBtn">Atualizar Tudo</button>'''),
+    ("function refreshAll() {", PRODUCTS_JS + "\n\n    function refreshAll() {\n      loadProducts();"),
+]
 
-class Product(db.Model):
-    __tablename__ = "products"
-    id = db.Column(db.Integer, primary_key=True)
-    establishment_id = db.Column(db.Integer, db.ForeignKey("establishments.id"), nullable=True)
-    name = db.Column(db.String(140), nullable=False)
-    description = db.Column(db.String(255), default="")
-    price = db.Column(db.Float, nullable=False, default=0.0)
-    featured = db.Column(db.Boolean, default=False)
-
-    def to_dict(self):
-        return {
-            "id": self.id,
-            "establishment_id": self.establishment_id,
-            "name": self.name,
-            "description": self.description,
-            "price": self.price,
-            "featured": self.featured,
-        }
-
-
-class Courier(db.Model):
-    __tablename__ = "couriers"
-    id = db.Column(db.Integer, primary_key=True)
-    full_name = db.Column(db.String(140), nullable=False)
-    phone = db.Column(db.String(40), nullable=False)
-    cpf = db.Column(db.String(20), nullable=True)
-    vehicle = db.Column(db.String(80), default="Moto")
-    plate = db.Column(db.String(20), default="")
-    status = db.Column(db.String(40), default="Offline")
-    lat = db.Column(db.Float, nullable=True)
-    lng = db.Column(db.Float, nullable=True)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-
-    def to_dict(self):
-        return {
-            "id": self.id,
-            "full_name": self.full_name,
-            "phone": self.phone,
-            "cpf": self.cpf,
-            "vehicle": self.vehicle,
-            "plate": self.plate,
-            "status": self.status,
-            "lat": self.lat,
-            "lng": self.lng,
-        }
-
-
-class Order(db.Model):
-    __tablename__ = "orders"
-    id = db.Column(db.Integer, primary_key=True)
-    order_code = db.Column(db.String(30), nullable=False)
-    store_id = db.Column(db.Integer, nullable=True)
-    store_name = db.Column(db.String(140), default="Estabelecimento")
-    client_name = db.Column(db.String(140), nullable=False)
-    client_phone = db.Column(db.String(40), nullable=False)
-    client_address = db.Column(db.String(255), nullable=False)
-    items_total = db.Column(db.Float, default=0.0)
-    delivery_fee = db.Column(db.Float, default=0.0)
-    courier_net_earning = db.Column(db.Float, default=0.0)
-    courier_id = db.Column(db.Integer, db.ForeignKey("couriers.id"), nullable=True)
-    courier_accepted = db.Column(db.Boolean, default=False)
-    status = db.Column(db.String(60), default="Aguardando entregador")
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-
-    def to_dict(self):
-        return {
-            "id": self.id,
-            "order_code": self.order_code,
-            "store_id": self.store_id,
-            "store_name": self.store_name,
-            "client_name": self.client_name,
-            "client_phone": self.client_phone,
-            "client_address": self.client_address,
-            "items_total": self.items_total,
-            "delivery_fee": self.delivery_fee,
-            "courier_net_earning": self.courier_net_earning,
-            "courier_id": self.courier_id,
-            "courier_accepted": self.courier_accepted,
-            "status": self.status,
-        }
-
-
-def _digits(value):
-    return re.sub(r"\D", "", str(value or ""))
-
-
-def _ensure_schema():
-    db.create_all()
-    inspector = inspect(db.engine)
-    dialect = db.engine.dialect.name
-    if "couriers" in inspector.get_table_names():
-        existing_cols = {col["name"] for col in inspector.get_columns("couriers")}
-        alter_statements = []
-        if "full_name" not in existing_cols:
-            alter_statements.append("ALTER TABLE couriers ADD COLUMN full_name VARCHAR(140)")
-        if "cpf" not in existing_cols:
-            alter_statements.append("ALTER TABLE couriers ADD COLUMN cpf VARCHAR(20)")
-        if "lat" not in existing_cols:
-            lat_type = "DOUBLE PRECISION" if dialect == "postgresql" else "FLOAT"
-            alter_statements.append(f"ALTER TABLE couriers ADD COLUMN lat {lat_type}")
-        if "lng" not in existing_cols:
-            lng_type = "DOUBLE PRECISION" if dialect == "postgresql" else "FLOAT"
-            alter_statements.append(f"ALTER TABLE couriers ADD COLUMN lng {lng_type}")
-        if "created_at" not in existing_cols:
-            dt_type = "TIMESTAMP WITHOUT TIME ZONE" if dialect == "postgresql" else "DATETIME"
-            alter_statements.append(f"ALTER TABLE couriers ADD COLUMN created_at {dt_type}")
-
-        if dialect == "postgresql" and "name" in existing_cols:
-            alter_statements.append("ALTER TABLE couriers ALTER COLUMN name DROP NOT NULL")
-
-        if alter_statements:
-            with db.engine.begin() as conn:
-                for stmt in alter_statements:
-                    conn.execute(text(stmt))
-                if "name" in existing_cols and "full_name" in existing_cols:
-                    conn.execute(text("UPDATE couriers SET full_name = name WHERE full_name IS NULL AND name IS NOT NULL"))
-                    conn.execute(text("UPDATE couriers SET name = full_name WHERE name IS NULL AND full_name IS NOT NULL"))
+FILES = {"app_cliente.html": CLIENTE, "app_motoboy.html": MOTOBOY, "painel_gestao.html": PAINEL}
 
 
-def _sync_legacy_courier_name(courier_id, full_name):
-    inspector = inspect(db.engine)
-    if "couriers" in inspector.get_table_names():
-        existing_cols = {col["name"] for col in inspector.get_columns("couriers")}
-        if "name" in existing_cols and courier_id is not None:
-            db.session.execute(
-                text("UPDATE couriers SET name = :full_name WHERE id = :id"),
-                {"full_name": full_name, "id": courier_id},
-            )
-            db.session.commit()
-
-
-def _render_safe(template_name):
-    try:
-        return render_template(template_name)
-    except TemplateNotFound:
-        templates_dir = os.path.join(app.root_path, "templates")
-        found = os.listdir(templates_dir) if os.path.isdir(templates_dir) else []
-        return (
-            f"Template '{template_name}' nao encontrado em '{templates_dir}'. "
-            f"Arquivos encontrados: {found}",
-            404,
-        )
-
-
-with app.app_context():
-    _ensure_schema()
-
-
-@app.get("/")
-@app.get("/painel")
-@app.get("/painel_gestao.html")
-def index():
-    return _render_safe("painel_gestao.html")
-
-
-@app.get("/cliente")
-@app.get("/app_cliente")
-@app.get("/app_cliente.html")
-@app.get("/cliente.html")
-def app_cliente():
-    return _render_safe("app_cliente.html")
-
-
-@app.get("/motoboy")
-@app.get("/app_motoboy")
-@app.get("/app_motoboy.html")
-@app.get("/entregador")
-def app_motoboy():
-    return _render_safe("app_motoboy.html")
-
-
-@app.get("/api/establishments")
-def list_establishments():
-    rows = Establishment.query.order_by(Establishment.id.desc()).all()
-    return jsonify([r.to_dict() for r in rows])
-
-
-@app.post("/api/establishments")
-def create_establishment():
-    data = request.get_json(silent=True) or {}
-    store_name = (data.get("store_name") or data.get("name") or "").strip()
-    if not store_name:
-        return jsonify({"error": "Informe o nome do estabelecimento."}), 400
-    est = Establishment(
-        store_name=store_name,
-        category=(data.get("category") or "Lanches & Refeições").strip(),
-        default_delivery_fee=float(data.get("default_delivery_fee") or data.get("delivery_fee") or 8.0),
-        estimated_time=(data.get("estimated_time") or "25-35 min").strip(),
-    )
-    db.session.add(est)
-    db.session.commit()
-    return jsonify(est.to_dict()), 201
-
-
-@app.get("/api/products")
-def list_products():
-    rows = Product.query.order_by(Product.id.desc()).all()
-    return jsonify([r.to_dict() for r in rows])
-
-
-@app.post("/api/products")
-def create_product():
-    data = request.get_json(silent=True) or {}
-    name = (data.get("name") or "").strip()
-    if not name:
-        return jsonify({"error": "Informe o nome do produto."}), 400
-    prod = Product(
-        establishment_id=data.get("establishment_id"),
-        name=name,
-        description=(data.get("description") or "").strip(),
-        price=float(data.get("price") or 0.0),
-        featured=bool(data.get("featured", False)),
-    )
-    db.session.add(prod)
-    db.session.commit()
-    return jsonify(prod.to_dict()), 201
-
-
-@app.get("/api/couriers")
-def list_couriers():
-    rows = Courier.query.order_by(Courier.id.desc()).all()
-    return jsonify([r.to_dict() for r in rows])
-
-
-@app.post("/api/couriers")
-def create_courier():
-    data = request.get_json(silent=True) or {}
-    full_name = (data.get("full_name") or data.get("name") or "").strip()
-    phone = (data.get("phone") or data.get("whatsapp") or "").strip()
-    cpf_clean = _digits(data.get("cpf") or "")
-    vehicle = (data.get("vehicle") or "Moto").strip()
-    plate = (data.get("plate") or "").strip().upper()
-    status = (data.get("status") or "Offline").strip()
-
-    if not full_name:
-        return jsonify({"error": "Informe o nome do entregador."}), 400
-    if len(_digits(phone)) < 8:
-        return jsonify({"error": "Informe um telefone / WhatsApp válido."}), 400
-    if cpf_clean and len(cpf_clean) not in (11, 14):
-        return jsonify({"error": "CPF inválido."}), 400
-
-    try:
-        courier = Courier(
-            full_name=full_name,
-            phone=phone,
-            cpf=cpf_clean or None,
-            vehicle=vehicle,
-            plate=plate,
-            status=status,
-        )
-        db.session.add(courier)
-        db.session.commit()
-        _sync_legacy_courier_name(courier.id, full_name)
-        return jsonify(courier.to_dict()), 201
-    except Exception as exc:
-        db.session.rollback()
-        return jsonify({"error": f"Erro ao salvar entregador: {exc}"}), 500
-
-
-@app.get("/api/orders")
-def list_orders():
-    rows = Order.query.order_by(Order.id.desc()).all()
-    return jsonify([r.to_dict() for r in rows])
-
-
-@app.post("/api/orders")
-def create_order():
-    data = request.get_json(silent=True) or {}
-    client_name = (data.get("client_name") or "").strip()
-    client_phone = _digits(data.get("client_phone") or "")
-    client_address = (data.get("client_address") or "").strip()
-
-    if not client_name or len(client_phone) < 8 or not client_address:
-        return jsonify({"error": "Preencha nome, celular e endereço."}), 400
-
-    fee = float(data.get("delivery_fee") or 0.0)
-    items_total = float(data.get("items_total") or 0.0)
-    count = Order.query.count() + 1
-    order = Order(
-        order_code=f"RS-{count:03d}",
-        store_id=data.get("store_id"),
-        store_name=(data.get("store_name") or "Estabelecimento").strip(),
-        client_name=client_name,
-        client_phone=client_phone,
-        client_address=client_address,
-        items_total=items_total,
-        delivery_fee=fee,
-        courier_net_earning=round(fee, 2),
-        status="Aguardando entregador",
-    )
-    db.session.add(order)
-    db.session.commit()
-    return jsonify(order.to_dict()), 201
-
-
-@app.patch("/api/orders/<int:order_id>")
-def update_order(order_id):
-    order = Order.query.get_or_404(order_id)
-    data = request.get_json(silent=True) or {}
-
-    if "courier_id" in data:
-        order.courier_id = data["courier_id"]
-    if "courier_accepted" in data:
-        order.courier_accepted = bool(data["courier_accepted"])
-    if "status" in data and str(data["status"]).strip():
-        next_status = str(data["status"]).strip()
-        if next_status.lower() == "entregue" and "delivery_code" in data:
-            expected_code = _digits(order.client_phone)[-4:]
-            provided_code = _digits(data.get("delivery_code"))
-            if expected_code and provided_code != expected_code:
-                return jsonify({"error": "Código de 4 dígitos incorreto."}), 400
-        order.status = next_status
-
-    db.session.commit()
-    return jsonify(order.to_dict())
+def patch(folder="templates"):
+    ok = True
+    for name, pairs in FILES.items():
+        path = pathlib.Path(folder) / name
+        if not path.exists():
+            print(f"[ERRO] {path} não existe. Rode na pasta do repositório.")
+            ok = False
+            continue
+        text = path.read_text(encoding="utf-8")
+        missing = [old[:70] for old, _ in pairs if old not in text]
+        if missing:
+            print(f"[ERRO] {name}: não alterado. Trechos não encontrados:")
+            for m in missing:
+                print("   -", m)
+            ok = False
+            continue
+        for old, new in pairs:
+            text = text.replace(old, new)
+        path.write_text(text, encoding="utf-8")
+        print(f"[ok] {name}: {len(pairs)} alterações aplicadas")
+    return ok
 
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", port=port, debug=True)
+    sys.exit(0 if patch() else 1)
