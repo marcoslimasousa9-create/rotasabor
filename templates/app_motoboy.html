@@ -73,11 +73,7 @@
     .title { font-size: 1.02rem; font-weight: 800; }
     .sub { font-size: 0.75rem; color: var(--muted); }
 
-    .top-actions {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
+    .top-actions { display: flex; align-items: center; gap: 8px; }
 
     .pill-btn {
       background: var(--surface-2);
@@ -93,15 +89,11 @@
       gap: 5px;
     }
 
-    .container {
-      max-width: 960px;
-      margin: 0 auto;
-      padding: 14px 16px;
-    }
+    .container { max-width: 960px; margin: 0 auto; padding: 14px 16px; }
 
     #liveMap {
       width: 100%;
-      height: 270px;
+      height: 250px;
       border-radius: 14px;
       border: 1px solid var(--border);
       overflow: hidden;
@@ -117,22 +109,35 @@
       margin-bottom: 12px;
     }
 
-    .card-top {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      gap: 10px;
-    }
-
+    .card-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
     .card-title { margin: 0; font-size: 1rem; font-weight: 800; }
     .meta { color: var(--muted); font-size: 0.82rem; margin-top: 4px; }
 
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 10px;
-      margin-bottom: 12px;
+    .fee-highlight {
+      margin-top: 8px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: rgba(16, 185, 129, 0.14);
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
     }
+
+    .fee-amount { font-size: 1.05rem; font-weight: 900; color: var(--primary); }
+
+    .code-pill {
+      display: inline-block;
+      background: rgba(56, 189, 248, 0.16);
+      color: var(--accent);
+      border-radius: 8px;
+      padding: 3px 8px;
+      font-size: 0.78rem;
+      font-weight: 800;
+    }
+
+    .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 12px; }
 
     .stat-box {
       background: var(--surface);
@@ -141,18 +146,8 @@
       padding: 12px 14px;
     }
 
-    .stat-label {
-      font-size: 0.75rem;
-      color: var(--muted);
-      font-weight: 700;
-    }
-
-    .stat-value {
-      font-size: 1.15rem;
-      font-weight: 800;
-      margin-top: 4px;
-      color: var(--primary);
-    }
+    .stat-label { font-size: 0.75rem; color: var(--muted); font-weight: 700; }
+    .stat-value { font-size: 1.15rem; font-weight: 800; margin-top: 4px; color: var(--primary); }
 
     .badge {
       padding: 4px 10px;
@@ -163,30 +158,12 @@
       color: var(--primary);
       white-space: nowrap;
     }
+    .badge.warn { background: rgba(245, 158, 11, 0.18); color: var(--warning); }
+    .badge.offline { background: rgba(148, 163, 184, 0.16); color: var(--muted); }
 
-    .badge.warn {
-      background: rgba(245, 158, 11, 0.18);
-      color: var(--warning);
-    }
+    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; }
 
-    .badge.offline {
-      background: rgba(148, 163, 184, 0.16);
-      color: var(--muted);
-    }
-
-    .grid-2 {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 10px;
-    }
-
-    label {
-      display: block;
-      font-size: 0.78rem;
-      color: var(--muted);
-      margin-bottom: 4px;
-      font-weight: 700;
-    }
+    label { display: block; font-size: 0.78rem; color: var(--muted); margin-bottom: 4px; font-weight: 700; }
 
     select, input {
       width: 100%;
@@ -198,12 +175,7 @@
       font-size: 0.9rem;
     }
 
-    .btn-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-top: 10px;
-    }
+    .btn-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
 
     .btn {
       border: none;
@@ -225,7 +197,6 @@
       background: var(--primary);
       color: #ffffff;
     }
-
     body:not(.theme-light) .btn-free-big { color: #04130d; }
 
     .btn-primary { background: var(--primary); color: #ffffff; }
@@ -256,7 +227,6 @@
       padding: 6px;
       cursor: pointer;
     }
-
     .nav-btn.active { color: var(--primary); }
 
     .toast {
@@ -298,7 +268,7 @@
   <div class="toast" id="toastBox"></div>
 
   <main class="container">
-    <!-- ABA MAPA (ESTILO DEL MATCH / IFOOD / KEETA) -->
+    <!-- ABA MAPA -->
     <section id="tab-map">
       <div class="card">
         <div class="card-top" style="margin-bottom: 10px;">
@@ -325,7 +295,7 @@
           <div class="stat-value" id="doneCountValue">0</div>
         </div>
         <div class="stat-box">
-          <div class="stat-label">Valor das concluídas</div>
+          <div class="stat-label">Ganho de entregas</div>
           <div class="stat-value" id="doneTotalValue">R$ 0,00</div>
         </div>
       </div>
@@ -354,7 +324,7 @@
 
     <!-- ABA ENTREGAS -->
     <section id="tab-active" class="hidden">
-      <h3 style="margin: 6px 0 10px;">Entregas em andamento / disponíveis</h3>
+      <h3 style="margin: 6px 0 10px;">Entregas disponíveis e em andamento</h3>
       <div id="activeOrdersList"></div>
     </section>
 
@@ -582,108 +552,4 @@
         showToast("Informe latitude e longitude válidas.");
         return;
       }
-      sendLocation(lat, lng);
-      showToast("Coordenadas aplicadas no mapa");
-    });
-
-    async function updateOrderStatus(orderId, newStatus) {
-      const courierIdRaw = document.getElementById("courierSelect").value;
-      const body = { status: newStatus };
-      if (courierIdRaw) body.courier_id = Number(courierIdRaw);
-
-      try {
-        const res = await fetch(`/api/orders/${orderId}`, {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(body)
-        });
-        if (res.ok) {
-          showToast(`Pedido #${orderId} → ${newStatus}`);
-          await loadOrders();
-        }
-      } catch (_) {
-        showToast("Erro ao atualizar status");
-      }
-    }
-
-    async function loadOrders() {
-      try {
-        const res = await fetch("/api/orders");
-        if (res.ok) orders = await res.json();
-      } catch (_) {}
-      renderOrders();
-    }
-
-    function renderOrders() {
-      const selectedCourierId = Number(document.getElementById("courierSelect").value || 0);
-      const activeContainer = document.getElementById("activeOrdersList");
-      const doneContainer = document.getElementById("doneOrdersList");
-
-      const filtered = orders.filter((o) => {
-        if (!selectedCourierId) return true;
-        return !o.courier_id || Number(o.courier_id) === selectedCourierId;
-      });
-
-      const activeList = filtered.filter((o) => !String(o.status || "").toLowerCase().includes("entregue"));
-      const doneList = filtered.filter((o) => String(o.status || "").toLowerCase().includes("entregue"));
-
-      const doneSum = doneList.reduce((acc, item) => acc + Number(item.total || 0), 0);
-      document.getElementById("doneCountValue").textContent = String(doneList.length);
-      document.getElementById("doneTotalValue").textContent = fmtBRL(doneSum);
-
-      activeContainer.innerHTML = activeList.length ? [...activeList].reverse().map((o) => {
-        const gmapsUrl = buildGoogleMapsRouteUrl(o.client_address || o.store_name || "Catanduva, SP");
-        return `
-          <article class="card">
-            <div class="card-top">
-              <div>
-                <h4 class="card-title">Pedido #${o.id} • ${o.store_name || "Estabelecimento"}</h4>
-                <div class="meta">Cliente: <strong>${o.client_name}</strong> • ${o.payment || "Pix"}</div>
-                <div class="meta">Destino: ${o.client_address || "Não informado"}</div>
-              </div>
-              <span class="badge warn">${o.status || "Pendente"}</span>
-            </div>
-            <div class="meta" style="margin-top: 8px;">Total: <strong>${fmtBRL(o.total)}</strong></div>
-            <div class="btn-row">
-              <a class="btn btn-blue" href="${gmapsUrl}" target="_blank" rel="noopener">🗺 Ir no Google Maps</a>
-            </div>
-            <div class="btn-row">
-              <button class="btn btn-outline" type="button" onclick="updateOrderStatus(${o.id}, 'Coletando')">Coletando</button>
-              <button class="btn btn-blue" type="button" onclick="updateOrderStatus(${o.id}, 'A caminho')">A caminho</button>
-              <button class="btn btn-primary" type="button" onclick="updateOrderStatus(${o.id}, 'Entregue')">Entregue</button>
-            </div>
-          </article>
-        `;
-      }).join("") : `<div class="card"><div class="meta">Nenhuma entrega ativa no momento.</div></div>`;
-
-      doneContainer.innerHTML = doneList.length ? [...doneList].reverse().map((o) => `
-        <article class="card">
-          <div class="card-top">
-            <div>
-              <h4 class="card-title">Pedido #${o.id} • ${o.store_name || "Estabelecimento"}</h4>
-              <div class="meta">${o.client_name} • ${o.client_address || ""}</div>
-            </div>
-            <span class="badge">${o.status}</span>
-          </div>
-          <div class="meta" style="margin-top: 6px;">Total: <strong>${fmtBRL(o.total)}</strong></div>
-        </article>
-      `).join("") : `<div class="card"><div class="meta">Nenhuma entrega concluída ainda.</div></div>`;
-    }
-
-    document.getElementById("refreshBtn").addEventListener("click", async () => {
-      await Promise.all([loadCouriers(), loadOrders()]);
-      showToast("Dados atualizados");
-    });
-
-    if ("serviceWorker" in navigator) {
-      window.addEventListener("load", () => {
-        navigator.serviceWorker.register("/sw.js").catch(() => {});
-      });
-    }
-
-    applyTheme();
-    initMap();
-    Promise.all([loadCouriers(), loadOrders()]);
-  </script>
-</body>
-</html>
+      sendLocation(lat, lng
