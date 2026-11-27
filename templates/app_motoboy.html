@@ -30,7 +30,7 @@
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       background: var(--bg);
       color: var(--text);
-      padding-bottom: 82px;
+      padding-bottom: 84px;
     }
 
     .topbar {
@@ -79,6 +79,33 @@
     .card-title { margin: 0; font-size: 1rem; font-weight: 700; }
     .meta { color: var(--muted); font-size: 0.83rem; margin-top: 4px; }
 
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .stat-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 12px 14px;
+    }
+
+    .stat-label {
+      font-size: 0.76rem;
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    .stat-value {
+      font-size: 1.15rem;
+      font-weight: 800;
+      margin-top: 4px;
+      color: var(--primary);
+    }
+
     .badge {
       padding: 4px 10px;
       border-radius: 999px;
@@ -92,6 +119,11 @@
     .badge.warn {
       background: rgba(245, 158, 11, 0.16);
       color: var(--warning);
+    }
+
+    .badge.offline {
+      background: rgba(148, 163, 184, 0.16);
+      color: var(--muted);
     }
 
     .grid-2 {
@@ -190,7 +222,7 @@
         <div class="title">RotaSabor • Entregador</div>
         <div class="sub" id="gpsStatusLabel">GPS: aguardando ativação</div>
       </div>
-      <button class="btn btn-primary" style="flex: 0 0 auto;" id="toggleGpsBtn" type="button">Ativar GPS</button>
+      <button class="btn btn-primary" style="flex: 0 0 auto;" id="toggleOnlineBtn" type="button">Ficar Online</button>
     </div>
   </header>
 
@@ -198,6 +230,13 @@
 
   <main class="container">
     <div class="card">
+      <div class="card-top" style="margin-bottom: 10px;">
+        <div>
+          <div class="card-title">Status de disponibilidade</div>
+          <div class="meta" id="onlineHint">Selecione o entregador e fique disponível para rotas.</div>
+        </div>
+        <span class="badge offline" id="onlineBadge">Desconectado</span>
+      </div>
       <div class="grid-2">
         <div>
           <label for="courierSelect">Entregador ativo</label>
@@ -208,10 +247,21 @@
         <div>
           <label>Ações rápidas</label>
           <div class="btn-row" style="margin-top: 0;">
-            <button class="btn btn-blue" type="button" id="sendOnceGpsBtn">Enviar posição agora</button>
+            <button class="btn btn-blue" type="button" id="sendOnceGpsBtn">Enviar GPS</button>
             <button class="btn btn-outline" type="button" id="refreshBtn">Atualizar</button>
           </div>
         </div>
+      </div>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-box">
+        <div class="stat-label">Entregas concluídas</div>
+        <div class="stat-value" id="doneCountValue">0</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">Valor das concluídas</div>
+        <div class="stat-value" id="doneTotalValue">R$ 0,00</div>
       </div>
     </div>
 
@@ -227,8 +277,11 @@
 
     <section id="tab-gps" class="hidden">
       <div class="card">
-        <h3 class="card-title">Coordenadas atuais</h3>
+        <h3 class="card-title">Rastreamento e coordenadas</h3>
         <div class="meta" id="coordsReadout">Lat: -- | Lng: --</div>
+        <div class="btn-row">
+          <button class="btn btn-primary" type="button" id="toggleGpsBtn">Ativar GPS contínuo</button>
+        </div>
         <div class="grid-2" style="margin-top: 12px;">
           <div>
             <label for="manualLat">Latitude manual</label>
@@ -240,7 +293,7 @@
           </div>
         </div>
         <div class="btn-row">
-          <button class="btn btn-primary" type="button" id="sendManualGpsBtn">Salvar coordenadas</button>
+          <button class="btn btn-blue" type="button" id="sendManualGpsBtn">Salvar coordenadas</button>
         </div>
       </div>
     </section>
@@ -256,6 +309,7 @@
     let watchId = null;
     let couriers = [];
     let orders = [];
+    let isOnline = false;
 
     const fmtBRL = (v) => Number(v || 0).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
@@ -277,6 +331,44 @@
       b.addEventListener("click", () => switchTab(b.dataset.tab));
     });
 
+    function syncOnlineUi() {
+      const btn = document.getElementById("toggleOnlineBtn");
+      const badge = document.getElementById("onlineBadge");
+      const hint = document.getElementById("onlineHint");
+      const courierId = document.getElementById("courierSelect").value;
+      const found = couriers.find((c) => String(c.id) === String(courierId));
+
+      if (found && String(found.status || "").toLowerCase() === "online") {
+        isOnline = true;
+      }
+
+      if (isOnline) {
+        btn.textContent = "Ficar Offline";
+        btn.className = "btn btn-outline";
+        badge.textContent = "Online / Livre";
+        badge.className = "badge";
+        hint.textContent = found ? `${found.name} disponível para receber entregas.` : "Disponível para entregas.";
+      } else {
+        btn.textContent = "Ficar Online";
+        btn.className = "btn btn-primary";
+        badge.textContent = "Desconectado";
+        badge.className = "badge offline";
+        hint.textContent = "Selecione o entregador e fique disponível para rotas.";
+      }
+    }
+
+    document.getElementById("toggleOnlineBtn").addEventListener("click", () => {
+      const courierId = document.getElementById("courierSelect").value;
+      if (!courierId) {
+        showToast("Selecione um entregador primeiro.");
+        return;
+      }
+      isOnline = !isOnline;
+      localStorage.setItem("rotasabor_courier_online", isOnline ? "1" : "0");
+      syncOnlineUi();
+      showToast(isOnline ? "Você está online para entregas" : "Você ficou offline");
+    });
+
     async function loadCouriers() {
       try {
         const res = await fetch("/api/couriers");
@@ -290,10 +382,13 @@
       ).join("");
 
       if (currentVal) sel.value = currentVal;
+      isOnline = localStorage.getItem("rotasabor_courier_online") === "1";
+      syncOnlineUi();
     }
 
     document.getElementById("courierSelect").addEventListener("change", (e) => {
       localStorage.setItem("rotasabor_courier_id", e.target.value);
+      syncOnlineUi();
       renderOrders();
     });
 
@@ -335,7 +430,7 @@
       if (watchId !== null) {
         navigator.geolocation.clearWatch(watchId);
         watchId = null;
-        e.target.textContent = "Ativar GPS";
+        e.target.textContent = "Ativar GPS contínuo";
         document.getElementById("gpsStatusLabel").textContent = "GPS pausado";
         showToast("Rastreamento GPS pausado");
         return;
@@ -349,7 +444,7 @@
         () => showToast("Não foi possível ler o GPS contínuo."),
         { enableHighAccuracy: true, maximumAge: 5000 }
       );
-      e.target.textContent = "Pausar GPS";
+      e.target.textContent = "Pausar GPS contínuo";
       showToast("Rastreamento GPS ligado");
     });
 
@@ -403,6 +498,10 @@
 
       const activeList = filtered.filter((o) => !String(o.status || "").toLowerCase().includes("entregue"));
       const doneList = filtered.filter((o) => String(o.status || "").toLowerCase().includes("entregue"));
+
+      const doneSum = doneList.reduce((acc, item) => acc + Number(item.total || 0), 0);
+      document.getElementById("doneCountValue").textContent = String(doneList.length);
+      document.getElementById("doneTotalValue").textContent = fmtBRL(doneSum);
 
       activeContainer.innerHTML = activeList.length ? [...activeList].reverse().map((o) => `
         <article class="card">
