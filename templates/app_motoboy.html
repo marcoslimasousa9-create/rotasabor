@@ -25,7 +25,7 @@
       height: 100dvh;
       overflow: hidden;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      font-size: 22px;
+      font-size: 21px;
       color: #111827;
       background: #e5e7eb;
     }
@@ -36,7 +36,6 @@
       }
     }
 
-    /* Mapa em 100% da tela */
     #courierMap {
       position: fixed;
       inset: 0;
@@ -45,7 +44,6 @@
       z-index: 1;
     }
 
-    /* Topo flutuante ampliado */
     .float-top {
       position: fixed;
       top: 14px;
@@ -66,24 +64,24 @@
       color: #111827;
       border: 2.5px solid #cbd5e1;
       border-radius: 999px;
-      height: 68px;
+      height: 66px;
       padding: 6px 22px 6px 8px;
       display: inline-flex;
       align-items: center;
       gap: 12px;
-      font-size: 30px;
+      font-size: 28px;
       font-weight: 900;
       box-shadow: 0 8px 22px rgba(0, 0, 0, 0.22);
       cursor: pointer;
     }
 
     .pill-logo {
-      width: 54px;
-      height: 54px;
+      width: 52px;
+      height: 52px;
       border-radius: 999px;
-      background: #ea580c;
-      color: #ffffff;
-      font-size: 20px;
+      background: #facc15;
+      color: #111827;
+      font-size: 19px;
       font-weight: 900;
       display: inline-flex;
       align-items: center;
@@ -95,82 +93,51 @@
       color: #111827;
       border: 2.5px solid #cbd5e1;
       border-radius: 999px;
-      height: 68px;
-      padding: 0 24px;
+      height: 66px;
+      padding: 0 22px;
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      font-size: 25px;
+      font-size: 23px;
       font-weight: 900;
       box-shadow: 0 8px 22px rgba(0, 0, 0, 0.22);
       cursor: pointer;
     }
 
-    /* Sino flutuante grande */
     .float-bell {
       position: fixed;
-      top: 94px;
+      top: 92px;
       right: 14px;
       z-index: 20;
-      width: 64px;
-      height: 64px;
+      width: 62px;
+      height: 62px;
       border-radius: 999px;
       background: #ffffff;
       color: #111827;
       border: 2.5px solid #cbd5e1;
-      font-size: 30px;
+      font-size: 28px;
       box-shadow: 0 8px 22px rgba(0, 0, 0, 0.22);
       cursor: pointer;
     }
 
-    /* Botão central ▶ Ficar Livre bem grande */
-    .float-go {
-      position: fixed;
-      left: 50%;
-      bottom: 162px;
-      transform: translateX(-50%);
-      z-index: 22;
-      background: #16a34a;
-      color: #ffffff;
-      border: 3px solid #ffffff;
-      border-radius: 999px;
-      height: 76px;
-      padding: 0 40px;
-      font-size: 27px;
-      font-weight: 900;
-      display: inline-flex;
-      align-items: center;
-      gap: 12px;
-      white-space: nowrap;
-      box-shadow: 0 12px 28px rgba(22, 163, 74, 0.48);
-      cursor: pointer;
-    }
-
-    .float-go.online {
-      background: #dc2626;
-      box-shadow: 0 12px 28px rgba(220, 38, 38, 0.48);
-    }
-
-    /* Botão GPS grande */
     .float-gps {
       position: fixed;
       right: 14px;
-      bottom: 166px;
+      bottom: 220px;
       z-index: 22;
-      width: 64px;
-      height: 64px;
+      width: 62px;
+      height: 62px;
       border-radius: 999px;
       background: #ffffff;
       color: #111827;
       border: 2.5px solid #cbd5e1;
-      font-size: 30px;
+      font-size: 28px;
       font-weight: 900;
       box-shadow: 0 8px 22px rgba(0, 0, 0, 0.24);
       cursor: pointer;
     }
 
-    /* Barra inferior flutuante grande */
-    .float-bottom-bar {
+    .float-panel {
       position: fixed;
       left: 10px;
       right: 10px;
@@ -179,104 +146,138 @@
       background: rgba(255, 255, 255, 0.98);
       border: 2.5px solid #cbd5e1;
       border-radius: 22px;
-      padding: 14px 16px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
-      max-height: 70dvh;
+      padding: 16px;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.26);
+      max-height: 76dvh;
       overflow-y: auto;
     }
 
     @media (min-width: 900px) {
-      .float-bottom-bar {
+      .float-panel {
         left: 50%;
         right: auto;
         transform: translateX(-50%);
         width: 780px;
         max-width: 94vw;
       }
-      .float-go {
-        bottom: 170px;
-        height: 80px;
-        font-size: 28px;
-      }
       .float-gps {
         right: 28px;
-        bottom: 174px;
-        width: 68px;
-        height: 68px;
+        bottom: 235px;
       }
     }
 
-    .status-strip {
+    .panel-stats {
       display: grid;
-      grid-template-columns: 92px 1fr 92px;
-      align-items: center;
-      gap: 8px;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 12px;
     }
 
-    .nav-mini-btn {
-      background: transparent;
-      border: none;
-      color: #4b5563;
-      font-size: 17px;
-      font-weight: 900;
-      padding: 4px;
-      cursor: pointer;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 3px;
+    .stat-box {
+      background: #f8fafc;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 14px;
+      padding: 12px;
     }
 
-    .nav-mini-btn span:first-child { font-size: 28px; }
-    .nav-mini-btn.active { color: #0284c7; }
-
-    .status-label {
-      text-align: center;
-      font-size: 22px;
+    .stat-val {
+      font-size: 24px;
       font-weight: 900;
       color: #111827;
     }
 
-    .offer-box {
-      margin-top: 12px;
-      background: #f8fafc;
-      border: 2px solid #cbd5e1;
-      border-radius: 16px;
-      padding: 16px;
+    .stat-lbl {
+      font-size: 16px;
+      color: #4b5563;
+      font-weight: 700;
+      margin-top: 2px;
     }
 
-    .offer-box.active-race {
-      background: #ecfdf5;
-      border-color: #16a34a;
-      border-width: 2.5px;
-    }
-
-    .offer-head {
+    .promo-strip {
+      background: #fef9c3;
+      border: 2px solid #facc15;
+      border-radius: 14px;
+      padding: 12px 14px;
+      font-size: 18px;
+      font-weight: 800;
+      color: #111827;
+      margin-bottom: 12px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       gap: 10px;
-      font-size: 22px;
+    }
+
+    .btn-online-main {
+      width: 100%;
+      border: none;
+      border-radius: 16px;
+      padding: 18px 20px;
+      font-size: 24px;
+      font-weight: 900;
+      cursor: pointer;
+      background: #facc15;
+      color: #111827;
+      box-shadow: 0 6px 18px rgba(250, 204, 21, 0.45);
+    }
+
+    .btn-online-main.active {
+      background: #16a34a;
+      color: #ffffff;
+    }
+
+    .order-card {
+      margin-top: 14px;
+      border: 2.5px solid #111827;
+      background: #ffffff;
+      border-radius: 18px;
+      padding: 16px;
+    }
+
+    .order-card.highlight-offer {
+      border-color: #eab308;
+      background: #fffbeb;
+    }
+
+    .order-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 10px;
+    }
+
+    .order-price {
+      font-size: 28px;
+      font-weight: 900;
+      color: #111827;
+    }
+
+    .order-badge {
+      background: #facc15;
+      color: #111827;
+      padding: 5px 12px;
+      border-radius: 999px;
+      font-size: 16px;
       font-weight: 900;
     }
 
-    .offer-sub {
+    .order-line {
       font-size: 19px;
       color: #1f2937;
-      margin-top: 6px;
+      margin-top: 8px;
       font-weight: 700;
       line-height: 1.35;
     }
 
     .btn-row {
       display: flex;
-      gap: 12px;
+      gap: 10px;
       margin-top: 14px;
       flex-wrap: wrap;
     }
 
     .btn-act {
-      flex: 1 1 170px;
+      flex: 1 1 160px;
       border: none;
       border-radius: 14px;
       padding: 16px 18px;
@@ -286,11 +287,11 @@
       color: #ffffff;
     }
 
-    .btn-green { background: #16a34a; }
-    .btn-blue { background: #0284c7; }
-    .btn-gray { background: #ffffff; color: #111827; border: 2px solid #cbd5e1; }
+    .btn-yellow { background: #facc15; color: #111827; }
+    .btn-green { background: #16a34a; color: #ffffff; }
+    .btn-blue { background: #0284c7; color: #ffffff; }
+    .btn-gray { background: #e5e7eb; color: #111827; flex: 0 0 auto; }
 
-    /* Menu flutuante ampliado */
     .menu-overlay {
       position: fixed;
       inset: 0;
@@ -325,13 +326,11 @@
       padding: 0 8px;
     }
 
-    .menu-section { border-bottom: 10px solid #f3f4f6; }
-
     .menu-row {
       width: 100%;
       background: #ffffff;
       border: none;
-      border-bottom: 1px solid #e5e7eb;
+      border-bottom: 1.5px solid #e5e7eb;
       color: #111827;
       padding: 22px;
       font-size: 23px;
@@ -347,6 +346,7 @@
       padding: 18px 22px;
       background: #f9fafb;
       font-size: 19px;
+      border-bottom: 1.5px solid #e5e7eb;
     }
 
     select, input {
@@ -364,7 +364,7 @@
       position: fixed;
       inset: 0;
       z-index: 60;
-      background: rgba(0, 0, 0, 0.7);
+      background: rgba(0, 0, 0, 0.72);
       display: none;
       align-items: center;
       justify-content: center;
@@ -375,14 +375,14 @@
 
     .modal-card {
       width: 100%;
-      max-width: 440px;
+      max-width: 450px;
       background: #ffffff;
       border-radius: 20px;
       padding: 22px;
       font-size: 20px;
     }
 
-    .pin-box-input {
+    .pin-input {
       text-align: center;
       font-size: 38px;
       font-weight: 900;
@@ -392,7 +392,7 @@
 
     .toast-msg {
       position: fixed;
-      top: 168px;
+      top: 164px;
       left: 50%;
       transform: translateX(-50%);
       z-index: 70;
@@ -420,36 +420,34 @@
     </button>
 
     <button class="pill-saldo" type="button" id="topSaldoBtn">
-      <span id="saldoText">R$ 0,00</span>
+      <span id="topSaldoText">R$ 0,00</span>
       <span>›</span>
     </button>
   </div>
 
   <button class="float-bell" type="button" id="bellBtn" title="Mensagens">🔔</button>
+  <button class="float-gps" type="button" id="gpsBtn" title="Centralizar GPS">📍</button>
 
-  <button class="float-go" type="button" id="toggleFreeBtn">
-    <span id="goSymbol">▶</span>
-    <span id="goText">Ficar Livre</span>
-  </button>
-
-  <button class="float-gps" type="button" id="gpsBtn" title="Minha localização">📍</button>
-
-  <div class="float-bottom-bar" id="bottomFloatingBar">
-    <div class="status-strip">
-      <button class="nav-mini-btn active" id="btnViewMap" type="button" onclick="setViewMode('map')">
-        <span>📍</span>
-        <span>Mapa</span>
-      </button>
-
-      <div class="status-label" id="statusLabel">Você está desconectado</div>
-
-      <button class="nav-mini-btn" id="btnViewDeliveries" type="button" onclick="setViewMode('deliveries')">
-        <span>🛵</span>
-        <span>Entregas</span>
-      </button>
+  <div class="float-panel" id="mainPanel">
+    <div class="panel-stats">
+      <div class="stat-box">
+        <div class="stat-val" id="panelGanhosHoje">R$ 0,00</div>
+        <div class="stat-lbl">Ganhos hoje</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-val" id="panelPedidosHoje">0</div>
+        <div class="stat-lbl">Pedidos hoje</div>
+      </div>
     </div>
 
-    <div id="offersContainer"></div>
+    <div class="promo-strip">
+      <span>🏆 Promoção &amp; extras por entrega</span>
+      <strong id="promoExtraLabel">+R$ 0,00</strong>
+    </div>
+
+    <button class="btn-online-main" type="button" id="onlineToggleBtn">Ficar online</button>
+
+    <div id="ordersFeed"></div>
   </div>
 
   <div class="menu-overlay" id="menuOverlay">
@@ -458,101 +456,62 @@
       <strong style="font-size:26px;">Menu</strong>
     </div>
 
-    <div class="menu-section">
-      <button class="menu-row" type="button" onclick="toggleDetail('detMsg')">
-        <span>Mensagens</span>
-        <span>›</span>
-      </button>
-      <div class="menu-detail hidden" id="detMsg">Sem mensagens novas no momento.</div>
-
-      <button class="menu-row" type="button" onclick="toggleDetail('detCad')">
-        <span>Cadastro</span>
-        <span>›</span>
-      </button>
-      <div class="menu-detail hidden" id="detCad">
-        <label for="courierSelect" style="font-weight:800;">Entregador ativo</label>
-        <select id="courierSelect">
-          <option value="">Selecione o entregador...</option>
-        </select>
-        <div id="gpsCoordsText" style="margin-top:10px;color:#4b5563;">GPS: aguardando ativação</div>
-      </div>
-
-      <button class="menu-row" type="button" onclick="toggleDetail('detPass')">
-        <span>Trocar senha</span>
-        <span>›</span>
-      </button>
-      <div class="menu-detail hidden" id="detPass">
-        <input type="password" id="passInput" placeholder="Nova senha" />
-        <button class="btn-act btn-green" style="margin-top:12px;width:100%;" type="button" onclick="toast('Senha salva');toggleDetail('detPass')">Salvar</button>
-      </div>
+    <button class="menu-row" type="button" onclick="toggleDetail('mCad')">
+      <span>Cadastro (Entregador)</span>
+      <span>›</span>
+    </button>
+    <div class="menu-detail hidden" id="mCad">
+      <label for="courierSelect" style="font-weight:800;">Entregador ativo</label>
+      <select id="courierSelect">
+        <option value="">Selecione o entregador...</option>
+      </select>
+      <div id="gpsInfo" style="margin-top:10px;color:#4b5563;">GPS: aguardando ativação</div>
     </div>
 
-    <div class="menu-section">
-      <button class="menu-row" type="button" onclick="toggleDetail('detHist')">
-        <span>Histórico</span>
-        <span>›</span>
-      </button>
-      <div class="menu-detail hidden" id="detHist">
-        <div id="histSummary">0 entregas concluídas • R$ 0,00</div>
-      </div>
-
-      <button class="menu-row" type="button" onclick="toggleDetail('detDes')">
-        <span>Desafios</span>
-        <span>›</span>
-      </button>
-      <div class="menu-detail hidden" id="detDes">Acompanhe suas entregas e ganhos do dia em Catanduva.</div>
-
-      <button class="menu-row" type="button" onclick="toggleDetail('detArea')">
-        <span>Viaturas por PA/Áreas</span>
-        <span>›</span>
-      </button>
-      <div class="menu-detail hidden" id="detArea">Área ativa: Catanduva - SP</div>
+    <button class="menu-row" type="button" onclick="toggleDetail('mHist')">
+      <span>Histórico de entregas</span>
+      <span>›</span>
+    </button>
+    <div class="menu-detail hidden" id="mHist">
+      <div id="histText">0 entregas concluídas • R$ 0,00</div>
     </div>
 
-    <div class="menu-section">
-      <button class="menu-row" type="button" onclick="toggleDetail('detCfg')">
-        <span>Configurações</span>
-        <span>›</span>
-      </button>
-      <div class="menu-detail hidden" id="detCfg">
-        <div class="btn-row" style="margin-top:0;">
-          <button class="btn-act btn-blue" type="button" onclick="locateNow(true)">Atualizar GPS</button>
-          <button class="btn-act btn-gray" type="button" onclick="setViewMode('deliveries');closeMenu()">Ver Entregas</button>
-        </div>
-      </div>
-
-      <button class="menu-row" type="button" onclick="toast('Suporte RotaSabor — Catanduva/SP')">
-        <span>Fale conosco</span>
-        <span>›</span>
-      </button>
-
-      <button class="menu-row" type="button" onclick="toast('Localização usada apenas para rotas de entrega')">
-        <span>Política de Privacidade</span>
-        <span>›</span>
-      </button>
-
-      <button class="menu-row" type="button" onclick="toggleDetail('detAgenda')">
-        <span>Agendamentos e Antecipações</span>
-        <span>›</span>
-      </button>
-      <div class="menu-detail hidden" id="detAgenda">Ganhos contabilizados ao confirmar os 4 dígitos na entrega.</div>
-
-      <button class="menu-row" type="button" onclick="toast('Benefícios do entregador RotaSabor')">
-        <span>Benefícios</span>
-        <span>›</span>
-      </button>
+    <button class="menu-row" type="button" onclick="toggleDetail('mCamp')">
+      <span>Campanhas e Desafios</span>
+      <span>›</span>
+    </button>
+    <div class="menu-detail hidden" id="mCamp">
+      Acompanhe suas entregas concluídas e ganhos extras do dia.
     </div>
+
+    <button class="menu-row" type="button" onclick="toggleDetail('mCfg')">
+      <span>Configurações e GPS</span>
+      <span>›</span>
+    </button>
+    <div class="menu-detail hidden" id="mCfg">
+      <button class="btn-act btn-blue" style="width:100%;" type="button" onclick="locateNow(true)">Atualizar GPS agora</button>
+    </div>
+
+    <button class="menu-row" type="button" onclick="toast('Suporte RotaSabor — Catanduva/SP')">
+      <span>Fale conosco</span>
+      <span>›</span>
+    </button>
+
+    <button class="menu-row" type="button" onclick="toast('Localização usada apenas para rotas e entregas')">
+      <span>Política de Privacidade</span>
+      <span>›</span>
+    </button>
   </div>
 
   <div class="modal-bg" id="pinModal">
     <div class="modal-card">
       <strong style="font-size:24px;">Confirmar entrega (4 dígitos)</strong>
-      <div id="pinInfo" style="color:#4b5563;margin-top:8px;">Digite os 4 últimos números do celular do cliente.</div>
-      <div id="pinAmount" style="font-weight:900;color:#16a34a;margin-top:10px;font-size:22px;">Receber: R$ 0,00</div>
-      <input class="pin-box-input" type="tel" id="pinDigits" maxlength="4" inputmode="numeric" placeholder="0000" />
+      <div id="pinDesc" style="color:#4b5563;margin-top:8px;">Peça os 4 últimos números do celular do cliente.</div>
+      <div id="pinReceive" style="font-weight:900;color:#16a34a;margin-top:10px;font-size:22px;">Receber: R$ 0,00</div>
+      <input class="pin-input" type="tel" id="pinCode" maxlength="4" inputmode="numeric" placeholder="0000" />
       <div class="btn-row">
         <button class="btn-act btn-gray" type="button" id="pinCancel">Cancelar</button>
-        <button class="btn-act btn-green" type="button" id="pinConfirm">Confirmar</button>
+        <button class="btn-act btn-green" type="button" id="pinSubmit">Entrega</button>
       </div>
     </div>
   </div>
@@ -565,25 +524,24 @@
     let lat = -21.1378;
     let lng = -48.9726;
     let hasGps = false;
-    let freeMode = false;
-    let viewMode = "map";
-    let ordersList = [];
-    let couriersList = [];
-    let pinOrder = null;
+    let isOnline = false;
+    let orders = [];
+    let couriers = [];
+    let pendingPinOrder = null;
+    const stepState = {};
 
-    const money = (n) => Number(n || 0).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+    const fmtBRL = (v) => Number(v || 0).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
-    function toast(txt) {
+    function toast(msg) {
       const el = document.getElementById("toastEl");
-      el.textContent = txt;
+      el.textContent = msg;
       el.style.display = "block";
-      clearTimeout(window._tt);
-      window._tt = setTimeout(() => { el.style.display = "none"; }, 2600);
+      clearTimeout(window._tm);
+      window._tm = setTimeout(() => { el.style.display = "none"; }, 2600);
     }
 
     function openMenu() { document.getElementById("menuOverlay").classList.add("open"); }
     function closeMenu() { document.getElementById("menuOverlay").classList.remove("open"); }
-
     function toggleDetail(id) {
       const el = document.getElementById(id);
       if (el) el.classList.toggle("hidden");
@@ -591,16 +549,16 @@
 
     document.getElementById("openMenuBtn").addEventListener("click", openMenu);
     document.getElementById("closeMenuBtn").addEventListener("click", closeMenu);
-    document.getElementById("bellBtn").addEventListener("click", () => { openMenu(); toggleDetail("detMsg"); });
-    document.getElementById("topSaldoBtn").addEventListener("click", () => { openMenu(); toggleDetail("detHist"); });
+    document.getElementById("bellBtn").addEventListener("click", () => { openMenu(); toggleDetail("mCamp"); });
+    document.getElementById("topSaldoBtn").addEventListener("click", () => { openMenu(); toggleDetail("mHist"); });
 
     function initMap() {
       if (typeof L === "undefined" || map) return;
       map = L.map("courierMap", { zoomControl: false, attributionControl: false }).setView([lat, lng], 16);
       L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 19 }).addTo(map);
       const icon = L.divIcon({
-        className: "rider-marker",
-        html: `<div style="width:44px;height:44px;border-radius:999px;background:#111827;border:4px solid #ffffff;box-shadow:0 4px 14px rgba(0,0,0,0.45);display:flex;align-items:center;justify-content:center;color:#ffffff;font-size:20px;">▲</div>`,
+        className: "rider-pin",
+        html: `<div style="width:44px;height:44px;border-radius:999px;background:#111827;border:4px solid #facc15;box-shadow:0 4px 14px rgba(0,0,0,0.45);display:flex;align-items:center;justify-content:center;color:#ffffff;font-size:20px;">▲</div>`,
         iconSize: [44, 44],
         iconAnchor: [22, 22]
       });
@@ -617,13 +575,13 @@
           lat = pos.coords.latitude;
           lng = pos.coords.longitude;
           hasGps = true;
-          document.getElementById("gpsCoordsText").textContent = `GPS: ativo (${lat.toFixed(4)}, ${lng.toFixed(4)})`;
+          document.getElementById("gpsInfo").textContent = `GPS: ativo (${lat.toFixed(4)}, ${lng.toFixed(4)})`;
           if (map) map.setView([lat, lng], 16);
           if (marker) marker.setLatLng([lat, lng]);
           if (showMsg) toast("Localização atualizada");
         },
         () => {
-          if (showMsg) toast("Ative a localização no aparelho");
+          if (showMsg) toast("Permita a localização no aparelho");
         },
         { enableHighAccuracy: true, timeout: 8000 }
       );
@@ -631,87 +589,104 @@
 
     document.getElementById("gpsBtn").addEventListener("click", () => locateNow(true));
 
-    function startGoogleMapsRoute(order) {
-      if (!order) return;
-      const addr = (order.client_address || "").trim();
-      const fullDest = addr.toLowerCase().includes("catanduva") ? addr : `${addr}, Catanduva - SP, Brasil`;
-      const originStr = hasGps ? `&origin=${lat},${lng}` : "";
-      const url = `https://www.google.com/maps/dir/?api=1${originStr}&destination=${encodeURIComponent(fullDest)}&travelmode=driving&dir_action=navigate`;
-      const opened = window.open(url, "_blank");
-      if (!opened) window.location.href = url;
+    function openMapsRoute(addressText) {
+      const clean = (addressText || "").trim();
+      const dest = clean.toLowerCase().includes("catanduva") ? clean : `${clean}, Catanduva - SP, Brasil`;
+      const origin = hasGps ? `&origin=${lat},${lng}` : "";
+      const url = `https://www.google.com/maps/dir/?api=1${origin}&destination=${encodeURIComponent(dest)}&travelmode=driving&dir_action=navigate`;
+      const win = window.open(url, "_blank");
+      if (!win) window.location.href = url;
     }
 
-    function setFreeMode(val) {
-      freeMode = Boolean(val);
-      const btn = document.getElementById("toggleFreeBtn");
-      document.getElementById("goSymbol").textContent = freeMode ? "■" : "▶";
-      document.getElementById("goText").textContent = freeMode ? "Ocupado" : "Ficar Livre";
-      btn.classList.toggle("online", freeMode);
-      document.getElementById("statusLabel").textContent = freeMode ? "Você está livre" : "Você está desconectado";
-      if (freeMode) {
+    function setOnline(val) {
+      isOnline = Boolean(val);
+      const btn = document.getElementById("onlineToggleBtn");
+      btn.classList.toggle("active", isOnline);
+      btn.textContent = isOnline ? "Online — Aguardando corridas" : "Ficar online";
+      if (isOnline) {
         locateNow(false);
         fetchOrders();
       }
-      renderOffers();
+      renderOrders();
     }
 
-    document.getElementById("toggleFreeBtn").addEventListener("click", () => setFreeMode(!freeMode));
-
-    function setViewMode(mode) {
-      viewMode = mode;
-      document.getElementById("btnViewMap").classList.toggle("active", mode === "map");
-      document.getElementById("btnViewDeliveries").classList.toggle("active", mode === "deliveries");
-      renderOffers();
-    }
+    document.getElementById("onlineToggleBtn").addEventListener("click", () => setOnline(!isOnline));
 
     function getGain(o) {
       if (o.courier_net_earning !== undefined && o.courier_net_earning !== null) return Number(o.courier_net_earning);
       return Number(o.delivery_fee || 0);
     }
 
-    function refreshBalance() {
+    function updateSummary() {
       const cid = Number(document.getElementById("courierSelect").value || 0);
-      const done = ordersList.filter((o) => Number(o.courier_id) === cid && String(o.status || "").toLowerCase() === "entregue");
+      const done = orders.filter((o) => Number(o.courier_id) === cid && String(o.status || "").toLowerCase() === "entregue");
       const total = done.reduce((acc, o) => acc + getGain(o), 0);
-      document.getElementById("saldoText").textContent = money(total);
-      document.getElementById("histSummary").textContent = `${done.length} entregas concluídas • ${money(total)}`;
+      document.getElementById("topSaldoText").textContent = fmtBRL(total);
+      document.getElementById("panelGanhosHoje").textContent = fmtBRL(total);
+      document.getElementById("panelPedidosHoje").textContent = String(done.length);
+      document.getElementById("histText").textContent = `${done.length} entregas concluídas • ${fmtBRL(total)}`;
     }
 
-    function renderOffers() {
-      const box = document.getElementById("offersContainer");
-      const cid = Number(document.getElementById("courierSelect").value || 0);
-      const active = ordersList.filter((o) => Number(o.courier_id) === cid && String(o.status || "").toLowerCase() !== "entregue");
-      const avail = freeMode ? ordersList.filter((o) => !o.courier_accepted && String(o.status || "").toLowerCase() !== "entregue") : [];
-
-      if (viewMode !== "deliveries" && !active.length && !avail.length) {
-        box.innerHTML = "";
-        return;
+    function advanceStage(order, nextStage) {
+      stepState[order.id] = nextStage;
+      if (nextStage === "to_client") {
+        openMapsRoute(order.client_address);
       }
+      renderOrders();
+    }
 
-      const activeHtml = active.map((o) => `
-        <div class="offer-box active-race">
-          <div class="offer-head">
-            <span>${o.order_code || "#" + o.id} • ${o.store_name || "Estabelecimento"}</span>
-            <span>${money(getGain(o))}</span>
-          </div>
-          <div class="offer-sub">📍 ${o.client_address || ""}</div>
-          <div class="btn-row">
-            <button class="btn-act btn-blue" type="button" onclick='startGoogleMapsRoute(${JSON.stringify(o)})'>🧭 Rota Maps</button>
-            <button class="btn-act btn-green" type="button" onclick='openPinModal(${JSON.stringify(o)})'>✅ 4 dígitos</button>
-          </div>
-        </div>
-      `).join("");
+    function renderOrders() {
+      const box = document.getElementById("ordersFeed");
+      const cid = Number(document.getElementById("courierSelect").value || 0);
 
-      const availHtml = avail.map((o) => `
-        <div class="offer-box">
-          <div class="offer-head">
-            <span>${o.order_code || "#" + o.id} • ${o.store_name || "Estabelecimento"}</span>
-            <span style="color:#16a34a;">${money(getGain(o))}</span>
+      const myActive = orders.filter((o) => Number(o.courier_id) === cid && String(o.status || "").toLowerCase() !== "entregue");
+      const available = isOnline ? orders.filter((o) => !o.courier_accepted && String(o.status || "").toLowerCase() !== "entregue") : [];
+
+      const activeHtml = myActive.map((o) => {
+        const stg = stepState[o.id] || "to_store";
+        let actionBtn = "";
+        if (stg === "to_store") {
+          actionBtn = `<button class="btn-act btn-yellow" type="button" onclick='advanceStage(${JSON.stringify(o)}, "arrived_store")'>Cheguei na loja</button>`;
+        } else if (stg === "arrived_store") {
+          actionBtn = `<button class="btn-act btn-yellow" type="button" onclick='advanceStage(${JSON.stringify(o)}, "collected")'>Coleta</button>`;
+        } else if (stg === "collected") {
+          actionBtn = `<button class="btn-act btn-green" type="button" onclick='advanceStage(${JSON.stringify(o)}, "to_client")'>Partir p/ entrega (Rotas)</button>`;
+        } else {
+          actionBtn = `<button class="btn-act btn-green" type="button" onclick='advanceStage(${JSON.stringify(o)}, "arrived_client")'>Cheguei na entrega</button>`;
+        }
+
+        const confirmBtn = stg === "arrived_client" || stg === "to_client"
+          ? `<button class="btn-act btn-green" type="button" onclick='openPin(${JSON.stringify(o)})'>Código &amp; Entrega</button>`
+          : "";
+
+        return `
+          <div class="order-card">
+            <div class="order-top">
+              <span class="order-price">${o.order_code || "#" + o.id} • ${fmtBRL(getGain(o))}</span>
+              <span class="order-badge">${o.status || "Em rota"}</span>
+            </div>
+            <div class="order-line">🍽️ Coleta: ${o.store_name || "Estabelecimento"}</div>
+            <div class="order-line">📍 Entrega: ${o.client_address || ""}</div>
+            <div class="btn-row">
+              <button class="btn-act btn-blue" type="button" onclick='openMapsRoute(${JSON.stringify(o.client_address || "")})'>🧭 Rotas</button>
+              ${actionBtn}
+              ${confirmBtn}
+            </div>
           </div>
-          <div class="offer-sub">📍 ${o.client_address || "Endereço não informado"}</div>
-          <div class="offer-sub">👤 ${o.client_name || "Cliente"}</div>
+        `;
+      }).join("");
+
+      const availHtml = available.map((o) => `
+        <div class="order-card highlight-offer">
+          <div class="order-top">
+            <span class="order-price">${fmtBRL(getGain(o))}</span>
+            <span class="order-badge">Novo pedido</span>
+          </div>
+          <div class="order-line">🍽️ Coleta: ${o.store_name || "Estabelecimento"}</div>
+          <div class="order-line">📍 Entrega: ${o.client_address || "Endereço não informado"}</div>
           <div class="btn-row">
-            <button class="btn-act btn-green" type="button" onclick="acceptRace(${o.id})">Aceitar e Abrir Rota Maps</button>
+            <button class="btn-act btn-gray" type="button" onclick="toast('Pedido recusado')">Recusar</button>
+            <button class="btn-act btn-yellow" type="button" onclick="acceptOrder(${o.id})">Aceitar</button>
           </div>
         </div>
       `).join("");
@@ -719,11 +694,11 @@
       box.innerHTML = activeHtml + availHtml;
     }
 
-    async function acceptRace(orderId) {
+    async function acceptOrder(orderId) {
       const cid = Number(document.getElementById("courierSelect").value || 0);
       if (!cid) {
         openMenu();
-        toggleDetail("detCad");
+        toggleDetail("mCad");
         toast("Selecione o entregador em Cadastro");
         return;
       }
@@ -735,39 +710,40 @@
         });
         if (res.ok) {
           const updated = await res.json();
-          toast("Corrida aceita! Abrindo rota no Google Maps...");
+          stepState[updated.id] = "to_store";
+          toast("Pedido aceito! Abrindo rota no Google Maps...");
           await fetchOrders();
-          startGoogleMapsRoute(updated);
+          openMapsRoute(updated.client_address);
         } else {
-          toast("Não foi possível aceitar a corrida");
+          toast("Não foi possível aceitar o pedido");
         }
       } catch (_) {
         toast("Erro de conexão ao aceitar");
       }
     }
 
-    function openPinModal(o) {
-      pinOrder = o;
-      document.getElementById("pinInfo").textContent = `Pedido ${o.order_code || "#" + o.id} (${o.client_name || "Cliente"}). Digite os 4 últimos números do celular.`;
-      document.getElementById("pinAmount").textContent = `Receber: ${money(getGain(o))}`;
-      document.getElementById("pinDigits").value = "";
+    function openPin(o) {
+      pendingPinOrder = o;
+      document.getElementById("pinDesc").textContent = `Pedido ${o.order_code || "#" + o.id} (${o.client_name || "Cliente"}). Digite os 4 últimos números do celular.`;
+      document.getElementById("pinReceive").textContent = `Receber: ${fmtBRL(getGain(o))}`;
+      document.getElementById("pinCode").value = "";
       document.getElementById("pinModal").classList.add("open");
     }
 
     document.getElementById("pinCancel").addEventListener("click", () => {
-      pinOrder = null;
+      pendingPinOrder = null;
       document.getElementById("pinModal").classList.remove("open");
     });
 
-    document.getElementById("pinConfirm").addEventListener("click", async () => {
-      if (!pinOrder) return;
-      const code = String(document.getElementById("pinDigits").value || "").replace(/\D/g, "").slice(0, 4);
+    document.getElementById("pinSubmit").addEventListener("click", async () => {
+      if (!pendingPinOrder) return;
+      const code = String(document.getElementById("pinCode").value || "").replace(/\D/g, "").slice(0, 4);
       if (code.length < 4) {
         toast("Digite os 4 últimos números");
         return;
       }
       try {
-        const res = await fetch(`/api/orders/${pinOrder.id}`, {
+        const res = await fetch(`/api/orders/${pendingPinOrder.id}`, {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ status: "Entregue", delivery_code: code })
@@ -777,9 +753,10 @@
           toast(data.error || "Código incorreto");
           return;
         }
+        delete stepState[pendingPinOrder.id];
         document.getElementById("pinModal").classList.remove("open");
-        pinOrder = null;
-        toast("Entrega confirmada!");
+        pendingPinOrder = null;
+        toast("Pedido concluído!");
         await fetchOrders();
       } catch (_) {
         toast("Erro ao confirmar entrega");
@@ -790,30 +767,30 @@
       try {
         const res = await fetch("/api/couriers");
         if (!res.ok) return;
-        couriersList = await res.json();
+        couriers = await res.json();
         const sel = document.getElementById("courierSelect");
         const saved = localStorage.getItem("rotasabor_courier_id") || "";
         sel.innerHTML = `<option value="">Selecione o entregador...</option>` +
-          couriersList.map((c) => `<option value="${c.id}">${c.full_name}</option>`).join("");
-        if (saved && couriersList.some((c) => String(c.id) === String(saved))) sel.value = saved;
-        else if (couriersList.length) sel.value = String(couriersList[0].id);
-        refreshBalance();
+          couriers.map((c) => `<option value="${c.id}">${c.full_name}</option>`).join("");
+        if (saved && couriers.some((c) => String(c.id) === String(saved))) sel.value = saved;
+        else if (couriers.length) sel.value = String(couriers[0].id);
+        updateSummary();
       } catch (_) {}
     }
 
     document.getElementById("courierSelect").addEventListener("change", (e) => {
       localStorage.setItem("rotasabor_courier_id", e.target.value);
-      refreshBalance();
-      renderOffers();
+      updateSummary();
+      renderOrders();
     });
 
     async function fetchOrders() {
       try {
         const res = await fetch("/api/orders");
         if (!res.ok) return;
-        ordersList = await res.json();
-        refreshBalance();
-        renderOffers();
+        orders = await res.json();
+        updateSummary();
+        renderOrders();
       } catch (_) {}
     }
 
