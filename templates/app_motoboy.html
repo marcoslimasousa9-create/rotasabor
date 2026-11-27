@@ -12,10 +12,10 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <style>
     :root {
-      --bg: #070c16;
+      --bg: #0b1324;
       --glass: rgba(15, 23, 42, 0.88);
-      --glass-2: rgba(22, 32, 51, 0.94);
-      --border: rgba(148, 163, 184, 0.2);
+      --glass-2: rgba(22, 32, 51, 0.95);
+      --border: rgba(148, 163, 184, 0.22);
       --text: #f8fafc;
       --muted: #94a3b8;
       --primary: #10b981;
@@ -26,7 +26,7 @@
     }
 
     body.theme-light {
-      --bg: #f4f6f9;
+      --bg: #e2e8f0;
       --glass: rgba(255, 255, 255, 0.9);
       --glass-2: rgba(241, 245, 249, 0.96);
       --border: rgba(15, 23, 42, 0.14);
@@ -58,7 +58,19 @@
       width: 100vw;
       height: 100vh;
       z-index: 1;
-      background: var(--bg);
+      background:
+        linear-gradient(rgba(56, 189, 248, 0.08) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(56, 189, 248, 0.08) 1px, transparent 1px),
+        #0d172a;
+      background-size: 36px 36px;
+    }
+
+    body.theme-light #fullscreenMap {
+      background:
+        linear-gradient(rgba(15, 23, 42, 0.07) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(15, 23, 42, 0.07) 1px, transparent 1px),
+        #e2e8f0;
+      background-size: 36px 36px;
     }
 
     /* TOPO FLUTUANTE SOBRE O MAPA */
@@ -105,7 +117,7 @@
       box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
     }
 
-    /* COLUNA LATERAL (PREPARADA PARA VÁRIAS OPÇÕES FUTURAS) */
+    /* COLUNA LATERAL RETRÁTIL */
     .sidebar-backdrop {
       position: fixed;
       inset: 0;
@@ -306,7 +318,7 @@
   </style>
 </head>
 <body>
-  <!-- MAPA EM TELA CHEIA PERMANENTE -->
+  <!-- MAPA SEMPRE EM TELA CHEIA -->
   <div id="fullscreenMap"></div>
 
   <!-- BARRA SUPERIOR FLUTUANTE -->
@@ -320,13 +332,14 @@
 
   <div class="toast" id="toastBox"></div>
 
-  <!-- COLUNA LATERAL RETRÁTIL (BASE PARA FUTURAS OPÇÕES) -->
+  <!-- COLUNA LATERAL RETRÁTIL -->
   <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
   <aside class="sidebar" id="sidebarMenu">
     <div class="row-between">
       <div>
         <h2 class="sidebar-title">RotaSabor</h2>
         <div class="sidebar-sub" id="sidebarGpsInfo">GPS: aguardando</div>
+        <div class="sidebar-sub" id="mapEngineStatus">Mapa: iniciando...</div>
       </div>
       <button class="hud-pill" type="button" id="closeSidebarBtn">✕</button>
     </div>
@@ -370,7 +383,7 @@
 
   <!-- CAMADA INFERIOR FLUTUANTE SOBRE O MAPA -->
   <div class="hud-bottom">
-    <!-- MODO ROTA ATIVO (QUANDO ACEITA A ENTREGA) -->
+    <!-- MODO ROTA ATIVO -->
     <div class="floating-card hidden" id="routeHudCard">
       <div class="row-between">
         <div>
@@ -400,7 +413,7 @@
     </div>
   </div>
 
-  <!-- TELA / MODAL DE 4 DÍGITOS PARA CONFIRMAR PAGAMENTO -->
+  <!-- MODAL DE 4 DÍGITOS -->
   <div class="pin-modal-backdrop" id="pinModalBackdrop">
     <div class="pin-modal">
       <h3 class="order-title">Confirmar entrega (4 dígitos)</h3>
@@ -444,7 +457,6 @@
       window._toastT = setTimeout(() => { box.style.display = "none"; }, 2600);
     }
 
-    /* SOM DE GRANA SINTETIZADO VIA WEB AUDIO API */
     function playMoneySound() {
       if (!soundEnabled) return;
       try {
@@ -452,13 +464,11 @@
         if (!AudioCtx) return;
         const ctx = new AudioCtx();
         const now = ctx.currentTime;
-
         const notes = [
           { freq: 987.77, start: 0.00, dur: 0.09 },
           { freq: 1318.51, start: 0.08, dur: 0.18 },
           { freq: 1567.98, start: 0.18, dur: 0.24 }
         ];
-
         notes.forEach((n) => {
           const osc = ctx.createOscillator();
           const gain = ctx.createGain();
@@ -500,7 +510,6 @@
       applyTheme();
     });
 
-    /* SIDEBAR */
     const sidebar = document.getElementById("sidebarMenu");
     const backdrop = document.getElementById("sidebarBackdrop");
     function setSidebarOpen(open) {
@@ -511,21 +520,43 @@
     document.getElementById("closeSidebarBtn").addEventListener("click", () => setSidebarOpen(false));
     backdrop.addEventListener("click", () => setSidebarOpen(false));
 
-    /* MAPA EM TELA CHEIA */
     function initMap() {
-      if (typeof L === "undefined" || map) return;
-      map = L.map("fullscreenMap", { zoomControl: false }).setView([currentLat, currentLng], 15);
-      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-        attribution: "© OpenStreetMap"
-      }).addTo(map);
-      courierMarker = L.circleMarker([currentLat, currentLng], {
-        radius: 11,
-        color: "#ffffff",
-        weight: 3,
-        fillColor: "#10b981",
-        fillOpacity: 1
-      }).addTo(map);
+      const statusEl = document.getElementById("mapEngineStatus");
+      if (typeof L === "undefined") {
+        if (statusEl) statusEl.textContent = "Mapa: sem conexão com Leaflet";
+        return;
+      }
+      if (!map) {
+        map = L.map("fullscreenMap", { zoomControl: false }).setView([currentLat, currentLng], 15);
+        const layer = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+          maxZoom: 19,
+          attribution: "© OpenStreetMap"
+        });
+        layer.on("tileerror", () => {
+          if (statusEl) statusEl.textContent = "Mapa: modo grade local (tiles bloqueados/offline)";
+        });
+        layer.on("load", () => {
+          if (statusEl) statusEl.textContent = "Mapa: ativo";
+        });
+        layer.addTo(map);
+
+        courierMarker = L.circleMarker([currentLat, currentLng], {
+          radius: 11,
+          color: "#ffffff",
+          weight: 3,
+          fillColor: "#10b981",
+          fillOpacity: 1
+        }).addTo(map);
+        if (statusEl) statusEl.textContent = "Mapa: carregando ruas...";
+      }
+      setTimeout(() => {
+        if (map) map.invalidateSize();
+      }, 150);
     }
+
+    window.addEventListener("resize", () => {
+      if (map) map.invalidateSize();
+    });
 
     function distanceMeters(lat1, lon1, lat2, lon2) {
       const R = 6371000;
@@ -540,10 +571,38 @@
 
     async function geocodeAddress(address) {
       const q = encodeURIComponent(`${address}, Catanduva, SP, Brasil`);
-      const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${q}`, { headers: { "Accept": "application/json" } }); if (!res.ok) throw new Error("Falha ao buscar endereço"); const rows = await res.json(); if (!Array.isArray(rows) \vert{}\vert{} !rows.length) throw new Error("Endereço não encontrado"); return { lat: parseFloat(rows[0].lat), lng: parseFloat(rows[0].lon) }; }  async function fetchRoute(fromLat, fromLng, toLat, toLng) { const url = `https://router.project-osrm.org/route/v1/driving/${fromLng},${fromLat};${toLng},${toLat}?overview=full&geometries=geojson`; const res = await fetch(url); if (!res.ok) return null; const data = await res.json(); const r = data?.routes?.[0]; if (!r?.geometry?.coordinates?.length) return null; return { latLngs: r.geometry.coordinates.map(([lng, lat]) => [lat, lng]), km: (Number(r.distance \vert{}\vert{} 0) / 1000).toFixed(1), mins: Math.max(1, Math.round(Number(r.duration \vert{}\vert{} 0) / 60)) }; }  async function enterRouteMode(order) { if (!order) return; activeRouteOrder = order; arrivalTriggeredForOrderId = null;  const code = order.order_code \vert{}\vert{} `RS-${String(order.id).padStart(3, "0")}`;
+      const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${q}`, {
+        headers: { "Accept": "application/json" }
+      });
+      if (!res.ok) throw new Error("Falha ao buscar endereço");
+      const rows = await res.json();
+      if (!Array.isArray(rows) || !rows.length) throw new Error("Endereço não encontrado");
+      return { lat: parseFloat(rows[0].lat), lng: parseFloat(rows[0].lon) };
+    }
+
+    async function fetchRoute(fromLat, fromLng, toLat, toLng) {
+      const url = `https://router.project-osrm.org/route/v1/driving/${fromLng},${fromLat};${toLng},${toLat}?overview=full&geometries=geojson`;
+      const res = await fetch(url);
+      if (!res.ok) return null;
+      const data = await res.json();
+      const r = data?.routes?.[0];
+      if (!r?.geometry?.coordinates?.length) return null;
+      return {
+        latLngs: r.geometry.coordinates.map(([lng, lat]) => [lat, lng]),
+        km: (Number(r.distance || 0) / 1000).toFixed(1),
+        mins: Math.max(1, Math.round(Number(r.duration || 0) / 60))
+      };
+    }
+
+    async function enterRouteMode(order) {
+      if (!order) return;
+      activeRouteOrder = order;
+      arrivalTriggeredForOrderId = null;
+
+      const code = order.order_code || `RS-${String(order.id).padStart(3, "0")}`;
       const addr = order.client_address || "Centro, Catanduva - SP";
       document.getElementById("routeOrderCode").textContent = code;
-      document.getElementById("routeClientTitle").textContent = `Pedido #${order.id} •${order.client_name || "Cliente"}`;
+      document.getElementById("routeClientTitle").textContent = `Pedido #${order.id} • ${order.client_name || "Cliente"}`;
       document.getElementById("routeAddressText").textContent = addr;
       document.getElementById("routeFeeText").textContent = fmtBRL(order.delivery_fee || 0);
       document.getElementById("routeMetricsText").textContent = "Traçando rota no mapa...";
@@ -551,36 +610,86 @@
       document.getElementById("offersHudCard").classList.add("hidden");
       document.getElementById("routeHudCard").classList.remove("hidden");
 
-      if (!map) initMap();
-      setTimeout(() => map && map.invalidateSize(), 100);
+      initMap();
 
       try {
         const dest = await geocodeAddress(addr);
         activeRouteOrder._destLat = dest.lat;
         activeRouteOrder._destLng = dest.lng;
 
-        if (destMarker) map.removeLayer(destMarker);
-        destMarker = L.circleMarker([dest.lat, dest.lng], {
-          radius: 11,
-          color: "#ffffff",
-          weight: 3,
-          fillColor: "#38bdf8",
-          fillOpacity: 1
-        }).addTo(map);
+        if (map && destMarker) map.removeLayer(destMarker);
+        if (map) {
+          destMarker = L.circleMarker([dest.lat, dest.lng], {
+            radius: 11,
+            color: "#ffffff",
+            weight: 3,
+            fillColor: "#38bdf8",
+            fillOpacity: 1
+          }).addTo(map);
+        }
 
         const road = await fetchRoute(currentLat, currentLng, dest.lat, dest.lng);
         const coords = road ? road.latLngs : [[currentLat, currentLng], [dest.lat, dest.lng]];
-        if (routePolyline) map.removeLayer(routePolyline);
-        routePolyline = L.polyline(coords, { color: "#38bdf8", weight: 6, opacity: 0.95 }).addTo(map);
-        map.fitBounds(L.latLngBounds([[currentLat, currentLng], [dest.lat, dest.lng]]), { padding: [48, 48] });
+        if (map && routePolyline) map.removeLayer(routePolyline);
+        if (map) {
+          routePolyline = L.polyline(coords, { color: "#38bdf8", weight: 6, opacity: 0.95 }).addTo(map);
+          map.fitBounds(L.latLngBounds([[currentLat, currentLng], [dest.lat, dest.lng]]), { padding: [48, 48] });
+        }
 
         document.getElementById("routeMetricsText").textContent = road
           ? `Rota ativa: ${road.km} km • ~${road.mins} min`
           : `Rota ativa até ${addr}`;
       } catch (_) {
-        document.getElementById("routeMetricsText").textContent = `Destino: ${addr}`; } }  function exitRouteMode() { activeRouteOrder = null; if (routePolyline && map) { map.removeLayer(routePolyline); routePolyline = null; } if (destMarker && map) { map.removeLayer(destMarker); destMarker = null; } document.getElementById("routeHudCard").classList.add("hidden"); document.getElementById("offersHudCard").classList.remove("hidden"); }  function checkAutoArrival(lat, lng) { if (!activeRouteOrder \vert{}\vert{} typeof activeRouteOrder._destLat !== "number") return; const dist = distanceMeters(lat, lng, activeRouteOrder._destLat, activeRouteOrder._destLng); if (dist <= 45 && arrivalTriggeredForOrderId !== activeRouteOrder.id) { arrivalTriggeredForOrderId = activeRouteOrder.id; onArrivedAtClient(); } }  function onArrivedAtClient() { if (!activeRouteOrder) return; const targetOrder = activeRouteOrder; exitRouteMode(); openPinModal(targetOrder); showToast("Você chegou ao cliente! Informe os 4 dígitos."); }  document.getElementById("arrivedBtn").addEventListener("click", onArrivedAtClient); document.getElementById("openPinFromRouteBtn").addEventListener("click", () => { if (activeRouteOrder) { const target = activeRouteOrder; exitRouteMode(); openPinModal(target); } });  /* MODAL DE 4 DÍGITOS */ function openPinModal(order) { pendingPinOrder = order; const code = order.order_code \vert{}\vert{} `RS-${String(order.id).padStart(3, "0")}`;
+        document.getElementById("routeMetricsText").textContent = `Destino: ${addr}`;
+      }
+    }
+
+    function exitRouteMode() {
+      activeRouteOrder = null;
+      if (routePolyline && map) {
+        map.removeLayer(routePolyline);
+        routePolyline = null;
+      }
+      if (destMarker && map) {
+        map.removeLayer(destMarker);
+        destMarker = null;
+      }
+      document.getElementById("routeHudCard").classList.add("hidden");
+      document.getElementById("offersHudCard").classList.remove("hidden");
+    }
+
+    function checkAutoArrival(lat, lng) {
+      if (!activeRouteOrder || typeof activeRouteOrder._destLat !== "number") return;
+      const dist = distanceMeters(lat, lng, activeRouteOrder._destLat, activeRouteOrder._destLng);
+      if (dist <= 45 && arrivalTriggeredForOrderId !== activeRouteOrder.id) {
+        arrivalTriggeredForOrderId = activeRouteOrder.id;
+        onArrivedAtClient();
+      }
+    }
+
+    function onArrivedAtClient() {
+      if (!activeRouteOrder) return;
+      const targetOrder = activeRouteOrder;
+      exitRouteMode();
+      openPinModal(targetOrder);
+      showToast("Você chegou ao cliente! Informe os 4 dígitos.");
+    }
+
+    document.getElementById("arrivedBtn").addEventListener("click", onArrivedAtClient);
+    document.getElementById("openPinFromRouteBtn").addEventListener("click", () => {
+      if (activeRouteOrder) {
+        const target = activeRouteOrder;
+        exitRouteMode();
+        openPinModal(target);
+      }
+    });
+
+    function openPinModal(order) {
+      pendingPinOrder = order;
+      const code = order.order_code || `RS-${String(order.id).padStart(3, "0")}`;
       document.getElementById("pinOrderInfo").textContent =
-        `Pedido #${order.id} (${code}) • ${order.client_name \vert{}\vert{} "Cliente"}`; document.getElementById("pinFeePreview").textContent = `Receber: ${fmtBRL(order.delivery_fee || 0)}`;
+        `Pedido #${order.id} (${code}) • ${order.client_name || "Cliente"}`;
+      document.getElementById("pinFeePreview").textContent = `Receber: ${fmtBRL(order.delivery_fee || 0)}`;
       const inp = document.getElementById("pinCodeInput");
       inp.value = "";
       document.getElementById("pinModalBackdrop").classList.add("open");
@@ -611,4 +720,218 @@
       if (courierIdRaw) payload.courier_id = Number(courierIdRaw);
 
       try {
-        const res = await fetch(`/api/orders
+        const res = await fetch(`/api/orders/${pendingPinOrder.id}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) {
+          showToast(data.error || "Código de 4 dígitos incorreto.");
+          return;
+        }
+        closePinModal();
+        exitRouteMode();
+        playMoneySound();
+        showToast(`Pagamento recebido! +${fmtBRL(pendingPinOrder.delivery_fee || 0)}`);
+        await loadOrders();
+      } catch (_) {
+        showToast("Erro ao confirmar entrega.");
+      }
+    });
+
+    function syncOnlineBadge() {
+      const btn = document.getElementById("onlineHudBtn");
+      btn.textContent = isOnline ? "● Online / Livre" : "● Offline";
+      btn.style.color = isOnline ? "var(--primary)" : "var(--muted)";
+    }
+
+    document.getElementById("onlineHudBtn").addEventListener("click", () => {
+      const cid = document.getElementById("courierSelect").value;
+      if (!cid) {
+        setSidebarOpen(true);
+        showToast("Selecione o entregador no menu lateral.");
+        return;
+      }
+      isOnline = !isOnline;
+      localStorage.setItem("rotasabor_courier_online", isOnline ? "1" : "0");
+      syncOnlineBadge();
+      if (isOnline && watchId === null) startGpsWatch();
+      showToast(isOnline ? "Você está online e rastreando" : "Você ficou offline");
+    });
+
+    async function pushLocation(lat, lng) {
+      currentLat = Number(lat);
+      currentLng = Number(lng);
+      if (map && courierMarker) {
+        courierMarker.setLatLng([currentLat, currentLng]);
+        if (!activeRouteOrder) {
+          map.panTo([currentLat, currentLng], { animate: true });
+        }
+      }
+      document.getElementById("sidebarGpsInfo").textContent =
+        `GPS: ${currentLat.toFixed(4)}, ${currentLng.toFixed(4)}`;
+      checkAutoArrival(currentLat, currentLng);
+
+      const cid = document.getElementById("courierSelect").value;
+      if (!cid) return;
+      try {
+        await fetch(`/api/couriers/${cid}/location`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ lat: currentLat, lng: currentLng })
+        });
+      } catch (_) {}
+    }
+
+    function startGpsWatch() {
+      if (!navigator.geolocation || watchId !== null) return;
+      watchId = navigator.geolocation.watchPosition(
+        (pos) => pushLocation(pos.coords.latitude, pos.coords.longitude),
+        () => {},
+        { enableHighAccuracy: true, maximumAge: 3000 }
+      );
+    }
+
+    document.getElementById("recenterBtn").addEventListener("click", () => {
+      initMap();
+      if (!navigator.geolocation) return;
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          pushLocation(pos.coords.latitude, pos.coords.longitude);
+          if (map) map.setView([pos.coords.latitude, pos.coords.longitude], 16);
+          setSidebarOpen(false);
+        },
+        () => showToast("Permita o GPS no navegador.")
+      );
+    });
+
+    async function loadCouriers() {
+      try {
+        const res = await fetch("/api/couriers");
+        if (res.ok) couriers = await res.json();
+      } catch (_) {}
+      const sel = document.getElementById("courierSelect");
+      const savedId = localStorage.getItem("rotasabor_courier_id") || sel.value;
+      sel.innerHTML = `<option value="">Selecione o entregador...</option>` + couriers.map((c) =>
+        `<option value="${c.id}">${c.name} (${c.vehicle || "Moto"})</option>`
+      ).join("");
+      if (savedId) sel.value = savedId;
+      isOnline = localStorage.getItem("rotasabor_courier_online") === "1";
+      syncOnlineBadge();
+    }
+
+    document.getElementById("courierSelect").addEventListener("change", (e) => {
+      localStorage.setItem("rotasabor_courier_id", e.target.value);
+      renderOrders();
+    });
+
+    async function acceptOrder(orderId) {
+      const cidRaw = document.getElementById("courierSelect").value;
+      if (!cidRaw) {
+        setSidebarOpen(true);
+        showToast("Selecione seu entregador no menu.");
+        return;
+      }
+      try {
+        const res = await fetch(`/api/orders/${orderId}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            courier_id: Number(cidRaw),
+            courier_accepted: true,
+            status: "A caminho da coleta"
+          })
+        });
+        if (res.ok) {
+          const updated = await res.json().catch(() => null);
+          const target = updated || orders.find((o) => Number(o.id) === Number(orderId)) || { id: orderId };
+          await loadOrders();
+          await enterRouteMode(target);
+          showToast(`Entrega #${orderId} aceita! Rota aberta.`);
+        }
+      } catch (_) {
+        showToast("Erro ao aceitar entrega.");
+      }
+    }
+
+    async function loadOrders() {
+      try {
+        const res = await fetch("/api/orders");
+        if (res.ok) orders = await res.json();
+      } catch (_) {}
+      renderOrders();
+    }
+
+    function renderOrders() {
+      const selectedCid = Number(document.getElementById("courierSelect").value || 0);
+      const filtered = orders.filter((o) => !selectedCid || !o.courier_id || Number(o.courier_id) === selectedCid);
+      const activeList = filtered.filter((o) => !String(o.status || "").toLowerCase().includes("entregue"));
+      const doneList = filtered.filter((o) => String(o.status || "").toLowerCase().includes("entregue"));
+
+      const totalEarned = doneList.reduce((acc, item) => acc + Number(item.delivery_fee || 0), 0);
+      document.getElementById("hudEarningsBox").textContent = fmtBRL(totalEarned);
+      document.getElementById("sidebarStatsText").textContent =
+        `${doneList.length} entregas concluídas • Total: ${fmtBRL(totalEarned)}`;
+
+      document.getElementById("offersCountSub").textContent = activeList.length
+        ? `${activeList.length} entrega(s) na fila`
+        : "Nenhuma entrega no momento";
+
+      const container = document.getElementById("offersContainer");
+      if (!activeList.length) {
+        container.innerHTML = `<div class="meta" style="margin-top:8px;">Aguardando novos pedidos...</div>`;
+        return;
+      }
+
+      container.innerHTML = [...activeList].reverse().map((o) => {
+        const code = o.order_code || `RS-${String(o.id).padStart(3, "0")}`;
+        const fee = Number(o.delivery_fee || 0);
+        const accepted = Boolean(o.courier_accepted) || String(o.status || "").toLowerCase().includes("caminho") || String(o.status || "").toLowerCase().includes("colet");
+
+        return `
+          <div class="offer-item">
+            <div class="row-between">
+              <div>
+                <span class="tag-code">${code}</span>
+                <strong style="margin-left:6px;">Pedido #${o.id} • ${o.store_name || "Loja"}</strong>
+                <div class="meta">${o.client_name || "Cliente"} • ${o.client_address || "Sem endereço"}</div>
+              </div>
+              <span class="tag-fee">${fmtBRL(fee)}</span>
+            </div>
+            <div class="btn-row">
+              ${!accepted
+                ? `<button class="btn btn-primary" type="button" onclick="acceptOrder(${o.id})">Aceitar e abrir rota</button>`
+                : `<button class="btn btn-blue" type="button" onclick='enterRouteMode(${JSON.stringify(o)})'>Ver rota no mapa</button>
+                   <button class="btn btn-warning" type="button" onclick='openPinModal(${JSON.stringify(o)})'>4 dígitos</button>`
+              }
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    document.getElementById("quickRefreshOffersBtn").addEventListener("click", loadOrders);
+    document.getElementById("refreshDataBtn").addEventListener("click", async () => {
+      await Promise.all([loadCouriers(), loadOrders()]);
+      setSidebarOpen(false);
+      showToast("Atualizado");
+    });
+
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("/sw.js").catch(() => {});
+      });
+    }
+
+    updateSoundUi();
+    applyTheme();
+    window.addEventListener("load", () => {
+      initMap();
+      setTimeout(() => map && map.invalidateSize(), 300);
+    });
+    initMap();
+    Promise.all([loadCouriers(), loadOrders()]);
+  </script>
+</body>
+</html>
