@@ -2,40 +2,50 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes" />
   <title>RotaSabor — Pedidos Online</title>
   <meta name="theme-color" content="#ffffff" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <link rel="manifest" href="/static/manifest-cliente.json" />
   <link rel="icon" type="image/svg+xml" href="/static/icon.svg" />
   <style>
     :root {
       --bg: #ffffff;
       --surface: #ffffff;
-      --surface-soft: #f5f6f8;
-      --surface-mint: #eefaf3;
-      --surface-warm: #fffbea;
-      --border: #e5e7eb;
-      --text: #111827;
-      --muted: #6b7280;
+      --surface-soft: #f1f5f9;
+      --surface-mint: #ecfdf5;
+      --surface-warm: #fefce8;
+      --border: #e2e8f0;
+      --text: #0f172a;
+      --muted: #475569;
       --green: #16a34a;
-      --green-dark: #064e3b;
       --yellow: #facc15;
       --yellow-soft: #fef08a;
-      --red: #dc2626;
-      --radius: 14px;
     }
 
-    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+      -webkit-text-size-adjust: 100%;
+    }
+
+    html {
+      font-size: 16.5px;
+    }
+
+    /* Escala ampla no celular para leitura confortável mesmo em WebView */
+    @media (max-width: 768px) {
+      html {
+        font-size: clamp(18px, 4.4vw, 21px);
+      }
+    }
 
     body {
       margin: 0;
-      font-size: 16px;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       background: var(--bg);
       color: var(--text);
-      padding-bottom: 84px;
+      padding-bottom: 92px;
     }
 
     .topbar {
@@ -44,17 +54,20 @@
       z-index: 30;
       background: rgba(255, 255, 255, 0.98);
       backdrop-filter: blur(10px);
-      border-bottom: 1px solid var(--border);
-      padding: 10px 14px 12px;
+      border-bottom: 1.5px solid var(--border);
+      padding: 12px 14px;
     }
 
-    .topbar-inner { max-width: 960px; margin: 0 auto; }
+    .topbar-inner {
+      max-width: 1120px;
+      margin: 0 auto;
+    }
 
     .addr-bar {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 8px;
+      gap: 10px;
       margin-bottom: 10px;
     }
 
@@ -63,13 +76,13 @@
       border: none;
       padding: 2px 0;
       color: var(--text);
-      font-size: 0.98rem;
+      font-size: 1rem;
       font-weight: 800;
       display: flex;
       align-items: center;
       gap: 6px;
       cursor: pointer;
-      max-width: 78%;
+      max-width: 76%;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
@@ -77,12 +90,12 @@
 
     .cart-top-btn {
       background: var(--surface-soft);
-      border: 1px solid var(--border);
+      border: 1.5px solid var(--border);
       color: var(--text);
       border-radius: 999px;
-      padding: 6px 12px;
-      font-size: 0.9rem;
-      font-weight: 800;
+      padding: 7px 14px;
+      font-size: 0.95rem;
+      font-weight: 900;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
@@ -93,10 +106,10 @@
     .search-input-wrap {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 10px;
       background: var(--surface-soft);
       border-radius: 12px;
-      padding: 10px 14px;
+      padding: 11px 14px;
     }
 
     .search-input-wrap input {
@@ -109,13 +122,17 @@
       padding: 0;
     }
 
-    .container { max-width: 960px; margin: 0 auto; padding: 12px 14px; }
+    .container {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 14px;
+    }
 
     .hero-promo {
       background: linear-gradient(125deg, #063b2c 0%, #0f6b4a 55%, #15803d 100%);
       color: #ffffff;
       border-radius: 16px;
-      padding: 16px;
+      padding: 18px;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -127,7 +144,7 @@
       display: inline-block;
       background: var(--yellow);
       color: #111827;
-      font-size: 0.78rem;
+      font-size: 0.8rem;
       font-weight: 900;
       padding: 3px 9px;
       border-radius: 6px;
@@ -135,8 +152,8 @@
       text-transform: uppercase;
     }
 
-    .hero-title { margin: 0; font-size: 1.35rem; font-weight: 900; line-height: 1.15; }
-    .hero-sub { margin-top: 4px; font-size: 0.9rem; opacity: 0.92; }
+    .hero-title { margin: 0; font-size: 1.32rem; font-weight: 900; line-height: 1.15; }
+    .hero-sub { margin-top: 4px; font-size: 0.92rem; opacity: 0.92; }
 
     .hero-badge-box {
       background: var(--yellow);
@@ -163,28 +180,27 @@
       background: transparent;
       border: none;
       color: var(--text);
-      min-width: 74px;
+      min-width: 4.6rem;
       display: flex;
       flex-direction: column;
       align-items: center;
       gap: 6px;
       cursor: pointer;
-      padding: 4px;
+      padding: 5px;
       border-radius: 12px;
       flex-shrink: 0;
-      font-size: 0.88rem;
-      font-weight: 700;
+      font-size: 0.9rem;
+      font-weight: 800;
     }
 
     .cat-pill-card.active {
       background: var(--surface-mint);
       color: var(--green);
-      font-weight: 800;
     }
 
     .cat-circle-img {
-      width: 56px;
-      height: 56px;
+      width: 3.4rem;
+      height: 3.4rem;
       border-radius: 14px;
       object-fit: cover;
       background: var(--surface-soft);
@@ -197,17 +213,16 @@
       justify-content: space-between;
       gap: 8px;
       flex-wrap: wrap;
-      font-size: 0.84rem;
+      font-size: 0.88rem;
       font-weight: 700;
-      color: var(--text);
-      margin-bottom: 10px;
+      margin-bottom: 12px;
     }
 
-    .benefits-strip span { color: var(--green); font-weight: 800; }
+    .benefits-strip span { color: var(--green); font-weight: 900; }
 
     .coupon-cards-row {
       display: grid;
-      grid-template-columns: repeat(3, minmax(110px, 1fr));
+      grid-template-columns: repeat(3, 1fr);
       gap: 8px;
       margin-bottom: 12px;
     }
@@ -222,7 +237,7 @@
     }
 
     .coupon-off { font-size: 1.05rem; font-weight: 900; color: #15803d; }
-    .coupon-sub { font-size: 0.78rem; color: var(--muted); font-weight: 700; margin-top: 2px; }
+    .coupon-sub { font-size: 0.8rem; color: var(--muted); font-weight: 700; margin-top: 2px; }
 
     .filter-pills {
       display: flex;
@@ -239,24 +254,39 @@
       border: 1px solid transparent;
       color: var(--text);
       border-radius: 999px;
-      padding: 8px 14px;
-      font-size: 0.9rem;
-      font-weight: 700;
+      padding: 8px 15px;
+      font-size: 0.92rem;
+      font-weight: 800;
       white-space: nowrap;
       cursor: pointer;
       flex-shrink: 0;
     }
 
     .f-pill.active {
-      background: #111827;
+      background: #0f172a;
       color: #ffffff;
+    }
+
+    /* No computador exibe as lojas em grade de 2 colunas; no celular em 1 coluna ampla */
+    .stores-grid-wrap {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+    }
+
+    @media (min-width: 860px) {
+      .stores-grid-wrap {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 18px;
+      }
     }
 
     .store-block {
       background: var(--surface);
-      border-bottom: 8px solid var(--surface-soft);
-      padding: 14px 0 18px;
-      margin-bottom: 6px;
+      border: 1.5px solid var(--border);
+      border-radius: 16px;
+      padding: 14px;
+      min-width: 0;
     }
 
     .store-header-row {
@@ -264,12 +294,12 @@
       gap: 12px;
       align-items: flex-start;
       cursor: pointer;
-      margin-bottom: 10px;
+      margin-bottom: 12px;
     }
 
     .store-avatar {
-      width: 56px;
-      height: 56px;
+      width: 3.5rem;
+      height: 3.5rem;
       border-radius: 12px;
       object-fit: cover;
       border: 1px solid var(--border);
@@ -283,14 +313,13 @@
       align-items: center;
       gap: 6px;
       flex-wrap: wrap;
-      font-size: 0.9rem;
+      font-size: 0.92rem;
       margin-top: 3px;
-      color: var(--text);
       font-weight: 700;
     }
 
     .star-txt { color: #eab308; font-weight: 900; }
-    .muted-txt { color: var(--muted); font-weight: 600; font-size: 0.88rem; }
+    .muted-txt { color: var(--muted); font-weight: 600; font-size: 0.9rem; }
     .strike-price { text-decoration: line-through; color: var(--muted); font-weight: 600; }
 
     .promo-tags-row {
@@ -303,23 +332,10 @@
     .tag-yellow {
       background: var(--yellow-soft);
       color: #111827;
-      font-size: 0.78rem;
+      font-size: 0.8rem;
       font-weight: 800;
       padding: 3px 8px;
       border-radius: 6px;
-    }
-
-    .tag-closed {
-      position: absolute;
-      inset: 0;
-      background: rgba(17, 24, 39, 0.65);
-      color: #ffffff;
-      font-size: 0.76rem;
-      font-weight: 800;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 12px;
     }
 
     .prod-carousel {
@@ -332,14 +348,14 @@
     .prod-carousel::-webkit-scrollbar { display: none; }
 
     .mini-prod-card {
-      width: 132px;
+      width: 8.2rem;
       flex-shrink: 0;
     }
 
     .mini-img-wrap {
       position: relative;
-      width: 132px;
-      height: 112px;
+      width: 8.2rem;
+      height: 6.8rem;
       border-radius: 12px;
       overflow: hidden;
       background: var(--surface-soft);
@@ -359,7 +375,7 @@
       left: 6px;
       background: var(--yellow);
       color: #111827;
-      font-size: 0.74rem;
+      font-size: 0.76rem;
       font-weight: 900;
       padding: 2px 6px;
       border-radius: 6px;
@@ -369,8 +385,8 @@
       position: absolute;
       right: 6px;
       bottom: 6px;
-      width: 30px;
-      height: 30px;
+      width: 1.9rem;
+      height: 1.9rem;
       border-radius: 999px;
       border: 1px solid var(--border);
       background: #ffffff;
@@ -379,14 +395,14 @@
       font-weight: 900;
       line-height: 1;
       cursor: pointer;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
     }
 
-    .mini-price { font-size: 1.02rem; font-weight: 900; color: var(--green); margin-top: 6px; }
-    .mini-old { font-size: 0.82rem; color: var(--muted); text-decoration: line-through; }
+    .mini-price { font-size: 1.05rem; font-weight: 900; color: var(--green); margin-top: 6px; }
+    .mini-old { font-size: 0.84rem; color: var(--muted); text-decoration: line-through; }
     .mini-name {
-      font-size: 0.9rem;
-      font-weight: 700;
+      font-size: 0.92rem;
+      font-weight: 800;
       color: var(--text);
       margin-top: 2px;
       display: -webkit-box;
@@ -395,10 +411,12 @@
       overflow: hidden;
     }
 
-    /* Tela de detalhes do estabelecimento (igual às telas 1, 2 e 7) */
+    /* Detalhes da loja */
     .store-detail-hero {
       position: relative;
-      margin: -12px -14px 12px;
+      margin-bottom: 12px;
+      border-radius: 16px;
+      overflow: hidden;
     }
 
     .store-detail-banner {
@@ -420,29 +438,26 @@
     }
 
     .circle-icon-btn {
-      width: 38px;
-      height: 38px;
+      width: 2.4rem;
+      height: 2.4rem;
       border-radius: 999px;
       border: 1px solid var(--border);
-      background: rgba(255, 255, 255, 0.95);
+      background: rgba(255, 255, 255, 0.96);
       color: #111827;
-      font-size: 1.1rem;
+      font-size: 1.15rem;
       font-weight: 900;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.16);
     }
 
     .detail-store-card {
       background: #ffffff;
-      border: 1px solid var(--border);
+      border: 1.5px solid var(--border);
       border-radius: 16px;
       padding: 14px;
-      margin-top: -20px;
-      position: relative;
-      z-index: 2;
     }
 
     .detail-metrics-box {
@@ -456,13 +471,13 @@
       text-align: center;
     }
 
-    .metric-val { font-size: 0.98rem; font-weight: 900; color: var(--text); }
-    .metric-lbl { font-size: 0.78rem; color: var(--muted); font-weight: 700; margin-top: 2px; }
+    .metric-val { font-size: 1rem; font-weight: 900; color: var(--text); }
+    .metric-lbl { font-size: 0.8rem; color: var(--muted); font-weight: 700; margin-top: 2px; }
 
     .detail-tabs {
       display: flex;
       gap: 18px;
-      border-bottom: 1px solid var(--border);
+      border-bottom: 1.5px solid var(--border);
       margin: 14px 0 12px;
       overflow-x: auto;
       scrollbar-width: none;
@@ -474,7 +489,7 @@
       border: none;
       border-bottom: 3px solid transparent;
       padding: 10px 2px;
-      font-size: 0.98rem;
+      font-size: 1rem;
       font-weight: 800;
       color: var(--muted);
       white-space: nowrap;
@@ -483,7 +498,7 @@
 
     .d-tab-btn.active {
       color: var(--text);
-      border-bottom-color: #111827;
+      border-bottom-color: #0f172a;
     }
 
     .menu-row-item {
@@ -491,14 +506,14 @@
       justify-content: space-between;
       align-items: center;
       gap: 12px;
-      padding: 12px 0;
+      padding: 14px 0;
       border-bottom: 1px solid var(--border);
     }
 
     .menu-row-img-wrap {
       position: relative;
-      width: 96px;
-      height: 96px;
+      width: 6rem;
+      height: 6rem;
       flex-shrink: 0;
     }
 
@@ -512,24 +527,24 @@
 
     .card-box {
       background: #ffffff;
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 14px;
-      margin-bottom: 12px;
+      border: 1.5px solid var(--border);
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 14px;
     }
 
-    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
 
-    label { display: block; font-size: 0.88rem; font-weight: 700; color: var(--muted); margin-bottom: 5px; }
+    label { display: block; font-size: 0.92rem; font-weight: 800; color: var(--muted); margin-bottom: 5px; }
 
     input, select {
       width: 100%;
       background: var(--surface-soft);
-      border: 1px solid var(--border);
+      border: 1.5px solid var(--border);
       color: var(--text);
       border-radius: 10px;
-      padding: 11px 12px;
-      font-size: 0.98rem;
+      padding: 12px 14px;
+      font-size: 1rem;
     }
 
     .btn-primary-green {
@@ -538,29 +553,31 @@
       border-radius: 12px;
       background: var(--green);
       color: #ffffff;
-      font-size: 1rem;
+      font-size: 1.05rem;
       font-weight: 900;
-      padding: 13px 16px;
+      padding: 14px 16px;
       cursor: pointer;
-      margin-top: 12px;
+      margin-top: 14px;
     }
 
     .floating-promo-bar {
       position: fixed;
       left: 12px;
       right: 12px;
-      bottom: 66px;
+      bottom: 70px;
+      max-width: 1100px;
+      margin: 0 auto;
       z-index: 25;
       background: var(--surface-warm);
-      border: 1px solid var(--yellow);
+      border: 1.5px solid var(--yellow);
       border-radius: 12px;
-      padding: 9px 12px;
+      padding: 10px 14px;
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 8px;
       box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
-      font-size: 0.88rem;
+      font-size: 0.9rem;
       font-weight: 800;
     }
 
@@ -571,19 +588,19 @@
       right: 0;
       z-index: 30;
       background: #ffffff;
-      border-top: 1px solid var(--border);
+      border-top: 1.5px solid var(--border);
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      padding: 6px 8px;
+      padding: 8px;
     }
 
     .b-nav-btn {
       background: transparent;
       border: none;
       color: var(--muted);
-      font-size: 0.82rem;
+      font-size: 0.88rem;
       font-weight: 800;
-      padding: 6px 4px;
+      padding: 4px;
       cursor: pointer;
       display: flex;
       flex-direction: column;
@@ -591,18 +608,18 @@
       gap: 2px;
     }
 
-    .b-nav-btn.active { color: #111827; }
+    .b-nav-btn.active { color: #0f172a; }
 
     .toast {
       position: fixed;
       top: 90px;
       left: 50%;
       transform: translateX(-50%);
-      background: #111827;
+      background: #0f172a;
       color: #ffffff;
-      padding: 10px 16px;
+      padding: 11px 18px;
       border-radius: 12px;
-      font-size: 0.92rem;
+      font-size: 0.95rem;
       font-weight: 800;
       z-index: 60;
       display: none;
@@ -629,7 +646,7 @@
       </div>
       <div class="search-input-wrap">
         <span>🔍</span>
-        <input type="search" id="searchInput" placeholder="Buscar lanches, marmitas, pizzas, sushi..." />
+        <input type="search" id="searchInput" placeholder="Buscar lanches, marmitas, pizzas..." />
       </div>
     </div>
   </header>
@@ -644,10 +661,10 @@
           <div>
             <span class="hero-tag">OFERTAS DO DIA</span>
             <h1 class="hero-title">Entrega rápida e descontos especiais</h1>
-            <div class="hero-sub">Escolha seu restaurante, aproveite cupons e peça em poucos toques.</div>
+            <div class="hero-sub">Escolha seu restaurante, aproveite cupons e peça em segundos.</div>
           </div>
           <div class="hero-badge-box">
-            <div style="font-size:0.74rem;">ATÉ</div>
+            <div style="font-size:0.78rem;">ATÉ</div>
             <div style="font-size:1.3rem;">R$ 9,90</div>
           </div>
         </div>
@@ -682,10 +699,9 @@
           <button class="f-pill" data-filter="top" type="button">TOP avaliados</button>
         </div>
 
-        <div id="storesFeedContainer"></div>
+        <div class="stores-grid-wrap" id="storesFeedContainer"></div>
       </div>
 
-      <!-- DETALHE DO ESTABELECIMENTO -->
       <div id="storeDetailView" class="hidden"></div>
     </section>
 
@@ -693,19 +709,19 @@
     <section id="tab-orders" class="hidden">
       <div class="card-box">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-          <h3 style="margin:0;font-size:1.15rem;">Sua sacola</h3>
+          <h3 style="margin:0;font-size:1.18rem;">Sua sacola</h3>
           <button class="f-pill" type="button" onclick="switchMainTab('tab-home')">+ Adicionar itens</button>
         </div>
         <div id="cartBox"></div>
         <div style="margin-top:12px;padding-top:10px;border-top:1px solid var(--border);">
           <div class="muted-txt" id="subTotalText">Itens: R$ 0,00</div>
           <div class="muted-txt" id="deliveryFeeText">Taxa de entrega: R$ 0,00</div>
-          <div style="font-size:1.18rem;font-weight:900;margin-top:4px;" id="totalOrderText">Total: R$ 0,00</div>
+          <div style="font-size:1.22rem;font-weight:900;margin-top:4px;" id="totalOrderText">Total: R$ 0,00</div>
         </div>
       </div>
 
       <div class="card-box">
-        <h3 style="margin:0 0 10px;font-size:1.12rem;">Dados para entrega</h3>
+        <h3 style="margin:0 0 10px;font-size:1.15rem;">Dados para entrega</h3>
         <div class="grid-2">
           <div>
             <label for="cliName">Seu nome</label>
@@ -734,7 +750,7 @@
       </div>
 
       <div style="display:flex;justify-content:space-between;align-items:center;margin:14px 0 8px;">
-        <h3 style="margin:0;font-size:1.12rem;">Meus pedidos</h3>
+        <h3 style="margin:0;font-size:1.15rem;">Meus pedidos</h3>
         <button class="f-pill" type="button" id="refreshOrdersBtn">Atualizar</button>
       </div>
       <div id="myOrdersList"></div>
@@ -743,7 +759,7 @@
     <!-- ABA CONTA -->
     <section id="tab-account" class="hidden">
       <div class="card-box">
-        <h3 style="margin:0 0 10px;font-size:1.15rem;">Minha conta e endereço</h3>
+        <h3 style="margin:0 0 10px;font-size:1.18rem;">Minha conta e endereço</h3>
         <div class="grid-2">
           <div>
             <label for="accName">Nome</label>
@@ -765,7 +781,7 @@
 
   <div class="floating-promo-bar" id="floatingPromoBar">
     <span>🎁 R$ 7,99 OFF na entrega acima de R$ 20</span>
-    <button class="f-pill active" style="padding:5px 12px;font-size:0.82rem;background:var(--yellow);color:#111827;" type="button" onclick="applyQuickFilter('free')">Ver</button>
+    <button class="f-pill active" style="padding:5px 12px;font-size:0.84rem;background:var(--yellow);color:#111827;" type="button" onclick="applyQuickFilter('free')">Ver</button>
   </div>
 
   <nav class="bottom-bar">
@@ -815,15 +831,13 @@
         old_fee: 13.99,
         prep_time: "16 a 31 min",
         distance: "4,8 km",
-        is_open: true,
         tags: ["Itens até 90% OFF", "15% OFF acima de R$ 60"],
         logo: makeImg("#111827", "#374151", "🍽️", "Original"),
         banner: makeImg("#14532d", "#166534", "🍱", "Restaurante Original"),
         items: [
           { id: "m1", sec: "Ofertas do dia", tag: "60% OFF", name: "Marmita P - Peito de Frango", desc: "Acompanha arroz branco, feijão carioca, farofa crocante e salada.", price: 9.90, oldPrice: 24.98, img: makeImg("#16a34a", "#0f766e", "🍗", "Marmita P") },
           { id: "m2", sec: "Ofertas do dia", tag: "1º pedido", name: "Marmita M - Contrafilé e Frango", desc: "Arroz, feijão, batata frita, contrafilé grelhado e filé de frango.", price: 9.00, oldPrice: 30.00, img: makeImg("#b45309", "#78350f", "🥩", "Marmita M") },
-          { id: "m3", sec: "Mais vendidos", tag: "40% OFF", name: "Marmita G - Linguiça Costela", desc: "Acompanha arroz branco, feijão carioca, farofa crocante e mandioca.", price: 30.00, oldPrice: 50.00, img: makeImg("#991b1b", "#7f1d1d", "🍖", "Marmita G") },
-          { id: "m4", sec: "Escolhido a dedo", tag: "70% OFF", name: "Marmita M - Contrafilé e Fritas", desc: "Porção caprichada com contrafile, batata frita, arroz e feijão.", price: 18.00, oldPrice: 30.00, img: makeImg("#047857", "#065f46", "🍟", "Contrafilé") }
+          { id: "m3", sec: "Mais vendidos", tag: "40% OFF", name: "Marmita G - Linguiça Costela", desc: "Acompanha arroz branco, feijão carioca, farofa crocante e mandioca.", price: 30.00, oldPrice: 50.00, img: makeImg("#991b1b", "#7f1d1d", "🍖", "Marmita G") }
         ]
       },
       {
@@ -836,7 +850,6 @@
         old_fee: 9.99,
         prep_time: "13 a 28 min",
         distance: "2,2 km",
-        is_open: true,
         tags: ["TOP", "Itens até 60% OFF"],
         logo: makeImg("#f59e0b", "#d97706", "🍔", "Luizão"),
         banner: makeImg("#7c2d12", "#9a3412", "🍔", "Luizão Lanches"),
@@ -844,26 +857,6 @@
           { id: "l1", sec: "Ofertas do dia", tag: "50% OFF", name: "X-Tudinho", desc: "Pão, hambúrguer, presunto, queijo, bacon, milho, alface e tomate.", price: 21.00, oldPrice: 41.99, img: makeImg("#ea580c", "#c2410c", "🍔", "X-Tudinho") },
           { id: "l2", sec: "Ofertas do dia", tag: "44% OFF", name: "X-Tudo", desc: "Duplo hambúrguer, bacon crocante, calabresa, presunto, queijo e ovos.", price: 31.99, oldPrice: 56.99, img: makeImg("#b91c1c", "#991b1b", "🥪", "X-Tudo") },
           { id: "l3", sec: "Mais vendidos", tag: "60% OFF", name: "Hot Dog Simples", desc: "Salsicha, molho especial da casa, batata palha, milho e maionese.", price: 9.90, oldPrice: 24.99, img: makeImg("#d97706", "#b45309", "🌭", "Hot Dog") }
-        ]
-      },
-      {
-        id: 3,
-        name: "Pastel D'villa",
-        category: "Pastel, Salgados",
-        rating: "5.0",
-        reviews: "100+",
-        delivery_fee: 8.00,
-        old_fee: 15.99,
-        prep_time: "17 a 32 min",
-        distance: "5,6 km",
-        is_open: true,
-        tags: ["Itens até 100% OFF"],
-        logo: makeImg("#fef08a", "#fde047", "🥟", "D'villa"),
-        banner: makeImg("#a16207", "#854d0e", "🥟", "Pastel D'villa"),
-        items: [
-          { id: "p1", sec: "Ofertas do dia", tag: "30% OFF", name: "Pastel Carne com Mussarela", desc: "Massa crocante frita na hora com carne temperada e mussarela.", price: 17.49, oldPrice: 24.99, img: makeImg("#ca8a04", "#a16207", "🥟", "Pastel Carne") },
-          { id: "p2", sec: "Mais vendidos", tag: "30% OFF", name: "Pastel de Costela Especial", desc: "Costela desfiada suculenta com requeijão cremoso.", price: 19.59, oldPrice: 27.99, img: makeImg("#b45309", "#92400e", "🥩", "Costela") },
-          { id: "p3", sec: "Escolhido a dedo", tag: "20% OFF", name: "Pastel Nutella (180g)", desc: "Recheio farto de chocolate/avelã bem quentinho.", price: 28.80, oldPrice: 36.00, img: makeImg("#7e22ce", "#6b21a8", "🍫", "Nutella") }
         ]
       }
     ];
@@ -1001,11 +994,8 @@
     });
 
     document.getElementById("searchInput").addEventListener("input", () => {
-      if (openedStore) {
-        renderStoreDetail();
-      } else {
-        renderStoresFeed();
-      }
+      if (openedStore) renderStoreDetail();
+      else renderStoresFeed();
     });
 
     function openStoreDetail(storeId) {
@@ -1037,16 +1027,12 @@
         return it.sec === openedTab || !it.sec;
       });
 
-      const carouselItems = filteredItems.slice(0, 6);
-
       box.innerHTML = `
         <div class="store-detail-hero">
           <img class="store-detail-banner" src="${st.banner || st.logo}" alt="${st.name}" />
           <div class="detail-top-overlay">
             <button class="circle-icon-btn" type="button" onclick="closeStoreDetail()">‹</button>
-            <div style="display:flex;gap:8px;">
-              <button class="circle-icon-btn" type="button" onclick="switchMainTab('tab-orders')">🛒</button>
-            </div>
+            <button class="circle-icon-btn" type="button" onclick="switchMainTab('tab-orders')">🛒</button>
           </div>
         </div>
 
@@ -1090,32 +1076,16 @@
           `).join("")}
         </div>
 
-        <h3 style="margin:6px 0 10px;font-size:1.1rem;">🔥 ${openedTab}</h3>
-        <div class="prod-carousel" style="margin-bottom:16px;">
-          ${carouselItems.map((it) => `
-            <div class="mini-prod-card">
-              <div class="mini-img-wrap">
-                <img src="${it.img}" alt="${it.name}" />
-                ${it.tag ? `<span class="off-badge">${it.tag}</span>` : ""}
-                <button class="plus-circle" type="button" onclick='addItem(event, ${JSON.stringify(it)}, ${JSON.stringify(st)})'>+</button>
-              </div>
-              <div class="mini-price">${brl(it.price)}</div>
-              ${it.oldPrice ? `<div class="mini-old">${brl(it.oldPrice)}</div>` : ""}
-              <div class="mini-name">${it.name}</div>
-            </div>
-          `).join("")}
-        </div>
-
-        <h3 style="margin:12px 0 4px;font-size:1.1rem;">Cardápio completo</h3>
+        <h3 style="margin:6px 0 10px;font-size:1.12rem;">🔥 ${openedTab}</h3>
         ${filteredItems.map((it) => `
           <div class="menu-row-item">
             <div style="flex:1;min-width:0;">
               ${it.tag ? `<span class="tag-yellow" style="margin-bottom:4px;display:inline-block;">${it.tag}</span>` : ""}
-              <div style="font-size:1.04rem;font-weight:800;">${it.name}</div>
+              <div style="font-size:1.06rem;font-weight:900;">${it.name}</div>
               <div class="muted-txt" style="margin-top:3px;">${it.desc || ""}</div>
               <div style="margin-top:6px;">
-                <strong style="color:var(--green);font-size:1.05rem;">${brl(it.price)}</strong>
-                ${it.oldPrice ? `<span class="strike-price" style="margin-left:6px;font-size:0.88rem;">${brl(it.oldPrice)}</span>` : ""}
+                <strong style="color:var(--green);font-size:1.08rem;">${brl(it.price)}</strong>
+                ${it.oldPrice ? `<span class="strike-price" style="margin-left:6px;font-size:0.9rem;">${brl(it.oldPrice)}</span>` : ""}
               </div>
             </div>
             <div class="menu-row-img-wrap">
@@ -1156,10 +1126,7 @@
         return `
           <article class="store-block">
             <div class="store-header-row" onclick="openStoreDetail(${s.id})">
-              <div style="position:relative;width:56px;height:56px;flex-shrink:0;">
-                <img class="store-avatar" src="${s.logo}" alt="${s.name}" />
-                ${!s.is_open ? `<div class="tag-closed">Fechado</div>` : ""}
-              </div>
+              <img class="store-avatar" src="${s.logo}" alt="${s.name}" />
               <div style="flex:1;min-width:0;">
                 <h3 class="store-title">${s.name}</h3>
                 <div class="store-rating-line">
@@ -1214,7 +1181,7 @@
       }
 
       box.innerHTML = cart.map((item, idx) => `
-        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--border);">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 0;border-bottom:1px solid var(--border);">
           <div>
             <strong>${item.name}</strong>
             <div class="muted-txt">${item.store_name} • ${brl(item.price)}</div>
@@ -1303,7 +1270,7 @@
               </div>
               <div class="muted-txt" style="margin-top:4px;">📍 ${o.client_address || ""}</div>
               <div class="muted-txt">Itens: ${brl(o.items_total)} • Entrega: ${brl(o.delivery_fee)}</div>
-              ${last4 ? `<div style="margin-top:8px;padding:8px 10px;border-radius:10px;background:var(--surface-soft);font-size:0.9rem;">Código de confirmação da entrega (4 últimos dígitos): <strong>${last4}</strong></div>` : ""}
+              ${last4 ? `<div style="margin-top:8px;padding:8px 10px;border-radius:10px;background:var(--surface-soft);font-size:0.92rem;">Código de confirmação da entrega (4 últimos dígitos): <strong>${last4}</strong></div>` : ""}
             </div>
           `;
         }).join("");
@@ -1328,7 +1295,6 @@
               old_fee: null,
               prep_time: s.estimated_time || "25-35 min",
               distance: "Catanduva",
-              is_open: true,
               tags: ["RotaSabor"],
               logo: CATEGORIES[idx % CATEGORIES.length].img,
               banner: makeImg("#063b2c", "#0f766e", "🛵", s.store_name || s.name || "Loja"),
