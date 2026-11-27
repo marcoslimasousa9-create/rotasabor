@@ -4,45 +4,27 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>RotaSabor — Pedidos Online</title>
-  <meta name="theme-color" content="#0b1220" />
+  <meta name="theme-color" content="#ffffff" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <link rel="manifest" href="/static/manifest-cliente.json" />
   <link rel="icon" type="image/svg+xml" href="/static/icon.svg" />
   <style>
     :root {
-      --bg: #070c16;
-      --surface: #0f172a;
-      --surface-2: #162033;
-      --border: rgba(148, 163, 184, 0.18);
-      --text: #f8fafc;
-      --muted: #cbd5e1;
-      --primary: #38bdf8;
-      --success: #22c55e;
-      --warning: #f59e0b;
-      --danger: #ef4444;
-      --accent-yellow: #facc15;
-      --banner-bg: linear-gradient(120deg, #0f2942 0%, #10243e 55%, #172554 100%);
-      --banner-border: rgba(56, 189, 248, 0.3);
-      --topbar-bg: rgba(11, 18, 32, 0.96);
-      --radius: 18px;
-    }
-
-    body.theme-light {
-      --bg: #f4f6f9;
+      --bg: #ffffff;
       --surface: #ffffff;
-      --surface-2: #eef2f6;
-      --border: rgba(15, 23, 42, 0.14);
-      --text: #0f172a;
-      --muted: #334155;
-      --primary: #0284c7;
-      --success: #16a34a;
-      --warning: #d97706;
-      --danger: #dc2626;
-      --accent-yellow: #facc15;
-      --banner-bg: linear-gradient(120deg, #e0f2fe 0%, #f0fdf4 55%, #fef9c3 100%);
-      --banner-border: rgba(2, 132, 199, 0.24);
-      --topbar-bg: rgba(255, 255, 255, 0.96);
+      --surface-soft: #f5f6f8;
+      --surface-mint: #eefaf3;
+      --surface-warm: #fffbea;
+      --border: #e5e7eb;
+      --text: #111827;
+      --muted: #6b7280;
+      --green: #16a34a;
+      --green-dark: #064e3b;
+      --yellow: #facc15;
+      --yellow-soft: #fef08a;
+      --red: #dc2626;
+      --radius: 14px;
     }
 
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -53,58 +35,53 @@
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       background: var(--bg);
       color: var(--text);
-      padding-bottom: 98px;
-      transition: background-color 0.2s ease, color 0.2s ease;
+      padding-bottom: 84px;
     }
 
     .topbar {
       position: sticky;
       top: 0;
-      z-index: 25;
-      background: var(--topbar-bg);
-      backdrop-filter: blur(12px);
+      z-index: 30;
+      background: rgba(255, 255, 255, 0.98);
+      backdrop-filter: blur(10px);
       border-bottom: 1px solid var(--border);
-      padding: 14px 16px;
+      padding: 10px 14px 12px;
     }
 
-    .topbar-inner { max-width: 1020px; margin: 0 auto; }
+    .topbar-inner { max-width: 960px; margin: 0 auto; }
 
-    .addr-row {
+    .addr-bar {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 10px;
-      margin-bottom: 12px;
-      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 10px;
     }
 
     .addr-btn {
       background: transparent;
       border: none;
+      padding: 2px 0;
       color: var(--text);
-      padding: 4px 0;
-      display: flex;
-      align-items: center;
-      gap: 8px;
       font-size: 0.98rem;
       font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 6px;
       cursor: pointer;
-      text-align: left;
+      max-width: 78%;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
-      max-width: 64%;
     }
 
-    .top-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
-
-    .pill-btn {
-      background: var(--surface-2);
+    .cart-top-btn {
+      background: var(--surface-soft);
       border: 1px solid var(--border);
       color: var(--text);
       border-radius: 999px;
-      padding: 8px 14px;
-      font-size: 0.92rem;
+      padding: 6px 12px;
+      font-size: 0.9rem;
       font-weight: 800;
       cursor: pointer;
       display: inline-flex;
@@ -113,303 +90,403 @@
       flex-shrink: 0;
     }
 
-    .search-box {
+    .search-input-wrap {
       display: flex;
       align-items: center;
-      gap: 10px;
-      background: var(--surface-2);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 11px 14px;
+      gap: 8px;
+      background: var(--surface-soft);
+      border-radius: 12px;
+      padding: 10px 14px;
     }
 
-    .search-box input {
+    .search-input-wrap input {
       width: 100%;
-      background: transparent;
       border: none;
+      background: transparent;
       color: var(--text);
-      font-size: 1.02rem;
+      font-size: 1rem;
       outline: none;
       padding: 0;
     }
 
-    .container { max-width: 1020px; margin: 0 auto; padding: 16px; }
+    .container { max-width: 960px; margin: 0 auto; padding: 12px 14px; }
 
-    .promo-banner {
-      background: var(--banner-bg);
-      border: 1px solid var(--banner-border);
-      border-radius: var(--radius);
-      padding: 18px;
+    .hero-promo {
+      background: linear-gradient(125deg, #063b2c 0%, #0f6b4a 55%, #15803d 100%);
+      color: #ffffff;
+      border-radius: 16px;
+      padding: 16px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 14px;
-      margin-bottom: 16px;
+      gap: 12px;
+      margin-bottom: 14px;
     }
 
-    .promo-tag {
+    .hero-tag {
       display: inline-block;
-      background: var(--accent-yellow);
-      color: #090d16;
-      font-size: 0.84rem;
+      background: var(--yellow);
+      color: #111827;
+      font-size: 0.78rem;
       font-weight: 900;
-      padding: 4px 10px;
-      border-radius: 999px;
-      margin-bottom: 8px;
+      padding: 3px 9px;
+      border-radius: 6px;
+      margin-bottom: 6px;
+      text-transform: uppercase;
     }
 
-    .promo-title { font-size: 1.25rem; font-weight: 900; margin: 0; }
-    .promo-sub { font-size: 0.96rem; color: var(--muted); margin-top: 4px; }
+    .hero-title { margin: 0; font-size: 1.35rem; font-weight: 900; line-height: 1.15; }
+    .hero-sub { margin-top: 4px; font-size: 0.9rem; opacity: 0.92; }
 
-    .promo-badge-price {
-      background: var(--accent-yellow);
-      color: #070c16;
-      border-radius: 16px;
-      padding: 12px 16px;
+    .hero-badge-box {
+      background: var(--yellow);
+      color: #111827;
+      border-radius: 14px;
+      padding: 10px 14px;
       text-align: center;
       font-weight: 900;
-      line-height: 1.1;
       flex-shrink: 0;
+      line-height: 1.1;
     }
 
-    .cat-strip {
+    .cat-row {
       display: flex;
       gap: 12px;
       overflow-x: auto;
-      padding-bottom: 8px;
-      margin-bottom: 14px;
+      padding-bottom: 6px;
+      margin-bottom: 12px;
       scrollbar-width: none;
     }
-    .cat-strip::-webkit-scrollbar { display: none; }
+    .cat-row::-webkit-scrollbar { display: none; }
 
-    .cat-item {
-      border: 1px solid var(--border);
-      background: var(--surface);
+    .cat-pill-card {
+      background: transparent;
+      border: none;
       color: var(--text);
-      border-radius: 16px;
-      padding: 10px 14px;
-      min-width: 104px;
+      min-width: 74px;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
       cursor: pointer;
+      padding: 4px;
+      border-radius: 12px;
       flex-shrink: 0;
-      font-size: 0.92rem;
+      font-size: 0.88rem;
+      font-weight: 700;
+    }
+
+    .cat-pill-card.active {
+      background: var(--surface-mint);
+      color: var(--green);
       font-weight: 800;
     }
 
-    .cat-item.active {
-      border-color: var(--primary);
-      background: rgba(56, 189, 248, 0.16);
-      color: var(--primary);
-    }
-
-    .cat-thumb {
+    .cat-circle-img {
       width: 56px;
       height: 56px;
       border-radius: 14px;
       object-fit: cover;
-      background: var(--surface-2);
+      background: var(--surface-soft);
+      border: 1px solid var(--border);
     }
 
-    .filter-strip {
+    .benefits-strip {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      flex-wrap: wrap;
+      font-size: 0.84rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 10px;
+    }
+
+    .benefits-strip span { color: var(--green); font-weight: 800; }
+
+    .coupon-cards-row {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(110px, 1fr));
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .coupon-box {
+      background: var(--surface-mint);
+      border: 1px solid #bbf7d0;
+      border-radius: 12px;
+      padding: 10px 8px;
+      text-align: center;
+      cursor: pointer;
+    }
+
+    .coupon-off { font-size: 1.05rem; font-weight: 900; color: #15803d; }
+    .coupon-sub { font-size: 0.78rem; color: var(--muted); font-weight: 700; margin-top: 2px; }
+
+    .filter-pills {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 8px;
+      margin-bottom: 12px;
+      scrollbar-width: none;
+    }
+    .filter-pills::-webkit-scrollbar { display: none; }
+
+    .f-pill {
+      background: var(--surface-soft);
+      border: 1px solid transparent;
+      color: var(--text);
+      border-radius: 999px;
+      padding: 8px 14px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      white-space: nowrap;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .f-pill.active {
+      background: #111827;
+      color: #ffffff;
+    }
+
+    .store-block {
+      background: var(--surface);
+      border-bottom: 8px solid var(--surface-soft);
+      padding: 14px 0 18px;
+      margin-bottom: 6px;
+    }
+
+    .store-header-row {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      cursor: pointer;
+      margin-bottom: 10px;
+    }
+
+    .store-avatar {
+      width: 56px;
+      height: 56px;
+      border-radius: 12px;
+      object-fit: cover;
+      border: 1px solid var(--border);
+      background: var(--surface-soft);
+      flex-shrink: 0;
+    }
+
+    .store-title { margin: 0; font-size: 1.15rem; font-weight: 900; color: var(--text); }
+    .store-rating-line {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+      font-size: 0.9rem;
+      margin-top: 3px;
+      color: var(--text);
+      font-weight: 700;
+    }
+
+    .star-txt { color: #eab308; font-weight: 900; }
+    .muted-txt { color: var(--muted); font-weight: 600; font-size: 0.88rem; }
+    .strike-price { text-decoration: line-through; color: var(--muted); font-weight: 600; }
+
+    .promo-tags-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 6px;
+    }
+
+    .tag-yellow {
+      background: var(--yellow-soft);
+      color: #111827;
+      font-size: 0.78rem;
+      font-weight: 800;
+      padding: 3px 8px;
+      border-radius: 6px;
+    }
+
+    .tag-closed {
+      position: absolute;
+      inset: 0;
+      background: rgba(17, 24, 39, 0.65);
+      color: #ffffff;
+      font-size: 0.76rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 12px;
+    }
+
+    .prod-carousel {
       display: flex;
       gap: 10px;
       overflow-x: auto;
-      padding-bottom: 8px;
-      margin-bottom: 14px;
+      padding-bottom: 4px;
       scrollbar-width: none;
     }
-    .filter-strip::-webkit-scrollbar { display: none; }
+    .prod-carousel::-webkit-scrollbar { display: none; }
 
-    .chip {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      color: var(--text);
-      border-radius: 999px;
-      padding: 9px 16px;
-      font-size: 0.92rem;
-      font-weight: 800;
-      cursor: pointer;
-      white-space: nowrap;
+    .mini-prod-card {
+      width: 132px;
       flex-shrink: 0;
     }
 
-    .chip.active { background: var(--primary); color: #ffffff; border-color: var(--primary); }
-    body:not(.theme-light) .chip.active { color: #04101d; }
-
-    .section-head {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      margin: 14px 0 10px;
-    }
-
-    .section-title { margin: 0; font-size: 1.18rem; font-weight: 900; }
-
-    .card {
-      background: var(--surface);
+    .mini-img-wrap {
+      position: relative;
+      width: 132px;
+      height: 112px;
+      border-radius: 12px;
+      overflow: hidden;
+      background: var(--surface-soft);
       border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 16px;
-      margin-bottom: 14px;
     }
 
-    .store-card {
-      display: flex;
-      gap: 14px;
-      align-items: flex-start;
-      cursor: pointer;
-      transition: border-color 0.15s ease;
-    }
-    .store-card:hover { border-color: var(--primary); }
-
-    .store-logo {
-      width: 78px;
-      height: 78px;
-      border-radius: 16px;
+    .mini-img-wrap img {
+      width: 100%;
+      height: 100%;
       object-fit: cover;
-      background: var(--surface-2);
-      flex-shrink: 0;
+      display: block;
     }
 
-    .store-body { flex: 1; min-width: 0; }
-    .store-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
-    .store-name { margin: 0; font-size: 1.18rem; font-weight: 900; }
-    .meta { color: var(--muted); font-size: 0.94rem; margin-top: 4px; line-height: 1.35; }
-
-    .tag-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
-
-    .pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      border-radius: 10px;
-      padding: 5px 10px;
-      font-size: 0.86rem;
-      font-weight: 800;
-      background: var(--surface-2);
-      color: var(--text);
-    }
-
-    .pill.free { background: rgba(34, 197, 94, 0.18); color: var(--success); }
-    .pill.promo { background: rgba(250, 204, 21, 0.22); color: var(--warning); }
-    body:not(.theme-light) .pill.promo { color: var(--accent-yellow); }
-
-    .subcat-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
-      gap: 12px;
-      margin-bottom: 16px;
-    }
-
-    .subcat-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 14px;
-      text-align: left;
-      color: var(--text);
-      font-size: 0.98rem;
-      font-weight: 800;
-      cursor: pointer;
-    }
-    .subcat-card.active { border-color: var(--primary); background: rgba(56, 189, 248, 0.16); }
-
-    .showcase-header {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      overflow: hidden;
-      margin-bottom: 14px;
-    }
-
-    .showcase-banner { width: 100%; height: 140px; object-fit: cover; display: block; background: var(--surface-2); }
-    .showcase-info { padding: 16px; }
-
-    .products-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-      gap: 14px;
-    }
-
-    .prod-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-    }
-
-    .prod-img-wrap { position: relative; height: 140px; background: var(--surface-2); }
-    .prod-img { width: 100%; height: 100%; object-fit: cover; display: block; }
-
-    .discount-tag {
+    .off-badge {
       position: absolute;
-      top: 10px;
-      left: 10px;
-      background: var(--accent-yellow);
-      color: #070c16;
-      font-size: 0.82rem;
+      top: 6px;
+      left: 6px;
+      background: var(--yellow);
+      color: #111827;
+      font-size: 0.74rem;
       font-weight: 900;
-      padding: 4px 9px;
-      border-radius: 9px;
+      padding: 2px 6px;
+      border-radius: 6px;
     }
 
-    .add-plus-btn {
+    .plus-circle {
       position: absolute;
-      right: 10px;
-      bottom: 10px;
-      width: 42px;
-      height: 42px;
+      right: 6px;
+      bottom: 6px;
+      width: 30px;
+      height: 30px;
       border-radius: 999px;
       border: 1px solid var(--border);
       background: #ffffff;
-      color: #070c16;
-      font-size: 1.45rem;
+      color: #111827;
+      font-size: 1.25rem;
       font-weight: 900;
+      line-height: 1;
       cursor: pointer;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
     }
 
-    .prod-body { padding: 14px; }
-    .price-now { font-size: 1.15rem; font-weight: 900; color: var(--success); }
-    .price-old { font-size: 0.88rem; color: var(--muted); text-decoration: line-through; margin-left: 8px; }
-    .prod-title { margin: 6px 0 3px; font-size: 1.05rem; font-weight: 800; }
-
-    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
-
-    label { display: block; font-size: 0.9rem; color: var(--muted); margin-bottom: 6px; font-weight: 700; }
-
-    input, select {
-      width: 100%;
-      background: var(--surface-2);
-      border: 1px solid var(--border);
+    .mini-price { font-size: 1.02rem; font-weight: 900; color: var(--green); margin-top: 6px; }
+    .mini-old { font-size: 0.82rem; color: var(--muted); text-decoration: line-through; }
+    .mini-name {
+      font-size: 0.9rem;
+      font-weight: 700;
       color: var(--text);
-      padding: 12px 14px;
-      border-radius: 12px;
-      font-size: 1rem;
+      margin-top: 2px;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
     }
 
-    .btn {
-      border: none;
-      border-radius: 14px;
-      padding: 13px 16px;
+    /* Tela de detalhes do estabelecimento (igual às telas 1, 2 e 7) */
+    .store-detail-hero {
+      position: relative;
+      margin: -12px -14px 12px;
+    }
+
+    .store-detail-banner {
+      width: 100%;
+      height: 190px;
+      object-fit: cover;
+      display: block;
+      background: var(--surface-soft);
+    }
+
+    .detail-top-overlay {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      right: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .circle-icon-btn {
+      width: 38px;
+      height: 38px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.95);
+      color: #111827;
+      font-size: 1.1rem;
       font-weight: 900;
-      font-size: 1rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+    }
+
+    .detail-store-card {
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 14px;
+      margin-top: -20px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .detail-metrics-box {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      background: var(--surface-soft);
+      border-radius: 12px;
+      padding: 10px;
+      margin-top: 12px;
+      text-align: center;
+    }
+
+    .metric-val { font-size: 0.98rem; font-weight: 900; color: var(--text); }
+    .metric-lbl { font-size: 0.78rem; color: var(--muted); font-weight: 700; margin-top: 2px; }
+
+    .detail-tabs {
+      display: flex;
+      gap: 18px;
+      border-bottom: 1px solid var(--border);
+      margin: 14px 0 12px;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .detail-tabs::-webkit-scrollbar { display: none; }
+
+    .d-tab-btn {
+      background: transparent;
+      border: none;
+      border-bottom: 3px solid transparent;
+      padding: 10px 2px;
+      font-size: 0.98rem;
+      font-weight: 800;
+      color: var(--muted);
+      white-space: nowrap;
       cursor: pointer;
     }
 
-    .btn-success { background: var(--success); color: #ffffff; width: 100%; margin-top: 14px; }
-    body:not(.theme-light) .btn-success { color: #04130d; }
-    .btn-outline { background: var(--surface-2); color: var(--text); border: 1px solid var(--border); }
-    .btn-sm { padding: 8px 13px; font-size: 0.9rem; border-radius: 10px; }
+    .d-tab-btn.active {
+      color: var(--text);
+      border-bottom-color: #111827;
+    }
 
-    .cart-row {
+    .menu-row-item {
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -417,65 +494,117 @@
       padding: 12px 0;
       border-bottom: 1px solid var(--border);
     }
-    .cart-row:last-child { border-bottom: none; }
 
-    .badge {
-      padding: 5px 12px;
-      border-radius: 999px;
-      font-size: 0.86rem;
-      font-weight: 800;
-      background: rgba(56, 189, 248, 0.18);
-      color: var(--primary);
-      white-space: nowrap;
+    .menu-row-img-wrap {
+      position: relative;
+      width: 96px;
+      height: 96px;
+      flex-shrink: 0;
     }
-    .badge.done { background: rgba(34, 197, 94, 0.18); color: var(--success); }
 
-    .delivery-code-box {
-      margin-top: 12px;
-      padding: 12px 14px;
+    .menu-row-img-wrap img {
+      width: 100%;
+      height: 100%;
+      border-radius: 12px;
+      object-fit: cover;
+      border: 1px solid var(--border);
+    }
+
+    .card-box {
+      background: #ffffff;
+      border: 1px solid var(--border);
       border-radius: 14px;
-      background: var(--surface-2);
-      border: 1px dashed var(--primary);
-      font-size: 0.96rem;
+      padding: 14px;
+      margin-bottom: 12px;
     }
 
-    .bottom-nav {
+    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+
+    label { display: block; font-size: 0.88rem; font-weight: 700; color: var(--muted); margin-bottom: 5px; }
+
+    input, select {
+      width: 100%;
+      background: var(--surface-soft);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 10px;
+      padding: 11px 12px;
+      font-size: 0.98rem;
+    }
+
+    .btn-primary-green {
+      width: 100%;
+      border: none;
+      border-radius: 12px;
+      background: var(--green);
+      color: #ffffff;
+      font-size: 1rem;
+      font-weight: 900;
+      padding: 13px 16px;
+      cursor: pointer;
+      margin-top: 12px;
+    }
+
+    .floating-promo-bar {
+      position: fixed;
+      left: 12px;
+      right: 12px;
+      bottom: 66px;
+      z-index: 25;
+      background: var(--surface-warm);
+      border: 1px solid var(--yellow);
+      border-radius: 12px;
+      padding: 9px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+      font-size: 0.88rem;
+      font-weight: 800;
+    }
+
+    .bottom-bar {
       position: fixed;
       bottom: 0;
       left: 0;
       right: 0;
-      background: var(--topbar-bg);
+      z-index: 30;
+      background: #ffffff;
       border-top: 1px solid var(--border);
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      padding: 10px 6px;
-      z-index: 30;
+      grid-template-columns: repeat(3, 1fr);
+      padding: 6px 8px;
     }
 
-    .nav-btn {
+    .b-nav-btn {
       background: transparent;
       border: none;
       color: var(--muted);
+      font-size: 0.82rem;
       font-weight: 800;
-      font-size: 0.94rem;
-      padding: 8px 4px;
+      padding: 6px 4px;
       cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
     }
-    .nav-btn.active { color: var(--primary); }
+
+    .b-nav-btn.active { color: #111827; }
 
     .toast {
       position: fixed;
-      top: 96px;
+      top: 90px;
       left: 50%;
       transform: translateX(-50%);
-      background: var(--surface-2);
-      border: 1px solid var(--primary);
-      color: var(--text);
-      padding: 12px 18px;
-      border-radius: 14px;
-      font-size: 0.96rem;
+      background: #111827;
+      color: #ffffff;
+      padding: 10px 16px;
+      border-radius: 12px;
+      font-size: 0.92rem;
       font-weight: 800;
-      z-index: 50;
+      z-index: 60;
       display: none;
       max-width: 92vw;
       text-align: center;
@@ -487,26 +616,20 @@
 <body>
   <header class="topbar">
     <div class="topbar-inner">
-      <div class="addr-row">
-        <button class="addr-btn" type="button" id="editAddressTopBtn" title="Alterar endereço de entrega">
+      <div class="addr-bar">
+        <button class="addr-btn" type="button" id="topAddressBtn">
           <span>📍</span>
-          <span id="topAddressText">Catanduva - SP • Endereço</span>
+          <span id="topAddressLabel">235 Rua Camanducaia, Catanduva - SP</span>
           <span>▾</span>
         </button>
-        <div class="top-actions">
-          <button class="pill-btn" type="button" id="themeToggleBtn" title="Alternar tema claro ou escuro">
-            <span id="themeIcon">☀️</span>
-            <span id="themeLabel">Claro</span>
-          </button>
-          <button class="pill-btn" type="button" id="openCartTopBtn">
-            <span>🛒</span>
-            <span id="topCartCount">0</span>
-          </button>
-        </div>
+        <button class="cart-top-btn" type="button" id="topCartBtn">
+          <span>🛒</span>
+          <span id="topCartBadge">0</span>
+        </button>
       </div>
-      <div class="search-box">
+      <div class="search-input-wrap">
         <span>🔍</span>
-        <input type="search" id="searchInput" placeholder="Buscar lanches, marmitas, pizzas, lojas..." />
+        <input type="search" id="searchInput" placeholder="Buscar lanches, marmitas, pizzas, sushi..." />
       </div>
     </div>
   </header>
@@ -516,247 +639,731 @@
   <main class="container">
     <!-- ABA INÍCIO -->
     <section id="tab-home">
-      <div class="promo-banner">
-        <div>
-          <span class="promo-tag">DESTAQUES DO DIA</span>
-          <h2 class="promo-title">Ofertas rápidas e entrega rastreável</h2>
-          <div class="promo-sub">Escolha uma categoria, filtre por taxa e monte seu pedido em segundos.</div>
+      <div id="homeFeedView">
+        <div class="hero-promo">
+          <div>
+            <span class="hero-tag">OFERTAS DO DIA</span>
+            <h1 class="hero-title">Entrega rápida e descontos especiais</h1>
+            <div class="hero-sub">Escolha seu restaurante, aproveite cupons e peça em poucos toques.</div>
+          </div>
+          <div class="hero-badge-box">
+            <div style="font-size:0.74rem;">ATÉ</div>
+            <div style="font-size:1.3rem;">R$ 9,90</div>
+          </div>
         </div>
-        <div class="promo-badge-price">
-          <div style="font-size: 0.78rem;">A PARTIR DE</div>
-          <div style="font-size: 1.35rem;">R$ 12</div>
+
+        <div class="cat-row" id="categoryStrip"></div>
+
+        <div class="benefits-strip">
+          <div><span>✓</span> Entrega rápida</div>
+          <div><span>✓</span> Pedido rastreável</div>
+          <div><span>✓</span> Horário Garantido ›</div>
         </div>
+
+        <div class="coupon-cards-row">
+          <div class="coupon-box" onclick="applyQuickFilter('offers')">
+            <div class="coupon-off">60% OFF</div>
+            <div class="coupon-sub">Em ofertas hoje</div>
+          </div>
+          <div class="coupon-box" onclick="applyQuickFilter('free')">
+            <div class="coupon-off">Grátis</div>
+            <div class="coupon-sub">Entrega selecionada</div>
+          </div>
+          <div class="coupon-box" onclick="applyQuickFilter('top')">
+            <div class="coupon-off">TOP 5.0</div>
+            <div class="coupon-sub">Mais avaliados</div>
+          </div>
+        </div>
+
+        <div class="filter-pills" id="filterPillsRow">
+          <button class="f-pill active" data-filter="all" type="button">Ordenar ▾</button>
+          <button class="f-pill" data-filter="free" type="button">Entrega grátis</button>
+          <button class="f-pill" data-filter="offers" type="button">Ofertas</button>
+          <button class="f-pill" data-filter="top" type="button">TOP avaliados</button>
+        </div>
+
+        <div id="storesFeedContainer"></div>
       </div>
 
-      <div class="cat-strip" id="homeCategoryStrip"></div>
-
-      <div class="filter-strip" id="homeFilterStrip">
-        <button class="chip active" data-filter="all" type="button">Todos</button>
-        <button class="chip" data-filter="fast" type="button">Mais rápidos</button>
-        <button class="chip" data-filter="lowfee" type="button">Menor taxa</button>
-        <button class="chip" data-filter="top" type="button">TOP avaliados</button>
-      </div>
-
-      <div id="storeShowcase" class="hidden"></div>
-
-      <div class="section-head">
-        <h3 class="section-title" id="storesSectionTitle">Estabelecimentos próximos</h3>
-        <button class="btn btn-outline btn-sm" type="button" id="clearFiltersBtn">Limpar filtros</button>
-      </div>
-      <div id="storesList"></div>
+      <!-- DETALHE DO ESTABELECIMENTO -->
+      <div id="storeDetailView" class="hidden"></div>
     </section>
 
-    <!-- ABA CATEGORIAS -->
-    <section id="tab-categories" class="hidden">
-      <h3 class="section-title" style="margin-bottom: 12px;">Categorias e subcategorias</h3>
-      <div class="cat-strip" id="catTabStrip"></div>
-      <div class="subcat-grid" id="subcategoriesGrid"></div>
-      <h3 class="section-title" style="margin-bottom: 12px;">Itens da seleção</h3>
-      <div class="products-grid" id="categoryProductsGrid"></div>
-    </section>
-
-    <!-- ABA SACOLA -->
-    <section id="tab-cart" class="hidden">
-      <div class="card">
-        <h3 class="section-title" style="margin-bottom: 12px;">Sua sacola</h3>
-        <div id="cartItemsContainer"></div>
-        <div style="margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--border);">
-          <div class="meta" id="cartSubtotalLabel">Valor dos itens: R$ 0,00</div>
-          <div class="meta" id="cartDeliveryLabel">Taxa de entrega: R$ 0,00</div>
-          <div style="font-size: 1.22rem; font-weight: 900; margin-top: 6px;" id="cartTotalLabel">Total: R$ 0,00</div>
+    <!-- ABA PEDIDOS / SACOLA -->
+    <section id="tab-orders" class="hidden">
+      <div class="card-box">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+          <h3 style="margin:0;font-size:1.15rem;">Sua sacola</h3>
+          <button class="f-pill" type="button" onclick="switchMainTab('tab-home')">+ Adicionar itens</button>
+        </div>
+        <div id="cartBox"></div>
+        <div style="margin-top:12px;padding-top:10px;border-top:1px solid var(--border);">
+          <div class="muted-txt" id="subTotalText">Itens: R$ 0,00</div>
+          <div class="muted-txt" id="deliveryFeeText">Taxa de entrega: R$ 0,00</div>
+          <div style="font-size:1.18rem;font-weight:900;margin-top:4px;" id="totalOrderText">Total: R$ 0,00</div>
         </div>
       </div>
 
-      <div class="card">
-        <h3 class="section-title" style="margin-bottom: 12px;">Seu cadastro e entrega</h3>
+      <div class="card-box">
+        <h3 style="margin:0 0 10px;font-size:1.12rem;">Dados para entrega</h3>
         <div class="grid-2">
           <div>
-            <label for="clientNameInput">Seu nome</label>
-            <input type="text" id="clientNameInput" placeholder="Ex.: Marcos" />
+            <label for="cliName">Seu nome</label>
+            <input type="text" id="cliName" placeholder="Seu nome completo" />
           </div>
           <div>
-            <label for="clientPhoneInput">Seu celular (4 últimos dígitos confirmam a entrega)</label>
-            <input type="tel" id="clientPhoneInput" placeholder="Ex.: (17) 99999-1234" />
+            <label for="cliPhone">Celular (4 últimos dígitos confirmam na entrega)</label>
+            <input type="tel" id="cliPhone" placeholder="(17) 99999-1234" />
           </div>
         </div>
-        <div class="grid-2" style="margin-top: 12px;">
+        <div class="grid-2" style="margin-top:10px;">
           <div>
-            <label for="paymentSelect">Forma de pagamento</label>
-            <select id="paymentSelect">
+            <label for="cliPayment">Pagamento</label>
+            <select id="cliPayment">
               <option value="Pix">Pix</option>
               <option value="Cartão na entrega">Cartão na entrega</option>
               <option value="Dinheiro">Dinheiro</option>
             </select>
           </div>
           <div>
-            <label for="clientAddressInput">Endereço completo</label>
-            <input type="text" id="clientAddressInput" placeholder="Rua, número, bairro — Catanduva/SP" />
+            <label for="cliAddress">Endereço de entrega</label>
+            <input type="text" id="cliAddress" placeholder="Rua, número, bairro — Catanduva/SP" />
           </div>
         </div>
-        <button class="btn btn-success" type="button" id="submitOrderBtn">Finalizar pedido</button>
+        <button class="btn-primary-green" type="button" id="sendOrderBtn">Finalizar pedido</button>
       </div>
+
+      <div style="display:flex;justify-content:space-between;align-items:center;margin:14px 0 8px;">
+        <h3 style="margin:0;font-size:1.12rem;">Meus pedidos</h3>
+        <button class="f-pill" type="button" id="refreshOrdersBtn">Atualizar</button>
+      </div>
+      <div id="myOrdersList"></div>
     </section>
 
-    <!-- ABA PEDIDOS -->
-    <section id="tab-orders" class="hidden">
-      <div class="section-head">
-        <h3 class="section-title">Meus pedidos</h3>
-        <button class="btn btn-outline btn-sm" type="button" id="reloadOrdersBtn">Atualizar</button>
+    <!-- ABA CONTA -->
+    <section id="tab-account" class="hidden">
+      <div class="card-box">
+        <h3 style="margin:0 0 10px;font-size:1.15rem;">Minha conta e endereço</h3>
+        <div class="grid-2">
+          <div>
+            <label for="accName">Nome</label>
+            <input type="text" id="accName" placeholder="Seu nome" />
+          </div>
+          <div>
+            <label for="accPhone">Telefone / WhatsApp</label>
+            <input type="tel" id="accPhone" placeholder="(17) 99999-0000" />
+          </div>
+        </div>
+        <div style="margin-top:10px;">
+          <label for="accAddress">Endereço padrão</label>
+          <input type="text" id="accAddress" placeholder="Rua, número, bairro — Catanduva/SP" />
+        </div>
+        <button class="btn-primary-green" type="button" id="saveAccountBtn">Salvar dados</button>
       </div>
-      <div id="ordersList"></div>
     </section>
   </main>
 
-  <nav class="bottom-nav">
-    <button class="nav-btn active" data-tab="tab-home" type="button">Início</button>
-    <button class="nav-btn" data-tab="tab-categories" type="button">Categorias</button>
-    <button class="nav-btn" data-tab="tab-cart" type="button">Sacola (<span id="navCartCount">0</span>)</button>
-    <button class="nav-btn" data-tab="tab-orders" type="button">Pedidos</button>
+  <div class="floating-promo-bar" id="floatingPromoBar">
+    <span>🎁 R$ 7,99 OFF na entrega acima de R$ 20</span>
+    <button class="f-pill active" style="padding:5px 12px;font-size:0.82rem;background:var(--yellow);color:#111827;" type="button" onclick="applyQuickFilter('free')">Ver</button>
+  </div>
+
+  <nav class="bottom-bar">
+    <button class="b-nav-btn active" data-tab="tab-home" type="button">
+      <span style="font-size:1.15rem;">🏠</span>
+      <span>Início</span>
+    </button>
+    <button class="b-nav-btn" data-tab="tab-orders" type="button">
+      <span style="font-size:1.15rem;">🧾</span>
+      <span>Pedidos (<span id="bottomCartCount">0</span>)</span>
+    </button>
+    <button class="b-nav-btn" data-tab="tab-account" type="button">
+      <span style="font-size:1.15rem;">👤</span>
+      <span>Conta</span>
+    </button>
   </nav>
 
   <script>
-    function svgArt(bg1, bg2, emoji, label) {
-      const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="320" height="200" viewBox="0 0 320 200">
-        <defs>
-          <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stop-color="${bg1}"/>
-            <stop offset="100%" stop-color="${bg2}"/>
-          </linearGradient>
-        </defs>
-        <rect width="320" height="200" rx="18" fill="url(#g)"/>
-        <circle cx="160" cy="84" r="42" fill="rgba(255,255,255,0.22)"/>
-        <text x="160" y="98" text-anchor="middle" font-size="44">${emoji}</text>
-        <text x="160" y="156" text-anchor="middle" fill="#ffffff" font-family="system-ui,sans-serif" font-size="18" font-weight="800">${label}</text>
+    function makeImg(c1, c2, emoji, text) {
+      const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="320" height="220" viewBox="0 0 320 220">
+        <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="${c1}"/><stop offset="100%" stop-color="${c2}"/></linearGradient></defs>
+        <rect width="320" height="220" rx="16" fill="url(#g)"/>
+        <circle cx="160" cy="92" r="46" fill="rgba(255,255,255,0.22)"/>
+        <text x="160" y="108" text-anchor="middle" font-size="48">${emoji}</text>
+        <text x="160" y="172" text-anchor="middle" fill="#ffffff" font-family="system-ui,sans-serif" font-size="18" font-weight="800">${text}</text>
       </svg>`;
       return "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(svg);
     }
 
-    const BANNER_SVG = svgArt("#0284c7", "#0f766e", "🛵", "RotaSabor • Entrega Rápida");
-
     const CATEGORIES = [
-      { id: "lanches", name: "Lanches", img: svgArt("#ea580c", "#facc15", "🍔", "Lanches"), subs: ["Smash & Artesanais", "X-Tudo & Combos", "Hot Dog & Porções"] },
-      { id: "marmitas", name: "Marmitas", img: svgArt("#16a34a", "#0d9488", "🍱", "Marmitas"), subs: ["Prato Executivo", "Fitness & Leves", "Caseira do Dia"] },
-      { id: "pizzas", name: "Pizzas", img: svgArt("#dc2626", "#f59e0b", "🍕", "Pizzas"), subs: ["Tradicionais", "Especiais", "Broto & Bordas"] },
-      { id: "doces", name: "Doces", img: svgArt("#9333ea", "#ec4899", "🍰", "Doces"), subs: ["Bolos & Fatias", "Açaí & Sobremesas", "Bebidas Geladas"] }
+      { id: "marmita", name: "Marmita", img: makeImg("#16a34a", "#15803d", "🍱", "Marmita") },
+      { id: "lanches", name: "Lanches", img: makeImg("#ea580c", "#c2410c", "🍔", "Lanches") },
+      { id: "pastel", name: "Pastel", img: makeImg("#eab308", "#ca8a04", "🥟", "Pastel") },
+      { id: "pizza", name: "Pizza", img: makeImg("#dc2626", "#991b1b", "🍕", "Pizza") },
+      { id: "doces", name: "Doces", img: makeImg("#9333ea", "#6b21a8", "🍰", "Doces") },
+      { id: "japonesa", name: "Japonesa", img: makeImg("#0284c7", "#0369a1", "🍣", "Japonesa") }
     ];
 
-    const DEFAULT_ITEMS = [
-      { id: "p1", categoryId: "lanches", subcat: "X-Tudo & Combos", section: "Ofertas do dia", name: "X-Tudo Caprichado", price: 26.90, oldPrice: 34.90, discount: "23% OFF", img: svgArt("#c2410c", "#eab308", "🍔", "X-Tudo") },
-      { id: "p2", categoryId: "lanches", subcat: "Smash & Artesanais", section: "Mais vendidos", name: "Duplo Smash Bacon", price: 24.50, oldPrice: 29.00, discount: "15% OFF", img: svgArt("#b45309", "#f97316", "🥓", "Smash") },
-      { id: "p3", categoryId: "lanches", subcat: "Hot Dog & Porções", section: "Escolhido a dedo", name: "Batata Frita Especial", price: 16.00, oldPrice: 21.00, discount: "24% OFF", img: svgArt("#ca8a04", "#facc15", "🍟", "Batata") },
-      { id: "p4", categoryId: "marmitas", subcat: "Caseira do Dia", section: "Ofertas do dia", name: "Marmita Caseira Completa", price: 19.90, oldPrice: 24.00, discount: "17% OFF", img: svgArt("#15803d", "#22c55e", "🍱", "Marmita") },
-      { id: "p5", categoryId: "marmitas", subcat: "Fitness & Leves", section: "Mais vendidos", name: "Frango Grelhado + Legumes", price: 21.50, oldPrice: null, discount: null, img: svgArt("#0f766e", "#14b8a6", "🥗", "Fitness") },
-      { id: "p6", categoryId: "pizzas", subcat: "Tradicionais", section: "Mais vendidos", name: "Pizza Calabresa Acebolada", price: 38.00, oldPrice: 46.00, discount: "17% OFF", img: svgArt("#b91c1c", "#ef4444", "🍕", "Pizza") },
-      { id: "p7", categoryId: "doces", subcat: "Bebidas Geladas", section: "Ofertas do dia", name: "Refrigerante Lata Gelado", price: 6.00, oldPrice: null, discount: null, img: svgArt("#0369a1", "#38bdf8", "🥤", "Bebida") },
-      { id: "p8", categoryId: "doces", subcat: "Bolos & Fatias", section: "Escolhido a dedo", name: "Fatia de Bolo Chocolate", price: 12.50, oldPrice: 15.00, discount: "17% OFF", img: svgArt("#7e22ce", "#c026d3", "🍫", "Bolo") }
+    const SEED_STORES = [
+      {
+        id: 1,
+        name: "Restaurante Original - marmitaria",
+        category: "Brasileira, Marmitas",
+        rating: "4.6",
+        reviews: "30+",
+        delivery_fee: 6.00,
+        old_fee: 13.99,
+        prep_time: "16 a 31 min",
+        distance: "4,8 km",
+        is_open: true,
+        tags: ["Itens até 90% OFF", "15% OFF acima de R$ 60"],
+        logo: makeImg("#111827", "#374151", "🍽️", "Original"),
+        banner: makeImg("#14532d", "#166534", "🍱", "Restaurante Original"),
+        items: [
+          { id: "m1", sec: "Ofertas do dia", tag: "60% OFF", name: "Marmita P - Peito de Frango", desc: "Acompanha arroz branco, feijão carioca, farofa crocante e salada.", price: 9.90, oldPrice: 24.98, img: makeImg("#16a34a", "#0f766e", "🍗", "Marmita P") },
+          { id: "m2", sec: "Ofertas do dia", tag: "1º pedido", name: "Marmita M - Contrafilé e Frango", desc: "Arroz, feijão, batata frita, contrafilé grelhado e filé de frango.", price: 9.00, oldPrice: 30.00, img: makeImg("#b45309", "#78350f", "🥩", "Marmita M") },
+          { id: "m3", sec: "Mais vendidos", tag: "40% OFF", name: "Marmita G - Linguiça Costela", desc: "Acompanha arroz branco, feijão carioca, farofa crocante e mandioca.", price: 30.00, oldPrice: 50.00, img: makeImg("#991b1b", "#7f1d1d", "🍖", "Marmita G") },
+          { id: "m4", sec: "Escolhido a dedo", tag: "70% OFF", name: "Marmita M - Contrafilé e Fritas", desc: "Porção caprichada com contrafile, batata frita, arroz e feijão.", price: 18.00, oldPrice: 30.00, img: makeImg("#047857", "#065f46", "🍟", "Contrafilé") }
+        ]
+      },
+      {
+        id: 2,
+        name: "Luizão Lanches",
+        category: "Lanches, Hambúrguer",
+        rating: "5.0",
+        reviews: "40+",
+        delivery_fee: 0.00,
+        old_fee: 9.99,
+        prep_time: "13 a 28 min",
+        distance: "2,2 km",
+        is_open: true,
+        tags: ["TOP", "Itens até 60% OFF"],
+        logo: makeImg("#f59e0b", "#d97706", "🍔", "Luizão"),
+        banner: makeImg("#7c2d12", "#9a3412", "🍔", "Luizão Lanches"),
+        items: [
+          { id: "l1", sec: "Ofertas do dia", tag: "50% OFF", name: "X-Tudinho", desc: "Pão, hambúrguer, presunto, queijo, bacon, milho, alface e tomate.", price: 21.00, oldPrice: 41.99, img: makeImg("#ea580c", "#c2410c", "🍔", "X-Tudinho") },
+          { id: "l2", sec: "Ofertas do dia", tag: "44% OFF", name: "X-Tudo", desc: "Duplo hambúrguer, bacon crocante, calabresa, presunto, queijo e ovos.", price: 31.99, oldPrice: 56.99, img: makeImg("#b91c1c", "#991b1b", "🥪", "X-Tudo") },
+          { id: "l3", sec: "Mais vendidos", tag: "60% OFF", name: "Hot Dog Simples", desc: "Salsicha, molho especial da casa, batata palha, milho e maionese.", price: 9.90, oldPrice: 24.99, img: makeImg("#d97706", "#b45309", "🌭", "Hot Dog") }
+        ]
+      },
+      {
+        id: 3,
+        name: "Pastel D'villa",
+        category: "Pastel, Salgados",
+        rating: "5.0",
+        reviews: "100+",
+        delivery_fee: 8.00,
+        old_fee: 15.99,
+        prep_time: "17 a 32 min",
+        distance: "5,6 km",
+        is_open: true,
+        tags: ["Itens até 100% OFF"],
+        logo: makeImg("#fef08a", "#fde047", "🥟", "D'villa"),
+        banner: makeImg("#a16207", "#854d0e", "🥟", "Pastel D'villa"),
+        items: [
+          { id: "p1", sec: "Ofertas do dia", tag: "30% OFF", name: "Pastel Carne com Mussarela", desc: "Massa crocante frita na hora com carne temperada e mussarela.", price: 17.49, oldPrice: 24.99, img: makeImg("#ca8a04", "#a16207", "🥟", "Pastel Carne") },
+          { id: "p2", sec: "Mais vendidos", tag: "30% OFF", name: "Pastel de Costela Especial", desc: "Costela desfiada suculenta com requeijão cremoso.", price: 19.59, oldPrice: 27.99, img: makeImg("#b45309", "#92400e", "🥩", "Costela") },
+          { id: "p3", sec: "Escolhido a dedo", tag: "20% OFF", name: "Pastel Nutella (180g)", desc: "Recheio farto de chocolate/avelã bem quentinho.", price: 28.80, oldPrice: 36.00, img: makeImg("#7e22ce", "#6b21a8", "🍫", "Nutella") }
+        ]
+      }
     ];
 
-    let stores = [];
-    let catalogItems = [...DEFAULT_ITEMS];
-    let selectedStore = null;
-    let selectedCategoryId = "";
-    let selectedSubcat = "";
-    let selectedFilter = "all";
-    let showcaseSection = "Todas";
+    let storesData = [...SEED_STORES];
+    let activeCat = "";
+    let activeFilter = "all";
+    let openedStore = null;
+    let openedTab = "Ofertas do dia";
     let cart = JSON.parse(localStorage.getItem("rotasabor_cart") || "[]");
 
-    const fmtBRL = (v) => Number(v || 0).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+    const brl = (n) => Number(n || 0).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
-    function applyTheme() {
-      const saved = localStorage.getItem("rotasabor_client_theme") || "dark";
-      const isLight = saved === "light";
-      document.body.classList.toggle("theme-light", isLight);
-      document.getElementById("themeIcon").textContent = isLight ? "🌙" : "☀️";
-      document.getElementById("themeLabel").textContent = isLight ? "Preto" : "Claro";
-    }
-
-    document.getElementById("themeToggleBtn").addEventListener("click", () => {
-      const next = document.body.classList.contains("theme-light") ? "dark" : "light";
-      localStorage.setItem("rotasabor_client_theme", next);
-      applyTheme();
-    });
-
-    function showToast(msg) {
+    function toast(msg) {
       const el = document.getElementById("toastBox");
       el.textContent = msg;
       el.style.display = "block";
-      clearTimeout(window._toastTimer);
-      window._toastTimer = setTimeout(() => { el.style.display = "none"; }, 2600);
+      clearTimeout(window._t);
+      window._t = setTimeout(() => { el.style.display = "none"; }, 2400);
     }
 
-    function switchTab(tabId) {
-      document.querySelectorAll("main > section").forEach((sec) => sec.classList.add("hidden"));
-      document.getElementById(tabId).classList.remove("hidden");
-      document.querySelectorAll(".nav-btn").forEach((btn) => btn.classList.toggle("active", btn.dataset.tab === tabId));
-      if (tabId === "tab-cart") renderCart();
-      if (tabId === "tab-orders") loadOrders();
-      if (tabId === "tab-categories") renderCategoriesTab();
-    }
-
-    document.querySelectorAll(".nav-btn").forEach((b) => b.addEventListener("click", () => switchTab(b.dataset.tab)));
-    document.getElementById("openCartTopBtn").addEventListener("click", () => switchTab("tab-cart"));
-
-    function syncProfileFields() {
-      const savedAddr = localStorage.getItem("rotasabor_client_addr") || "";
-      const savedName = localStorage.getItem("rotasabor_client_name") || "";
-      const savedPhone = localStorage.getItem("rotasabor_client_phone") || "";
-      const addrInput = document.getElementById("clientAddressInput");
-      const nameInput = document.getElementById("clientNameInput");
-      const phoneInput = document.getElementById("clientPhoneInput");
-      if (savedAddr && !addrInput.value) addrInput.value = savedAddr;
-      if (savedName && !nameInput.value) nameInput.value = savedName;
-      if (savedPhone && !phoneInput.value) phoneInput.value = savedPhone;
-      document.getElementById("topAddressText").textContent = savedAddr || "Catanduva - SP • Endereço";
-    }
-
-    document.getElementById("editAddressTopBtn").addEventListener("click", () => {
-      const current = localStorage.getItem("rotasabor_client_addr") || "Catanduva - SP";
-      const next = prompt("Informe seu endereço de entrega:", current);
-      if (next !== null) {
-        const trimmed = next.trim();
-        localStorage.setItem("rotasabor_client_addr", trimmed);
-        document.getElementById("clientAddressInput").value = trimmed;
-        syncProfileFields();
+    function switchMainTab(tabId) {
+      ["tab-home", "tab-orders", "tab-account"].forEach((id) => {
+        document.getElementById(id).classList.toggle("hidden", id !== tabId);
+      });
+      document.querySelectorAll(".b-nav-btn").forEach((btn) => {
+        btn.classList.toggle("active", btn.dataset.tab === tabId);
+      });
+      document.getElementById("floatingPromoBar").classList.toggle("hidden", tabId !== "tab-home");
+      if (tabId === "tab-orders") {
+        renderCart();
+        loadMyOrders();
       }
+    }
+
+    document.querySelectorAll(".b-nav-btn").forEach((b) => {
+      b.addEventListener("click", () => switchMainTab(b.dataset.tab));
+    });
+    document.getElementById("topCartBtn").addEventListener("click", () => switchMainTab("tab-orders"));
+
+    function syncClientProfile() {
+      const addr = localStorage.getItem("rotasabor_client_addr") || "235 Rua Camanducaia, Catanduva - SP";
+      const name = localStorage.getItem("rotasabor_client_name") || "";
+      const phone = localStorage.getItem("rotasabor_client_phone") || "";
+      document.getElementById("topAddressLabel").textContent = addr;
+      if (!document.getElementById("cliAddress").value) document.getElementById("cliAddress").value = addr;
+      if (!document.getElementById("accAddress").value) document.getElementById("accAddress").value = addr;
+      if (!document.getElementById("cliName").value && name) document.getElementById("cliName").value = name;
+      if (!document.getElementById("accName").value && name) document.getElementById("accName").value = name;
+      if (!document.getElementById("cliPhone").value && phone) document.getElementById("cliPhone").value = phone;
+      if (!document.getElementById("accPhone").value && phone) document.getElementById("accPhone").value = phone;
+    }
+
+    document.getElementById("topAddressBtn").addEventListener("click", () => {
+      const cur = localStorage.getItem("rotasabor_client_addr") || "235 Rua Camanducaia, Catanduva - SP";
+      const next = prompt("Informe seu endereço de entrega:", cur);
+      if (next && next.trim()) {
+        localStorage.setItem("rotasabor_client_addr", next.trim());
+        document.getElementById("cliAddress").value = next.trim();
+        document.getElementById("accAddress").value = next.trim();
+        syncClientProfile();
+      }
+    });
+
+    document.getElementById("saveAccountBtn").addEventListener("click", () => {
+      const name = document.getElementById("accName").value.trim();
+      const phone = document.getElementById("accPhone").value.trim();
+      const addr = document.getElementById("accAddress").value.trim();
+      if (name) localStorage.setItem("rotasabor_client_name", name);
+      if (phone) localStorage.setItem("rotasabor_client_phone", phone);
+      if (addr) localStorage.setItem("rotasabor_client_addr", addr);
+      syncClientProfile();
+      toast("Dados salvos");
     });
 
     function saveCart() {
       localStorage.setItem("rotasabor_cart", JSON.stringify(cart));
-      const count = cart.reduce((acc, i) => acc + Number(i.qty || 1), 0);
-      document.getElementById("topCartCount").textContent = String(count);
-      document.getElementById("navCartCount").textContent = String(count);
+      const qty = cart.reduce((s, x) => s + Number(x.qty || 1), 0);
+      document.getElementById("topCartBadge").textContent = String(qty);
+      document.getElementById("bottomCartCount").textContent = String(qty);
     }
 
-    function addToCart(product, storeObj = null) {
-      const targetStore = storeObj || selectedStore || stores[0] || { id: 1, name: "RotaSabor", delivery_fee: 8 };
-      if (cart.length > 0 && String(cart[0].store_id) !== String(targetStore.id)) {
-        const ok = confirm(`Sua sacola tem itens de "${cart[0].store_name}". Deseja limpar e adicionar de "${targetStore.name}"?`);
+    function addItem(ev, item, storeObj) {
+      if (ev) ev.stopPropagation();
+      const st = storeObj || openedStore || storesData[0];
+      if (cart.length && String(cart[0].store_id) !== String(st.id)) {
+        const ok = confirm(`A sacola tem itens de "${cart[0].store_name}". Trocar para "${st.name}"?`);
         if (!ok) return;
         cart = [];
       }
-
-      const existing = cart.find((i) => String(i.id) === String(product.id));
-      if (existing) {
-        existing.qty += 1;
+      const found = cart.find((x) => String(x.id) === String(item.id));
+      if (found) {
+        found.qty += 1;
       } else {
         cart.push({
-          id: product.id,
-          name: product.name,
-          price: Number(product.price),
+          id: item.id,
+          name: item.name,
+          price: Number(item.price || 0),
           qty: 1,
-          store_id: targetStore.id,
-          store_name: targetStore.name,
-          delivery_fee: Number(targetStore.delivery_fee ?? targetStore.default_delivery_fee ?? 8)
+          store_id: st.id,
+          store_name: st.name,
+          delivery_fee: Number(st.delivery_fee || 0)
         });
       }
       saveCart();
-      showToast(`${product.name} adicionado à sacola`);
+      toast(`${item.name} adicionado (+)`);
     }
 
-    function renderCategoryStrips() {
-      const makeStripHtml = (includeAll) => {
-        const allBtn = includeAll
-          ? `<button class="cat-item ${selectedCategoryId === "" ? "active" : ""}" data-cat="" type="button">
-               <div class="cat-thumb" style="display:flex;align-items:center;justify-content:center;font-weight:900;font-size:1.05rem;">ALL</div>
-               <span>Tudo</span>
-             </button>`
+    function renderCategories() {
+      const el = document.getElementById("categoryStrip");
+      el.innerHTML = CATEGORIES.map((c) => `
+        <button class="cat-pill-card ${activeCat === c.id ? "active" : ""}" type="button" onclick="toggleCat('${c.id}')">
+          <img class="cat-circle-img" src="${c.img}" alt="${c.name}" />
+          <span>${c.name}</span>
+        </button>
+      `).join("");
+    }
+
+    function toggleCat(catId) {
+      activeCat = activeCat === catId ? "" : catId;
+      renderCategories();
+      renderStoresFeed();
+    }
+
+    function applyQuickFilter(flt) {
+      activeFilter = activeFilter === flt && flt !== "all" ? "all" : flt;
+      document.querySelectorAll("#filterPillsRow .f-pill").forEach((b) => {
+        b.classList.toggle("active", b.dataset.filter === activeFilter);
+      });
+      renderStoresFeed();
+    }
+
+    document.querySelectorAll("#filterPillsRow .f-pill").forEach((btn) => {
+      btn.addEventListener("click", () => applyQuickFilter(btn.dataset.filter));
+    });
+
+    document.getElementById("searchInput").addEventListener("input", () => {
+      if (openedStore) {
+        renderStoreDetail();
+      } else {
+        renderStoresFeed();
+      }
+    });
+
+    function openStoreDetail(storeId) {
+      openedStore = storesData.find((s) => String(s.id) === String(storeId)) || null;
+      openedTab = "Ofertas do dia";
+      document.getElementById("homeFeedView").classList.add("hidden");
+      document.getElementById("storeDetailView").classList.remove("hidden");
+      renderStoreDetail();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function closeStoreDetail() {
+      openedStore = null;
+      document.getElementById("storeDetailView").classList.add("hidden");
+      document.getElementById("homeFeedView").classList.remove("hidden");
+    }
+
+    function renderStoreDetail() {
+      const box = document.getElementById("storeDetailView");
+      if (!openedStore) return;
+      const st = openedStore;
+      const q = (document.getElementById("searchInput").value || "").trim().toLowerCase();
+      const fee = Number(st.delivery_fee || 0);
+      const tabs = ["Ofertas do dia", "Mais vendidos", "Escolhido a dedo"];
+
+      const filteredItems = (st.items || []).filter((it) => {
+        if (q && !`${it.name} ${it.desc || ""}`.toLowerCase().includes(q)) return false;
+        if (openedTab === "Ofertas do dia") return true;
+        return it.sec === openedTab || !it.sec;
+      });
+
+      const carouselItems = filteredItems.slice(0, 6);
+
+      box.innerHTML = `
+        <div class="store-detail-hero">
+          <img class="store-detail-banner" src="${st.banner || st.logo}" alt="${st.name}" />
+          <div class="detail-top-overlay">
+            <button class="circle-icon-btn" type="button" onclick="closeStoreDetail()">‹</button>
+            <div style="display:flex;gap:8px;">
+              <button class="circle-icon-btn" type="button" onclick="switchMainTab('tab-orders')">🛒</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="detail-store-card">
+          <div style="display:flex;gap:12px;align-items:center;">
+            <img class="store-avatar" src="${st.logo}" alt="${st.name}" />
+            <div style="flex:1;min-width:0;">
+              <h2 class="store-title">${st.name} ›</h2>
+              <div class="store-rating-line">
+                <span>${st.category}</span>
+                <span>•</span>
+                <span class="star-txt">★ ${st.rating}</span>
+                <span class="muted-txt">(${st.reviews}) ›</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="detail-metrics-box">
+            <div>
+              <div class="metric-val" style="color:var(--green);">⚡ ${st.prep_time}</div>
+              <div class="metric-lbl">Horário Garantido ›</div>
+            </div>
+            <div>
+              <div class="metric-val">${fee === 0 ? "Grátis" : brl(fee)}</div>
+              <div class="metric-lbl">${st.old_fee ? `<span class="strike-price">${brl(st.old_fee)}</span> ›` : "Entrega ›"}</div>
+            </div>
+            <div>
+              <div class="metric-val">RotaSabor</div>
+              <div class="metric-lbl">Entrega ›</div>
+            </div>
+          </div>
+
+          <div class="promo-tags-row" style="margin-top:10px;">
+            ${(st.tags || []).map((t) => `<span class="tag-yellow">${t}</span>`).join("")}
+          </div>
+        </div>
+
+        <div class="detail-tabs">
+          ${tabs.map((t) => `
+            <button class="d-tab-btn ${openedTab === t ? "active" : ""}" type="button" onclick="selectDetailTab('${t}')">${t}</button>
+          `).join("")}
+        </div>
+
+        <h3 style="margin:6px 0 10px;font-size:1.1rem;">🔥 ${openedTab}</h3>
+        <div class="prod-carousel" style="margin-bottom:16px;">
+          ${carouselItems.map((it) => `
+            <div class="mini-prod-card">
+              <div class="mini-img-wrap">
+                <img src="${it.img}" alt="${it.name}" />
+                ${it.tag ? `<span class="off-badge">${it.tag}</span>` : ""}
+                <button class="plus-circle" type="button" onclick='addItem(event, ${JSON.stringify(it)}, ${JSON.stringify(st)})'>+</button>
+              </div>
+              <div class="mini-price">${brl(it.price)}</div>
+              ${it.oldPrice ? `<div class="mini-old">${brl(it.oldPrice)}</div>` : ""}
+              <div class="mini-name">${it.name}</div>
+            </div>
+          `).join("")}
+        </div>
+
+        <h3 style="margin:12px 0 4px;font-size:1.1rem;">Cardápio completo</h3>
+        ${filteredItems.map((it) => `
+          <div class="menu-row-item">
+            <div style="flex:1;min-width:0;">
+              ${it.tag ? `<span class="tag-yellow" style="margin-bottom:4px;display:inline-block;">${it.tag}</span>` : ""}
+              <div style="font-size:1.04rem;font-weight:800;">${it.name}</div>
+              <div class="muted-txt" style="margin-top:3px;">${it.desc || ""}</div>
+              <div style="margin-top:6px;">
+                <strong style="color:var(--green);font-size:1.05rem;">${brl(it.price)}</strong>
+                ${it.oldPrice ? `<span class="strike-price" style="margin-left:6px;font-size:0.88rem;">${brl(it.oldPrice)}</span>` : ""}
+              </div>
+            </div>
+            <div class="menu-row-img-wrap">
+              <img src="${it.img}" alt="${it.name}" />
+              <button class="plus-circle" type="button" onclick='addItem(event, ${JSON.stringify(it)}, ${JSON.stringify(st)})'>+</button>
+            </div>
+          </div>
+        `).join("")}
+      `;
+    }
+
+    function selectDetailTab(tabName) {
+      openedTab = tabName;
+      renderStoreDetail();
+    }
+
+    function renderStoresFeed() {
+      const box = document.getElementById("storesFeedContainer");
+      const q = (document.getElementById("searchInput").value || "").trim().toLowerCase();
+
+      let list = storesData.filter((s) => {
+        const hay = `${s.name} ${s.category} ${(s.items || []).map((i) => i.name).join(" ")}`.toLowerCase();
+        if (q && !hay.includes(q)) return false;
+        if (activeCat && !hay.includes(activeCat.slice(0, 5))) return false;
+        if (activeFilter === "free" && Number(s.delivery_fee || 0) > 0) return false;
+        if (activeFilter === "offers" && !(s.tags && s.tags.length)) return false;
+        if (activeFilter === "top" && parseFloat(s.rating || "0") < 4.8) return false;
+        return true;
+      });
+
+      if (!list.length) {
+        box.innerHTML = `<div class="card-box"><div class="muted-txt">Nenhum estabelecimento encontrado com esse filtro.</div></div>`;
+        return;
+      }
+
+      box.innerHTML = list.map((s) => {
+        const fee = Number(s.delivery_fee || 0);
+        return `
+          <article class="store-block">
+            <div class="store-header-row" onclick="openStoreDetail(${s.id})">
+              <div style="position:relative;width:56px;height:56px;flex-shrink:0;">
+                <img class="store-avatar" src="${s.logo}" alt="${s.name}" />
+                ${!s.is_open ? `<div class="tag-closed">Fechado</div>` : ""}
+              </div>
+              <div style="flex:1;min-width:0;">
+                <h3 class="store-title">${s.name}</h3>
+                <div class="store-rating-line">
+                  <span class="star-txt">★ ${s.rating}</span>
+                  <span class="muted-txt">(${s.reviews})</span>
+                  <span>•</span>
+                  <span>${fee === 0 ? `<strong style="color:var(--green);">Grátis</strong>` : brl(fee)}</span>
+                  ${s.old_fee ? `<span class="strike-price">${brl(s.old_fee)}</span>` : ""}
+                  <span class="muted-txt">• ${s.prep_time} • ${s.distance}</span>
+                </div>
+                <div class="promo-tags-row">
+                  ${(s.tags || []).map((tg) => `<span class="tag-yellow">${tg}</span>`).join("")}
+                </div>
+              </div>
+            </div>
+
+            <div class="prod-carousel">
+              ${(s.items || []).map((it) => `
+                <div class="mini-prod-card" onclick="openStoreDetail(${s.id})" style="cursor:pointer;">
+                  <div class="mini-img-wrap">
+                    <img src="${it.img}" alt="${it.name}" />
+                    ${it.tag ? `<span class="off-badge">${it.tag}</span>` : ""}
+                    <button class="plus-circle" type="button" onclick='addItem(event, ${JSON.stringify(it)}, ${JSON.stringify(s)})'>+</button>
+                  </div>
+                  <div class="mini-price">${brl(it.price)}</div>
+                  ${it.oldPrice ? `<div class="mini-old">${brl(it.oldPrice)}</div>` : ""}
+                  <div class="mini-name">${it.name}</div>
+                </div>
+              `).join("")}
+            </div>
+          </article>
+        `;
+      }).join("");
+    }
+
+    function changeCartQty(idx, delta) {
+      if (!cart[idx]) return;
+      cart[idx].qty = Number(cart[idx].qty || 1) + delta;
+      if (cart[idx].qty <= 0) cart.splice(idx, 1);
+      saveCart();
+      renderCart();
+    }
+
+    function renderCart() {
+      const box = document.getElementById("cartBox");
+      if (!cart.length) {
+        box.innerHTML = `<div class="muted-txt">Sua sacola está vazia. Toque no botão + de qualquer produto.</div>`;
+        document.getElementById("subTotalText").textContent = "Itens: R$ 0,00";
+        document.getElementById("deliveryFeeText").textContent = "Taxa de entrega: R$ 0,00";
+        document.getElementById("totalOrderText").textContent = "Total: R$ 0,00";
+        return;
+      }
+
+      box.innerHTML = cart.map((item, idx) => `
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--border);">
+          <div>
+            <strong>${item.name}</strong>
+            <div class="muted-txt">${item.store_name} • ${brl(item.price)}</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px;">
+            <button class="f-pill" type="button" onclick="changeCartQty(${idx}, -1)">-</button>
+            <strong>${item.qty}</strong>
+            <button class="f-pill" type="button" onclick="changeCartQty(${idx}, 1)">+</button>
+          </div>
+        </div>
+      `).join("");
+
+      const sub = cart.reduce((s, x) => s + Number(x.price || 0) * Number(x.qty || 1), 0);
+      const fee = Number(cart[0]?.delivery_fee || 0);
+      document.getElementById("subTotalText").textContent = `Itens: ${brl(sub)}`;
+      document.getElementById("deliveryFeeText").textContent = `Taxa de entrega: ${brl(fee)}`;
+      document.getElementById("totalOrderText").textContent = `Total: ${brl(sub + fee)}`;
+    }
+
+    document.getElementById("sendOrderBtn").addEventListener("click", async () => {
+      if (!cart.length) {
+        toast("Adicione itens na sacola primeiro");
+        return;
+      }
+      const name = document.getElementById("cliName").value.trim();
+      const phone = document.getElementById("cliPhone").value.trim();
+      const addr = document.getElementById("cliAddress").value.trim();
+      const digits = phone.replace(/\D/g, "");
+      if (!name || digits.length < 8 || !addr) {
+        toast("Preencha nome, celular válido e endereço");
+        return;
+      }
+      localStorage.setItem("rotasabor_client_name", name);
+      localStorage.setItem("rotasabor_client_phone", phone);
+      localStorage.setItem("rotasabor_client_addr", addr);
+      syncClientProfile();
+
+      const sub = cart.reduce((s, x) => s + Number(x.price || 0) * Number(x.qty || 1), 0);
+      const fee = Number(cart[0]?.delivery_fee || 0);
+
+      try {
+        const res = await fetch("/api/orders", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            store_id: cart[0].store_id,
+            store_name: cart[0].store_name,
+            client_name: name,
+            client_phone: digits,
+            client_address: addr,
+            items_total: Number(sub.toFixed(2)),
+            delivery_fee: Number(fee.toFixed(2))
+          })
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) {
+          toast(data.error || "Erro ao enviar pedido");
+          return;
+        }
+        cart = [];
+        saveCart();
+        renderCart();
+        toast(`Pedido enviado! 4 últimos dígitos: ${digits.slice(-4)}`);
+        loadMyOrders();
+      } catch (_) {
+        toast("Falha de conexão ao enviar pedido");
+      }
+    });
+
+    async function loadMyOrders() {
+      const box = document.getElementById("myOrdersList");
+      try {
+        const res = await fetch("/api/orders");
+        const list = res.ok ? await res.json() : [];
+        if (!Array.isArray(list) || !list.length) {
+          box.innerHTML = `<div class="card-box"><div class="muted-txt">Nenhum pedido encontrado no momento.</div></div>`;
+          return;
+        }
+        box.innerHTML = [...list].reverse().map((o) => {
+          const last4 = String(o.client_phone || "").replace(/\D/g, "").slice(-4);
+          return `
+            <div class="card-box">
+              <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
+                <strong>${o.order_code || "#" + o.id} • ${o.store_name || "Estabelecimento"}</strong>
+                <span class="tag-yellow">${o.status || "Em andamento"}</span>
+              </div>
+              <div class="muted-txt" style="margin-top:4px;">📍 ${o.client_address || ""}</div>
+              <div class="muted-txt">Itens: ${brl(o.items_total)} • Entrega: ${brl(o.delivery_fee)}</div>
+              ${last4 ? `<div style="margin-top:8px;padding:8px 10px;border-radius:10px;background:var(--surface-soft);font-size:0.9rem;">Código de confirmação da entrega (4 últimos dígitos): <strong>${last4}</strong></div>` : ""}
+            </div>
+          `;
+        }).join("");
+      } catch (_) {
+        box.innerHTML = `<div class="card-box"><div class="muted-txt">Não foi possível atualizar os pedidos.</div></div>`;
+      }
+    }
+
+    async function mergeBackendStoresAndProducts() {
+      try {
+        const [sRes, pRes] = await Promise.all([fetch("/api/establishments"), fetch("/api/products")]);
+        if (sRes.ok) {
+          const apiStores = await sRes.json();
+          if (Array.isArray(apiStores) && apiStores.length) {
+            const mapped = apiStores.map((s, idx) => ({
+              id: s.id,
+              name: s.store_name || s.name || "Estabelecimento",
+              category: s.category || "Lanches & Refeições",
+              rating: "5.0",
+              reviews: "Novo",
+              delivery_fee: Number(s.default_delivery_fee ?? s.delivery_fee ?? 8),
+              old_fee: null,
+              prep_time: s.estimated_time || "25-35 min",
+              distance: "Catanduva",
+              is_open: true,
+              tags: ["RotaSabor"],
+              logo: CATEGORIES[idx % CATEGORIES.length].img,
+              banner: makeImg("#063b2c", "#0f766e", "🛵", s.store_name || s.name || "Loja"),
+              items: [...SEED_STORES[0].items]
+            }));
+            storesData = [...mapped, ...SEED_STORES];
+          }
+        }
+        if (pRes.ok) {
+          const apiProds = await pRes.json();
+          if (Array.isArray(apiProds) && apiProds.length && storesData.length) {
+            const customItems = apiProds.map((p) => ({
+              id: p.id,
+              sec: p.featured ? "Ofertas do dia" : "Mais vendidos",
+              tag: p.featured ? "DESTAQUE" : null,
+              name: p.name,
+              desc: p.description || "Produto cadastrado pela loja",
+              price: Number(p.price || 0),
+              oldPrice: null,
+              img: makeImg("#0f766e", "#15803d", "🍽️", p.name)
+            }));
+            storesData[0].items = [...customItems, ...storesData[0].items];
+          }
+        }
+      } catch (_) {}
+      renderStoresFeed();
+    }
+
+    document.getElementById("refreshOrdersBtn").addEventListener("click", loadMyOrders);
+
+    syncClientProfile();
+    saveCart();
+    renderCategories();
+    renderStoresFeed();
+    mergeBackendStoresAndProducts();
+  </script>
+</body>
+</html>
