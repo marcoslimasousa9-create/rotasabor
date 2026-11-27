@@ -55,18 +55,18 @@
       color: var(--text);
     }
 
-    /* MAPA EM TELA CHEIA PERMANENTE */
+    /* MAPA SEMPRE EM TELA CHEIA PERMANENTE */
     #fullscreenMap {
       position: fixed;
       inset: 0;
       width: 100vw;
       height: 100vh;
       z-index: 1;
-      background:
-        linear-gradient(rgba(34, 211, 238, 0.07) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(34, 211, 238, 0.07) 1px, transparent 1px),
-        #081629;
-      background-size: 38px 38px;
+      background: #081629;
+    }
+
+    body:not(.theme-light) .leaflet-tile-pane {
+      filter: invert(92%) hue-rotate(180deg) brightness(92%) contrast(105%) saturate(85%);
     }
 
     /* FAIXA DE DIREÇÃO SUPERIOR (ESTILO NAVEGAÇÃO) */
@@ -672,16 +672,27 @@
       }
       if (!map) {
         map = L.map("fullscreenMap", { zoomControl: false, attributionControl: false }).setView([currentLat, currentLng], 16);
-        const tiles = L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
+
+        const osmLayer = L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
           maxZoom: 19
         });
-        tiles.on("tileerror", () => {
-          if (mapInfo) mapInfo.textContent = "Mapa: grade local ativa";
+        const esriFallback = L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}", {
+          maxZoom: 19
         });
-        tiles.on("load", () => {
+
+        let fallbackSwitched = false;
+        osmLayer.on("tileerror", () => {
+          if (!fallbackSwitched) {
+            fallbackSwitched = true;
+            map.removeLayer(osmLayer);
+            esriFallback.addTo(map);
+            if (mapInfo) mapInfo.textContent = "Mapa: modo rua alternativo";
+          }
+        });
+        osmLayer.on("load", () => {
           if (mapInfo) mapInfo.textContent = "Mapa: ativo em tempo real";
         });
-        tiles.addTo(map);
+        osmLayer.addTo(map);
 
         courierMarker = L.circleMarker([currentLat, currentLng], {
           radius: 11,
@@ -842,7 +853,6 @@
       }
     }
 
-    /* MODAL DOS 4 DÍGITOS + PAGAMENTO + SOM DE GRANA */
     function openPinModal(order) {
       pendingPinOrder = order;
       const code = order.order_code || `RS-${String(order.id).padStart(3, "0")}`;
@@ -900,7 +910,6 @@
       }
     });
 
-    /* ONLINE & GPS AO VIVO */
     function syncOnlineUi() {
       const btn = document.getElementById("onlineHudBtn");
       btn.textContent = isOnline ? "● Online" : "● Offline";
@@ -982,7 +991,6 @@
 
     document.getElementById("recenterCircleBtn").addEventListener("click", recenterMap);
 
-    /* DADOS */
     async function loadCouriers() {
       try {
         const res = await fetch("/api/couriers");
