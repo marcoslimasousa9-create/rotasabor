@@ -1,1 +1,347 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>RotaSabor — Painel do Estabelecimento</title>
+  <meta name="theme-color" content="#0b1220" />
+  <link rel="icon" type="image/svg+xml" href="/static/icon.svg" />
+  <style>
+    :root {
+      --bg: #070c16;
+      --surface: #0f172a;
+      --surface-2: #162033;
+      --border: rgba(148, 163, 184, 0.16);
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --primary: #f59e0b;
+      --accent: #38bdf8;
+      --success: #22c55e;
+      --topbar-bg: rgba(11, 18, 32, 0.96);
+      --radius: 16px;
+    }
 
+    body.theme-light {
+      --bg: #f4f6f9;
+      --surface: #ffffff;
+      --surface-2: #eef2f6;
+      --border: rgba(15, 23, 42, 0.12);
+      --text: #0f172a;
+      --muted: #475569;
+      --primary: #d97706;
+      --accent: #0284c7;
+      --success: #16a34a;
+      --topbar-bg: rgba(255, 255, 255, 0.96);
+    }
+
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      padding-bottom: 48px;
+      transition: background-color 0.2s ease, color 0.2s ease;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: var(--topbar-bg);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 16px;
+    }
+
+    .topbar-row {
+      max-width: 980px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .title { font-size: 1.02rem; font-weight: 800; }
+    .sub { font-size: 0.76rem; color: var(--muted); }
+
+    .pill-btn {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 999px;
+      padding: 6px 12px;
+      font-size: 0.78rem;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .container {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 16px;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px;
+      margin-bottom: 12px;
+    }
+
+    .card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 10px;
+    }
+
+    .code-tag {
+      display: inline-block;
+      background: rgba(245, 158, 11, 0.18);
+      color: var(--primary);
+      border: 1px solid rgba(245, 158, 11, 0.35);
+      border-radius: 10px;
+      padding: 4px 10px;
+      font-size: 0.85rem;
+      font-weight: 900;
+      letter-spacing: 0.04em;
+    }
+
+    .meta {
+      color: var(--muted);
+      font-size: 0.82rem;
+      margin-top: 4px;
+    }
+
+    label {
+      display: block;
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-bottom: 4px;
+      font-weight: 700;
+    }
+
+    select {
+      width: 100%;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 10px 12px;
+      border-radius: 10px;
+      font-size: 0.9rem;
+    }
+
+    .btn-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .btn {
+      border: none;
+      border-radius: 11px;
+      padding: 10px 13px;
+      font-weight: 800;
+      font-size: 0.84rem;
+      cursor: pointer;
+    }
+
+    .btn-primary { background: var(--primary); color: #090d16; }
+    .btn-success { background: var(--success); color: #04130d; }
+    .btn-outline { background: var(--surface-2); color: var(--text); border: 1px solid var(--border); }
+
+    .badge {
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 800;
+      background: rgba(56, 189, 248, 0.16);
+      color: var(--accent);
+      white-space: nowrap;
+    }
+
+    .badge.ready {
+      background: rgba(34, 197, 94, 0.16);
+      color: var(--success);
+    }
+
+    .toast {
+      position: fixed;
+      top: 72px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--surface-2);
+      border: 1px solid var(--primary);
+      color: var(--text);
+      padding: 10px 16px;
+      border-radius: 12px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      z-index: 50;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-row">
+      <div>
+        <div class="title">RotaSabor • Estabelecimento</div>
+        <div class="sub">Preparo, etiqueta do código e baixa para coleta</div>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <button class="pill-btn" type="button" id="themeToggleBtn">Tema</button>
+        <button class="pill-btn" type="button" id="refreshBtn">Atualizar</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="toast" id="toastBox"></div>
+
+  <main class="container">
+    <div class="card">
+      <label for="storeSelect">Estabelecimento</label>
+      <select id="storeSelect">
+        <option value="">Todos os estabelecimentos...</option>
+      </select>
+      <div class="meta">Use o <strong>código do pedido</strong> na embalagem/sacola para o entregador conferir na retirada.</div>
+    </div>
+
+    <div id="ordersContainer"></div>
+  </main>
+
+  <script>
+    let stores = [];
+    let orders = [];
+
+    const fmtBRL = (v) => Number(v || 0).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+
+    function applyTheme() {
+      const saved = localStorage.getItem("rotasabor_store_theme") || "dark";
+      document.body.classList.toggle("theme-light", saved === "light");
+    }
+
+    document.getElementById("themeToggleBtn").addEventListener("click", () => {
+      const next = document.body.classList.contains("theme-light") ? "dark" : "light";
+      localStorage.setItem("rotasabor_store_theme", next);
+      applyTheme();
+    });
+
+    function showToast(msg) {
+      const box = document.getElementById("toastBox");
+      box.textContent = msg;
+      box.style.display = "block";
+      clearTimeout(window._t);
+      window._t = setTimeout(() => { box.style.display = "none"; }, 2500);
+    }
+
+    async function loadStores() {
+      try {
+        const res = await fetch("/api/stores");
+        if (res.ok) stores = await res.json();
+      } catch (_) {}
+      const sel = document.getElementById("storeSelect");
+      const saved = localStorage.getItem("rotasabor_store_id") || "";
+      sel.innerHTML = `<option value="">Todos os estabelecimentos...</option>` + stores.map((s) =>
+        `<option value="${s.id}">${s.name}</option>`
+      ).join("");
+      if (saved) sel.value = saved;
+    }
+
+    document.getElementById("storeSelect").addEventListener("change", (e) => {
+      localStorage.setItem("rotasabor_store_id", e.target.value);
+      renderOrders();
+    });
+
+    async function markOrderReady(orderId) {
+      try {
+        const res = await fetch(`/api/orders/${orderId}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            store_ready: true,
+            status: "Pronto para coleta"
+          })
+        });
+        if (res.ok) {
+          showToast(`Pedido #${orderId} marcado como Pronto para coleta!`);
+          await loadOrders();
+        }
+      } catch (_) {
+        showToast("Erro ao dar baixa no pedido.");
+      }
+    }
+
+    async function loadOrders() {
+      try {
+        const res = await fetch("/api/orders");
+        if (res.ok) orders = await res.json();
+      } catch (_) {}
+      renderOrders();
+    }
+
+    function renderOrders() {
+      const selectedStoreId = document.getElementById("storeSelect").value;
+      const container = document.getElementById("ordersContainer");
+
+      const list = orders.filter((o) => {
+        if (!selectedStoreId) return true;
+        return String(o.store_id || "") === String(selectedStoreId);
+      });
+
+      if (!list.length) {
+        container.innerHTML = `<div class="card"><div class="meta">Nenhum pedido encontrado para este estabelecimento.</div></div>`;
+        return;
+      }
+
+      container.innerHTML = [...list].reverse().map((o) => {
+        const code = o.order_code || `RS-${String(o.id).padStart(3, "0")}`;
+        const deliveryFee = Number(o.delivery_fee || 0);
+        const total = Number(o.total || 0);
+        const itemsFee = Math.max(0, total - deliveryFee);
+        const itemsText = Array.isArray(o.items) && o.items.length
+          ? o.items.map((i) => `${i.qty || 1}x ${i.name}`).join(", ")
+          : "Itens do pedido";
+        const isReady = Boolean(o.store_ready) || String(o.status || "").toLowerCase().includes("pronto");
+
+        return `
+          <article class="card">
+            <div class="card-top">
+              <div>
+                <span class="code-tag">ETIQUETA: ${code}</span>
+                <div class="meta"><strong>Pedido #${o.id}</strong> • ${o.store_name || "Estabelecimento"}</div>
+              </div>
+              <span class="badge ${isReady ? "ready" : ""}">${o.status || "Pendente"}</span>
+            </div>
+            <div class="meta" style="margin-top:8px;"><strong>Itens:</strong> ${itemsText}</div>
+            <div class="meta"><strong>Cliente:</strong> ${o.client_name || "Cliente"} • ${o.payment || "Pix"}</div>
+            <div class="meta"><strong>Entrega:</strong> ${o.client_address || "Não informado"}</div>
+            <div class="meta" style="margin-top:8px;">
+              Itens: <strong>${fmtBRL(itemsFee)}</strong> • Repasse/Taxa entrega: <strong>${fmtBRL(deliveryFee)}</strong> • Total: <strong>${fmtBRL(total)}</strong>
+            </div>
+            <div class="btn-row">
+              ${!isReady
+                ? `<button class="btn btn-success" type="button" onclick="markOrderReady(${o.id})">✓ Dar baixa / Pronto para coleta</button>`
+                : `<span class="badge ready">Baixa dada • Código ${code} pronto para coleta</span>`
+              }
+            </div>
+          </article>
+        `;
+      }).join("");
+    }
+
+    document.getElementById("refreshBtn").addEventListener("click", async () => {
+      await Promise.all([loadStores(), loadOrders()]);
+      showToast("Pedidos atualizados");
+    });
+
+    applyTheme();
+    Promise.all([loadStores(), loadOrders()]);
+  </script>
+</body>
+</html>
