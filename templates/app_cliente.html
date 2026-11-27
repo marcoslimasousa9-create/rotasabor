@@ -3,430 +3,520 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>RotaSabor — Cliente</title>
-  <link rel="manifest" href="/static/manifest.json" />
-  <meta name="theme-color" content="#0b1220" />
+  <meta name="theme-color" content="#ff4d2d" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="RS Cliente" />
+  <link rel="manifest" href="/static/manifest-cliente.json" />
+  <link rel="icon" type="image/svg+xml" href="/static/icon.svg" />
+  <link rel="apple-touch-icon" href="/static/icon.svg" />
+  <title>RotaSabor Cliente — Vitrine & Pedidos</title>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      background: #0b1220;
-      color: #e5e7eb;
-      min-height: 100vh;
+    :root {
+      --bg: #0b1220;
+      --panel: #111827;
+      --panel-2: #0f172a;
+      --card: #131c2e;
+      --ink: #f8fafc;
+      --muted: #94a3b8;
+      --line: #1e293b;
+      --brand: #ff4d2d;
+      --brand-dark: #e03b1d;
+      --brand-soft: rgba(255, 77, 45, 0.14);
+      --green: #10b981;
+      --green-soft: rgba(16, 185, 129, 0.15);
+      --amber: #f59e0b;
+      --amber-soft: rgba(245, 158, 11, 0.15);
+      --shadow: 0 12px 28px rgba(0, 0, 0, 0.28);
     }
-    header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 12px;
-      padding: 16px 24px;
-      background: #0f172a;
-      border-bottom: 1px solid #1e293b;
+    * { box-sizing: border-box; font-family: "Segoe UI", system-ui, -apple-system, Arial, sans-serif; }
+    html { scroll-behavior: smooth; }
+    body { margin: 0; background: var(--bg); color: var(--ink); padding-bottom: 92px; }
+
+    .topbar {
+      position: sticky; top: 0; z-index: 50;
+      background: rgba(11, 18, 32, 0.92); backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--line);
     }
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 10px;
+    .topbar-inner {
+      max-width: 1080px; margin: 0 auto; padding: 14px 18px;
+      display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px;
     }
-    .brand h1 {
-      font-size: 1.25rem;
-      color: #f8fafc;
+    .brand-box { display: flex; align-items: center; gap: 10px; }
+    .logo {
+      background: linear-gradient(135deg, var(--brand), #ff7b54);
+      color: #fff; font-weight: 900; padding: 8px 12px; border-radius: 12px; font-size: 13px; letter-spacing: 0.4px;
     }
-    .badge {
-      font-size: 0.75rem;
-      padding: 3px 8px;
-      border-radius: 999px;
-      background: #1e293b;
-      color: #94a3b8;
+    .top-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .city-pill {
+      font-size: 12px; font-weight: 700; color: var(--ink);
+      background: var(--panel); border: 1px solid var(--line); padding: 6px 12px; border-radius: 999px;
     }
-    .header-actions {
-      display: flex;
-      gap: 10px;
-      align-items: center;
+    .btn-install {
+      display: none;
+      background: var(--brand); color: #fff; border: none;
+      font-size: 12px; font-weight: 800; padding: 7px 13px; border-radius: 999px; cursor: pointer;
     }
-    .btn {
-      border: none;
-      border-radius: 8px;
-      padding: 9px 14px;
-      font-weight: 600;
-      cursor: pointer;
-      font-size: 0.9rem;
-      text-decoration: none;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
+    .btn-dl {
+      background: var(--panel); color: var(--ink); border: 1px solid #2b3a54;
+      font-size: 12px; font-weight: 800; padding: 7px 12px; border-radius: 999px;
+      cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;
     }
-    .btn-ghost {
-      background: #1e293b;
-      color: #f8fafc;
+    .btn-dl:hover { border-color: var(--brand); }
+
+    .update-bar {
+      background: rgba(255, 77, 45, 0.12);
+      border-bottom: 1px solid rgba(255, 77, 45, 0.3);
+      padding: 10px 18px;
     }
-    .btn-primary {
-      background: #2563eb;
-      color: #ffffff;
-      padding: 7px 12px;
-      font-size: 0.85rem;
+    .update-bar-inner {
+      max-width: 1080px; margin: 0 auto;
+      display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px;
+      font-size: 12px;
     }
-    .btn-success {
-      background: #22c55e;
-      color: #052e16;
-      width: 100%;
-      padding: 12px;
-      font-size: 1rem;
+    .btn-sync-now {
+      background: var(--brand); color: #fff; border: none; border-radius: 999px;
+      padding: 6px 12px; font-size: 11px; font-weight: 800; cursor: pointer;
     }
-    main {
-      max-width: 1200px;
-      margin: 24px auto;
-      padding: 0 20px 40px;
-      display: grid;
-      grid-template-columns: 1.6fr 1fr;
-      gap: 24px;
-      align-items: start;
+
+    .container { max-width: 1080px; margin: 0 auto; padding: 18px; }
+
+    .promo-banner {
+      background: linear-gradient(135deg, #172033 0%, #111827 55%, #3a1510 100%);
+      border: 1px solid #263248; color: #fff; border-radius: 20px; padding: 20px 22px; margin-bottom: 18px;
+      display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 14px;
+      box-shadow: var(--shadow);
     }
-    @media (max-width: 900px) {
-      main { grid-template-columns: 1fr; }
+    .promo-tag {
+      display: inline-block; background: var(--brand); color: #fff;
+      font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 999px; margin-bottom: 6px;
     }
-    .card {
-      background: #111827;
-      border: 1px solid #1f2937;
-      border-radius: 12px;
-      padding: 20px;
-      margin-bottom: 20px;
+    .promo-banner h1 { margin: 0; font-size: clamp(20px, 3vw, 26px); }
+    .promo-banner p { margin: 6px 0 0 0; color: #cbd5e1; font-size: 13px; max-width: 560px; }
+    .pix-pill-box {
+      background: rgba(11, 18, 32, 0.72); border: 1px solid #2a3750;
+      padding: 12px 16px; border-radius: 14px; font-size: 12px;
     }
-    .card h2 {
-      font-size: 1.15rem;
-      margin-bottom: 6px;
-      color: #f9fafb;
+
+    .section-head {
+      display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 8px;
+      margin: 20px 0 12px 0;
     }
-    .subtitle {
-      font-size: 0.88rem;
-      color: #9ca3af;
-      margin-bottom: 18px;
+    .section-title { margin: 0; font-size: 18px; font-weight: 800; color: var(--ink); }
+    .section-sub { font-size: 12px; color: var(--muted); }
+
+    .stores-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(270px, 1fr)); gap: 14px;
     }
-    .store {
-      border: 1px solid #1e293b;
-      background: #0d1526;
-      border-radius: 10px;
-      padding: 16px;
-      margin-bottom: 16px;
+    .store-card {
+      background: var(--card); border: 2px solid var(--line); border-radius: 18px; padding: 16px;
+      cursor: pointer; transition: all 0.16s ease; box-shadow: var(--shadow);
+      display: flex; flex-direction: column; justify-content: space-between; gap: 10px;
     }
-    .store-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      gap: 12px;
-      margin-bottom: 8px;
+    .store-card:hover { border-color: #334155; transform: translateY(-1px); }
+    .store-card.ativa { border-color: var(--brand); background: #182236; }
+    .store-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+    .store-name { font-size: 16px; font-weight: 800; margin: 0; color: var(--ink); }
+    .store-cat { font-size: 12px; color: var(--muted); margin-top: 2px; }
+    .rating-badge {
+      background: var(--amber-soft); color: #fbbf24; font-weight: 800; font-size: 12px;
+      padding: 4px 8px; border-radius: 8px; white-space: nowrap;
     }
-    .store-title { font-weight: 700; font-size: 1rem; color: #f8fafc; }
-    .store-meta { font-size: 0.83rem; color: #94a3b8; margin-top: 2px; }
-    .rating {
-      background: #1e293b;
-      color: #fbbf24;
-      font-size: 0.8rem;
-      font-weight: 700;
-      padding: 4px 8px;
-      border-radius: 6px;
-      white-space: nowrap;
+    .store-promo {
+      background: var(--brand-soft); color: #ff8a73; font-size: 12px; font-weight: 700;
+      padding: 7px 10px; border-radius: 10px;
     }
-    .promo {
-      display: inline-block;
-      background: rgba(245, 158, 11, 0.15);
-      color: #fbbf24;
-      border: 1px solid rgba(245, 158, 11, 0.35);
-      font-size: 0.78rem;
-      font-weight: 600;
-      padding: 3px 8px;
-      border-radius: 6px;
-      margin-bottom: 12px;
+    .store-meta {
+      display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); font-weight: 600;
+      border-top: 1px solid var(--line); padding-top: 10px;
     }
-    .item-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 10px 0;
-      border-top: 1px solid #1e293b;
-      gap: 12px;
+
+    .products-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px;
     }
-    .item-name { font-size: 0.92rem; color: #e2e8f0; }
-    .item-right { display: flex; align-items: center; gap: 10px; }
-    .item-price { font-weight: 700; color: #38bdf8; font-size: 0.9rem; white-space: nowrap; }
-    label { display: block; font-size: 0.85rem; color: #cbd5e1; margin-bottom: 6px; }
-    select, input {
-      width: 100%;
-      background: #0b1220;
-      color: #f8fafc;
-      border: 1px solid #334155;
-      border-radius: 8px;
-      padding: 10px 12px;
-      font-size: 0.92rem;
-      margin-bottom: 14px;
+    .product-card {
+      background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 16px;
+      box-shadow: var(--shadow); display: flex; flex-direction: column; justify-content: space-between; gap: 12px;
     }
-    .cart-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 8px 0;
-      border-bottom: 1px solid #1e293b;
-      font-size: 0.9rem;
+    .promo-chip {
+      display: inline-block; background: var(--green-soft); color: #34d399;
+      font-size: 11px; font-weight: 800; padding: 3px 8px; border-radius: 999px; margin-bottom: 6px;
     }
-    .total-box {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin: 14px 0 18px;
-      font-weight: 700;
+    .prod-title { margin: 0; font-size: 15px; font-weight: 800; color: var(--ink); }
+    .prod-desc { margin: 5px 0 0 0; font-size: 12px; color: var(--muted); line-height: 1.45; }
+    .prod-foot {
+      display: flex; justify-content: space-between; align-items: center; gap: 10px;
+      border-top: 1px solid var(--line); padding-top: 12px;
     }
-    .total-value { color: #38bdf8; font-size: 1.05rem; }
-    .empty-msg { color: #94a3b8; font-size: 0.88rem; }
-    .order-box {
-      border: 1px solid #1e293b;
-      background: #0d1526;
-      border-radius: 8px;
-      padding: 10px 12px;
-      margin-top: 10px;
-      font-size: 0.86rem;
+    .price-now { font-size: 16px; font-weight: 900; color: var(--ink); }
+    .price-old { font-size: 12px; color: var(--muted); text-decoration: line-through; margin-left: 6px; }
+    .qty-ctrl { display: flex; align-items: center; gap: 8px; }
+    .btn-qty {
+      width: 32px; height: 32px; border-radius: 10px; border: 1px solid #334155;
+      background: var(--panel-2); color: var(--ink); font-weight: 900; font-size: 15px; cursor: pointer;
+    }
+    .btn-add {
+      background: var(--brand); color: #fff; border: none; border-radius: 10px;
+      padding: 8px 14px; font-weight: 800; font-size: 12px; cursor: pointer;
+    }
+    .btn-add:hover { background: var(--brand-dark); }
+    .qty-num { font-weight: 800; font-size: 14px; min-width: 18px; text-align: center; }
+
+    .checkout-card {
+      background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 18px;
+      margin-top: 22px; box-shadow: var(--shadow);
+    }
+    .checkout-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+    @media (max-width: 780px) { .checkout-grid { grid-template-columns: 1fr; } }
+    label { display: block; font-size: 12px; font-weight: 700; color: var(--muted); margin-top: 10px; }
+    input, select {
+      width: 100%; padding: 10px 12px; margin-top: 5px; border-radius: 11px;
+      border: 1px solid #283548; background: var(--panel-2); color: var(--ink); font-size: 13px;
+    }
+    .summary-box {
+      background: var(--panel-2); border: 1px solid var(--line); border-radius: 14px; padding: 14px;
+    }
+    .summary-row { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 8px; color: var(--muted); }
+    .summary-total {
+      display: flex; justify-content: space-between; font-size: 16px; font-weight: 900; color: var(--ink);
+      border-top: 1px solid var(--line); padding-top: 10px; margin-top: 8px;
+    }
+    .pix-box {
+      margin-top: 12px; padding: 12px; border-radius: 12px;
+      background: var(--brand-soft); border: 1px solid rgba(255, 77, 45, 0.35);
+    }
+    .pix-key {
+      font-family: Consolas, monospace; font-size: 12px; background: var(--panel); color: var(--ink);
+      padding: 7px 9px; border-radius: 8px; border: 1px solid #283548; margin-top: 6px; word-break: break-all;
+    }
+    .btn-copiar {
+      margin-top: 8px; padding: 6px 11px; border-radius: 8px; border: 1px solid #334155;
+      background: var(--panel); color: var(--ink); font-weight: 700; font-size: 11px; cursor: pointer;
+    }
+    .btn-submit {
+      margin-top: 14px; width: 100%; padding: 13px; border: none; border-radius: 12px;
+      background: var(--brand); color: #fff; font-weight: 900; font-size: 14px; cursor: pointer;
+    }
+    .btn-submit:hover { background: var(--brand-dark); }
+
+    .orders-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); gap: 12px; }
+    .order-card {
+      background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 14px; box-shadow: var(--shadow);
+    }
+    .order-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+    .badge { font-size: 11px; font-weight: 800; padding: 4px 9px; border-radius: 999px; background: var(--amber-soft); color: #fbbf24; }
+    .badge.ok { background: var(--green-soft); color: #34d399; }
+    .btn-pix-ok {
+      padding: 5px 9px; border-radius: 8px; border: none; background: var(--green);
+      color: #06281e; font-size: 11px; font-weight: 800; cursor: pointer;
+    }
+    .muted { color: var(--muted); font-size: 12px; }
+    .feedback { margin-top: 10px; font-size: 13px; font-weight: 700; color: #34d399; }
+
+    .cart-bar {
+      position: fixed; bottom: 0; left: 0; right: 0; z-index: 60;
+      background: rgba(17, 24, 39, 0.96); backdrop-filter: blur(10px);
+      border-top: 1px solid var(--line); padding: 12px 18px;
+      box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.35);
+    }
+    .cart-bar-inner {
+      max-width: 1080px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; gap: 12px;
+    }
+    .btn-go {
+      background: var(--brand); color: #fff; border: none; border-radius: 12px;
+      padding: 10px 18px; font-weight: 800; font-size: 13px; cursor: pointer; text-decoration: none;
     }
   </style>
 </head>
 <body>
-  <header>
-    <div class="brand">
-      <h1>RotaSabor</h1>
-      <span class="badge">v2026.11.26.211600</span>
-    </div>
-    <div class="header-actions">
-      <a class="btn btn-ghost" href="/app-motoboy">App Motoboy</a>
-      <button class="btn btn-ghost" id="btnInstall" type="button" style="display:none;">Instalar App</button>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand-box">
+        <span class="logo">RS CLIENTE</span>
+        <div>
+          <div style="font-weight:900; font-size:15px;">RotaSabor Cliente</div>
+          <div class="muted">Vitrine de lojas, promoções e pedidos</div>
+        </div>
+      </div>
+      <div class="top-actions">
+        <a href="/download/pacote-app" class="btn-dl" id="link-baixar-app">Baixar atualização</a>
+        <a href="/download/apk" class="btn-dl" id="link-baixar-apk" style="display:none;">Baixar APK</a>
+        <button type="button" class="btn-install" id="btn-instalar-app" onclick="instalarApp()">Instalar app</button>
+        <span class="city-pill">Catanduva • SP</span>
+      </div>
     </div>
   </header>
 
-  <main>
-    <section class="card">
-      <h2>Estabelecimentos e Cardápio</h2>
-      <p class="subtitle">RotaSabor na nuvem — Tema escuro #0b1220, persistência em JSON, App Cliente, App Motoboy e atalho PWA prontos.</p>
-
-      <div class="store">
-        <div class="store-header">
-          <div>
-            <div class="store-title">Hamburgueria Centro</div>
-            <div class="store-meta">Lanches & Smash • Centro, Catanduva - SP • 25–35 min • Entrega R$ 8,00</div>
-          </div>
-          <span class="rating">★ 4.9</span>
-        </div>
-        <span class="promo">Combo Smash + Fritas com 15% OFF</span>
-
-        <div class="item-row">
-          <span class="item-name">Smash Duplo Bacon</span>
-          <div class="item-right">
-            <span class="item-price">R$ 28,00</span>
-            <button class="btn btn-primary" type="button" onclick="addItem('Hamburgueria Centro', 'Smash Duplo Bacon', 28.00)">+ Add</button>
-          </div>
-        </div>
-
-        <div class="item-row">
-          <span class="item-name">Batata Rustica 300g</span>
-          <div class="item-right">
-            <span class="item-price">R$ 14,00</span>
-            <button class="btn btn-primary" type="button" onclick="addItem('Hamburgueria Centro', 'Batata Rustica 300g', 14.00)">+ Add</button>
-          </div>
-        </div>
-
-        <div class="item-row">
-          <span class="item-name">Refrigerante Lata</span>
-          <div class="item-right">
-            <span class="item-price">R$ 6,00</span>
-            <button class="btn btn-primary" type="button" onclick="addItem('Hamburgueria Centro', 'Refrigerante Lata', 6.00)">+ Add</button>
-          </div>
-        </div>
+  <div class="update-bar" id="barra-atualizacao">
+    <div class="update-bar-inner">
+      <div>
+        <strong style="color:#ff8a73;">Atualização do App:</strong>
+        <span id="info-versao">Carregando versão...</span>
       </div>
+      <div style="display:flex; align-items:center; gap:8px;">
+        <button type="button" class="btn-sync-now" onclick="forcarAtualizacaoApp()">Atualizar agora</button>
+      </div>
+    </div>
+  </div>
 
-      <div class="store">
-        <div class="store-header">
-          <div>
-            <div class="store-title">Marmitaria Sabor da Casa</div>
-            <div class="store-meta">Refeicoes Caseiras • Catanduva - SP • 30-45 min • Entrega R$ 7,00</div>
-          </div>
-          <span class="rating">★ 4.8</span>
+  <main class="container">
+    <section class="promo-banner">
+      <div>
+        <span class="promo-tag">PROMOÇÕES DO DIA</span>
+        <h1 id="banner-titulo">Lanches, pizzas e açaí com entrega rápida</h1>
+        <p id="banner-desc">Selecione um estabelecimento cadastrado para conferir o cardápio completo, preços e ofertas ativas.</p>
+      </div>
+      <div class="pix-pill-box">
+        <div style="font-weight:800; color:#ff8a73;">Pix Asaas Sandbox</div>
+        <div style="margin-top:3px; font-family:Consolas,monospace; font-size:11px; color:#e2e8f0;">5ef9e6b1-2663-4a29-9606-686640dd63d9</div>
+      </div>
+    </section>
+
+    <div class="section-head">
+      <h2 class="section-title">Estabelecimentos cadastrados</h2>
+      <span class="section-sub">Toque em uma loja para abrir os produtos</span>
+    </div>
+    <section class="stores-grid" id="lista-lojas"></section>
+
+    <div class="section-head">
+      <h2 class="section-title" id="titulo-cardapio">Cardápio</h2>
+      <span class="section-sub" id="sub-cardapio">Preços e promoções</span>
+    </div>
+    <section class="products-grid" id="lista-produtos"></section>
+
+    <section class="checkout-card" id="secao-checkout">
+      <div class="checkout-grid">
+        <div>
+          <h2 class="section-title" style="margin-bottom:4px;">Finalizar pedido</h2>
+          <div class="muted">Preencha seus dados de entrega e escolha o pagamento</div>
+
+          <form onsubmit="enviarPedido(event)">
+            <label>Seu nome</label>
+            <input type="text" id="cliente_nome" value="Marcos" required />
+
+            <label>Endereço de entrega</label>
+            <input type="text" id="destino_endereco" value="Rua Minas Gerais, 800 - Centro, Catanduva - SP" required />
+
+            <label>Forma de pagamento</label>
+            <select id="pagamento_metodo" onchange="alternarPix()">
+              <option value="pix">Pix (Asaas Sandbox)</option>
+              <option value="entrega">Pagamento na entrega</option>
+            </select>
+
+            <div class="pix-box" id="box-pix">
+              <div style="font-size:12px; font-weight:800; color:#ff8a73;">Chave Pix Aleatória • Asaas Sandbox</div>
+              <div class="pix-key">5ef9e6b1-2663-4a29-9606-686640dd63d9</div>
+              <button type="button" class="btn-copiar" onclick="copiarChave()">Copiar chave Pix</button>
+            </div>
+
+            <button type="submit" class="btn-submit">Enviar pedido</button>
+          </form>
+          <div id="msg-pedido" class="feedback"></div>
         </div>
-        <span class="promo">Marmita Executiva + Sobremesa</span>
 
-        <div class="item-row">
-          <span class="item-name">Marmita Frango Grelhado G</span>
-          <div class="item-right">
-            <span class="item-price">R$ 24,00</span>
-            <button class="btn btn-primary" type="button" onclick="addItem('Marmitaria Sabor da Casa', 'Marmita Frango Grelhado G', 24.00)">+ Add</button>
-          </div>
-        </div>
-
-        <div class="item-row">
-          <span class="item-name">Marmita Contra-File G</span>
-          <div class="item-right">
-            <span class="item-price">R$ 29,00</span>
-            <button class="btn btn-primary" type="button" onclick="addItem('Marmitaria Sabor da Casa', 'Marmita Contra-File G', 29.00)">+ Add</button>
+        <div>
+          <h2 class="section-title" style="margin-bottom:8px;">Resumo da sacola</h2>
+          <div class="summary-box">
+            <div id="itens-sacola" class="muted" style="margin-bottom:10px;">Adicione produtos do cardápio para montar seu pedido.</div>
+            <div class="summary-row"><span>Subtotal dos itens</span><strong id="res-subtotal" style="color:#f8fafc;">R$ 0,00</strong></div>
+            <div class="summary-row"><span>Taxa de entrega</span><strong id="res-taxa" style="color:#f8fafc;">R$ 0,00</strong></div>
+            <div class="summary-total"><span>Total</span><span id="res-total">R$ 0,00</span></div>
           </div>
         </div>
       </div>
     </section>
 
-    <aside>
-      <div class="card">
-        <h2>Seu Carrinho</h2>
-        <p class="subtitle" id="cartHint">Adicione um item do cardápio para começar.</p>
-        <div id="cartItems"></div>
-
-        <label for="paymentMethod">Forma de pagamento</label>
-        <select id="paymentMethod">
-          <option value="Pix">Pix</option>
-          <option value="Dinheiro">Dinheiro</option>
-          <option value="Cartao na Entrega">Cartão na Entrega</option>
-        </select>
-
-        <div class="total-box">
-          <span>Total estimado</span>
-          <span class="total-value" id="cartTotal">R$ 0,00</span>
-        </div>
-
-        <button class="btn btn-success" type="button" onclick="submitOrder()">Finalizar Pedido</button>
-      </div>
-
-      <div class="card">
-        <h2>Pedidos Recentes</h2>
-        <div id="recentOrders"><p class="empty-msg">Nenhum pedido ainda.</p></div>
-      </div>
-    </aside>
+    <div class="section-head" style="margin-top:24px;">
+      <h2 class="section-title">Meus pedidos</h2>
+      <span class="section-sub">Atualização automática a cada 4s</span>
+    </div>
+    <section class="orders-list" id="lista-pedidos">
+      <div class="muted">Carregando pedidos...</div>
+    </section>
   </main>
 
+  <div class="cart-bar">
+    <div class="cart-bar-inner">
+      <div>
+        <div style="font-size:12px; color:#94a3b8;" id="bar-loja">Loja: Hamburgueria Centro</div>
+        <div style="font-size:15px; font-weight:900; color:#f8fafc;" id="bar-resumo">0 item(ns) • R$ 0,00</div>
+      </div>
+      <a href="#secao-checkout" class="btn-go">Ver sacola</a>
+    </div>
+  </div>
+
   <script>
-    let cart = [];
+    const CHAVE_PIX = "5ef9e6b1-2663-4a29-9606-686640dd63d9";
+    let lojas = [];
+    let lojaAtualId = null;
+    let carrinho = {};
+    let deferredInstallPrompt = null;
 
-    function formatBRL(value) {
-      return "R$ " + Number(value || 0).toFixed(2).replace(".", ",");
-    }
-
-    function addItem(store, name, price) {
-      const existing = cart.find((i) => i.store === store && i.name === name);
-      if (existing) {
-        existing.qty += 1;
-      } else {
-        cart.push({ store, name, price, qty: 1 });
-      }
-      renderCart();
-    }
-
-    function removeItem(index) {
-      cart.splice(index, 1);
-      renderCart();
-    }
-
-    function renderCart() {
-      const container = document.getElementById("cartItems");
-      const hint = document.getElementById("cartHint");
-      const totalEl = document.getElementById("cartTotal");
-
-      if (!cart.length) {
-        hint.textContent = "Adicione um item do cardápio para começar.";
-        container.innerHTML = "";
-        totalEl.textContent = "R$ 0,00";
-        return;
-      }
-
-      hint.textContent = `${cart.reduce((acc, i) => acc + i.qty, 0)} item(ns) no carrinho`;
-      let total = 0;
-      container.innerHTML = cart.map((item, idx) => {
-        const sub = item.price * item.qty;
-        total += sub;
-        return `
-          <div class="cart-item">
-            <div>
-              <strong>${item.qty}x ${item.name}</strong><br/>
-              <small style="color:#94a3b8;">${item.store}</small>
-            </div>
-            <div style="display:flex;align-items:center;gap:8px;">
-              <span>${formatBRL(sub)}</span>
-              <button class="btn btn-ghost" style="padding:4px 8px;" type="button" onclick="removeItem(${idx})">✕</button>
-            </div>
-          </div>
-        `;
-      }).join("");
-      totalEl.textContent = formatBRL(total);
-    }
-
-    async function loadOrders() {
-      try {
-        const res = await fetch("/api/orders");
-        if (!res.ok) return;
-        const orders = await res.json();
-        const box = document.getElementById("recentOrders");
-        if (!Array.isArray(orders) || !orders.length) {
-          box.innerHTML = '<p class="empty-msg">Nenhum pedido ainda.</p>';
-          return;
-        }
-        box.innerHTML = orders.slice().reverse().slice(0, 5).map((o) => `
-          <div class="order-box">
-            <strong>#${o.id}</strong> • ${o.status || "Pendente"} • <strong>${formatBRL(o.total)}</strong><br/>
-            <small style="color:#94a3b8;">Pagamento: ${o.payment || "Pix"}</small>
-          </div>
-        `).join("");
-      } catch (_) {}
-    }
-
-    async function submitOrder() {
-      if (!cart.length) {
-        alert("Adicione pelo menos um item ao carrinho.");
-        return;
-      }
-      const total = cart.reduce((acc, i) => acc + i.price * i.qty, 0);
-      const payment = document.getElementById("paymentMethod").value;
-
-      try {
-        const res = await fetch("/api/orders", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ items: cart, total, payment })
-        });
-        if (!res.ok) throw new Error("Falha ao enviar pedido");
-        cart = [];
-        renderCart();
-        await loadOrders();
-        alert("Pedido enviado com sucesso!");
-      } catch (err) {
-        alert("Erro ao finalizar pedido: " + err.message);
-      }
-    }
-
-    let deferredPrompt = null;
     window.addEventListener("beforeinstallprompt", (e) => {
       e.preventDefault();
-      deferredPrompt = e;
-      const btn = document.getElementById("btnInstall");
-      if (btn) btn.style.display = "inline-flex";
+      deferredInstallPrompt = e;
+      const btn = document.getElementById("btn-instalar-app");
+      if (btn) btn.style.display = "inline-block";
     });
 
-    const installBtn = document.getElementById("btnInstall");
-    if (installBtn) {
-      installBtn.addEventListener("click", async () => {
-        if (!deferredPrompt) return;
-        deferredPrompt.prompt();
-        await deferredPrompt.userChoice;
-        deferredPrompt = null;
-        installBtn.style.display = "none";
-      });
+    async function instalarApp() {
+      if (!deferredInstallPrompt) return;
+      deferredInstallPrompt.prompt();
+      await deferredInstallPrompt.userChoice;
+      deferredInstallPrompt = null;
+      const btn = document.getElementById("btn-instalar-app");
+      if (btn) btn.style.display = "none";
+    }
+
+    async function forcarAtualizacaoApp() {
+      if ("serviceWorker" in navigator) {
+        const regs = await navigator.serviceWorker.getRegistrations();
+        for (const r of regs) {
+          await r.update();
+        }
+      }
+      if ("caches" in window) {
+        const keys = await caches.keys();
+        for (const k of keys) {
+          await caches.delete(k);
+        }
+      }
+      const url = new URL(window.location.href);
+      url.searchParams.set("v", Date.now());
+      window.location.replace(url.toString());
     }
 
     if ("serviceWorker" in navigator) {
       window.addEventListener("load", () => {
-        navigator.serviceWorker
-          .register("/sw.js", { scope: "/" })
-          .then((reg) => console.log("SW registado:", reg.scope))
-          .catch((err) => console.error("Erro SW:", err));
+        navigator.serviceWorker.register("/sw.js").then((reg) => reg.update()).catch(() => {});
       });
     }
 
-    loadOrders();
-  </script>
-</body>
-</html>
+    async function verificarAtualizacoes() {
+      try {
+        const res = await fetch("/api/atualizacoes?_=" + Date.now(), { cache: "no-store" });
+        const data = await res.json();
+        if (data.ok && data.release) {
+          const r = data.release;
+          document.getElementById("info-versao").textContent =
+            `Build ${r.build} • Atualizado em ${r.atualizado_em} — ${r.notas}`;
+          const linkPacote = document.getElementById("link-baixar-app");
+          if (linkPacote) linkPacote.textContent = `Baixar v${r.build}`;
+          const linkApk = document.getElementById("link-baixar-apk");
+          if (linkApk) {
+            linkApk.style.display = r.apk_disponivel ? "inline-flex" : "none";
+          }
+        }
+      } catch (_) {}
+    }
+
+    function fmtBRL(v) {
+      return "R$ " + Number(v || 0).toFixed(2).replace(".", ",");
+    }
+
+    function copiarChave() {
+      navigator.clipboard?.writeText(CHAVE_PIX);
+      alert("Chave Pix copiada: " + CHAVE_PIX);
+    }
+
+    function alternarPix() {
+      const metodo = document.getElementById("pagamento_metodo").value;
+      document.getElementById("box-pix").style.display = (metodo === "pix") ? "block" : "none";
+    }
+
+    function lojaSelecionada() {
+      return lojas.find(l => l.id === lojaAtualId) || lojas[0] || null;
+    }
+
+    function selecionarLoja(id) {
+      if (lojaAtualId !== id) {
+        lojaAtualId = id;
+        carrinho = {};
+      }
+      renderLojas();
+      renderProdutos();
+      renderSacola();
+    }
+
+    function alterarQtd(prodId, delta) {
+      const atual = carrinho[prodId] || 0;
+      const prox = Math.max(0, atual + delta);
+      if (prox === 0) delete carrinho[prodId];
+      else carrinho[prodId] = prox;
+      renderProdutos();
+      renderSacola();
+    }
+
+    function renderLojas() {
+      const atual = lojaSelecionada();
+      document.getElementById("lista-lojas").innerHTML = lojas.map(l => {
+        const ativa = atual && l.id === atual.id;
+        return `
+          <div class="store-card ${ativa ? "ativa" : ""}" onclick="selecionarLoja('${l.id}')">
+            <div>
+              <div class="store-top">
+                <div>
+                  <h3 class="store-name">${l.nome}</h3>
+                  <div class="store-cat">${l.categoria} • ${l.bairro}</div>
+                </div>
+                <span class="rating-badge">★ ${l.avaliacao}</span>
+              </div>
+              <div class="store-promo" style="margin-top:10px;">${l.destaque_promo}</div>
+            </div>
+            <div class="store-meta">
+              <span>${l.tempo_estimado}</span>
+              <span>Entrega: ${fmtBRL(l.taxa_entrega)}</span>
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function renderProdutos() {
+      const loja = lojaSelecionada();
+      if (!loja) return;
+      document.getElementById("banner-titulo").textContent = loja.nome + " — " + loja.categoria;
+      document.getElementById("banner-desc").textContent = loja.destaque_promo + " • Entrega em " + loja.tempo_estimado + " (" + loja.bairro + ").";
+      document.getElementById("titulo-cardapio").textContent = "Cardápio • " + loja.nome;
+      document.getElementById("sub-cardapio").textContent = loja.produtos.length + " itens disponíveis";
+      document.getElementById("bar-loja").textContent = "Loja: " + loja.nome;
+
+      document.getElementById("lista-produtos").innerHTML = loja.produtos.map(p => {
+        const qtd = carrinho[p.id] || 0;
+        return `
+          <div class="product-card">
+            <div>
+              ${p.promo ? `<span class="promo-chip">${p.promo}</span>` : ""}
+              <h3 class="prod-title">${p.nome}</h3>
+              <p class="prod-desc">${p.descricao}</p>
+            </div>
+            <div class="prod-foot">
+              <div>
+                <span class="price-now">${fmtBRL(p.preco)}</span>
+                ${p.preco_antigo ? `<span class="price-old">${fmtBRL(p.preco_antigo)}</span>` : ""}
+              </div>
+              <div class="qty-ctrl">
+                ${qtd > 0 ? `
+                  <button type="button" class="btn-qty" onclick="alterarQtd('${p.id}', -1)">-</button>
+                  <span class="qty-num">${qtd}</span>
+                  <button type="button" class="btn-qty" onclick="alterarQtd('${p.id}', 1)">+</button>
+                ` : `
+                  <button type="button" class="btn-add" onclick="alterarQtd('${p.id}', 1)">Adicionar</button>
+                `}
+              </div>
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function renderSacola() {
+      const loja = lojaSelecionada();
+      if (!loja) return;
+      const escolhidos = loja.produtos
+        .filter(p => (carrinho[p.id] || 0) > 0)
+        .map(p => ({ ...p, qtd: carrinho[p.id] }));
+
+      const qtdTotal = escolhidos.reduce((acc, i) => acc + i.qtd, 0);
+      const subtotal = escolhidos.reduce((acc, i) => acc + (i.preco *
