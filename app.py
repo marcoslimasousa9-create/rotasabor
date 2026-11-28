@@ -39,7 +39,7 @@ app.config.update(
 db = SQLAlchemy(app)
 
 PAYMENTS = {"Dinheiro", "Cartão na entrega"}
-STATUSES = {"Aguardando entregador", "Aceito pelo entregador", "Em rota", "Entregue", "Cancelado"}
+STATUSES = {"Aguardando loja", "Em preparo", "Aguardando entregador", "Aceito pelo entregador", "Em rota", "Entregue", "Cancelado"}
 
 
 # --------------------------------------------------------------------- modelos
@@ -50,6 +50,9 @@ class Establishment(db.Model):
     category = db.Column(db.String(80), default="Lanches & Refeições")
     default_delivery_fee = db.Column(db.Float, default=8.0)
     estimated_time = db.Column(db.String(40), default="25-35 min")
+    email = db.Column(db.String(120), nullable=True)
+    password_hash = db.Column(db.String(255), nullable=True)
+    active = db.Column(db.Boolean, default=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     def to_dict(self):
@@ -144,7 +147,7 @@ def order_dict(o, view):
         "id", "order_code", "store_id", "store_name", "client_address", "items_total",
         "delivery_fee", "courier_net_earning", "courier_id", "courier_accepted", "status")}
     d["created_at"] = o.created_at.isoformat() if o.created_at else None
-    if view in ("admin", "courier_mine", "customer"):
+    if view in ("admin", "courier_mine", "customer", "store"):
         d["client_name"] = o.client_name
         d["payment_method"] = o.payment_method
         d["items"] = json.loads(o.items_json or "[]")
@@ -221,6 +224,45 @@ def current_courier():
         return None
     c = db.session.get(Courier, session.get("uid"))
     return c if c and c.active is not False else None
+
+
+EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
+
+
+def current_store():
+    if session.get("role") != "store":
+        return None
+    e = db.session.get(Establishment, session.get("uid"))
+    return e if e and e.active is not False else None
+
+
+def _set_store_access(est, email, pwd):
+    email = clean(email, 120).lower()
+    pwd = str(pwd or "") or f"{secrets.randbelow(10**6):06d}"
+    if not EMAIL_RE.match(email):
+        return None, "Informe um e-mail válido."
+    if len(pwd) < 6:
+        return None, "A senha precisa ter ao menos 6 caracteres."
+    if Establishment.query.filter(db.func.lower(Establishment.email) == email,
+                                  Establishment.id != (est.id or 0)).first():
+        return None, "Este e-mail já está em uso."
+    est.email = email
+    est.password_hash = generate_password_hash(pwd)
+    return pwd, None
+
+
+def _new_product(est, d):
+    name = clean(d.get("name"))
+    price = _num(d.get("price"), -1)
+    if not name:
+        return None, "Informe o nome do produto."
+    if not 0.5 <= price <= 5000:
+        return None, "Preço inválido."
+    prod = Product(establishment_id=est.id, name=name, description=clean(d.get("description"), 255),
+                   price=price, featured=False)
+    db.session.add(prod)
+    db.session.commit()
+    return prod, None
 
 
 @app.before_request
@@ -302,6 +344,14 @@ def painel():
     return _render_safe("painel_gestao.html")
 
 
+@app.get("/loja")
+@app.get("/loja.html")
+def loja_page():
+    if session.get("role") != "store":
+        return redirect("/login")
+    return _render_safe("loja.html")
+
+
 @app.get("/cliente")
 @app.get("/app_cliente")
 @app.get("/app_cliente.html")
@@ -344,6 +394,13 @@ def login():
                 session.update(role="courier", uid=c.id, name=c.full_name)
                 session.permanent = True
                 return jsonify({"role": "courier", "redirect": "/motoboy"})
+    if "@" in ident:
+        e = Establishment.query.filter(db.func.lower(Establishment.email) == ident.lower()).first()
+        if e and e.password_hash and e.active is not False and check_password_hash(e.password_hash, pwd):
+            session.clear()
+            session.update(role="store", uid=e.id, name=e.store_name)
+            session.permanent = True
+            return jsonify({"role": "store", "redirect": "/loja"})
     return jsonify({"error": "Usuário ou senha incorretos."}), 401
 
 
@@ -361,7 +418,8 @@ def me():
 # ---------------------------------------------------------- estabelecimentos/produtos
 @app.get("/api/establishments")
 def list_establishments():
-    rows = Establishment.query.order_by(Establishment.id.desc()).all()
+    rows = (Establishment.query.filter(Establishment.active.is_not(False))
+            .order_by(Establishment.id.desc()).all())
     return jsonify([r.to_dict() for r in rows])
 
 
@@ -380,10 +438,30 @@ def create_establishment():
         category=clean(d.get("category"), 80) or "Lanches & Refeições",
         default_delivery_fee=fee,
         estimated_time=clean(d.get("estimated_time"), 40) or "25-35 min",
+        active=True,
     )
+    pwd = None
+    if d.get("email"):
+        pwd, err = _set_store_access(est, d.get("email"), d.get("password"))
+        if err:
+            return jsonify({"error": err}), 400
     db.session.add(est)
     db.session.commit()
-    return jsonify(est.to_dict()), 201
+    out = est.to_dict()
+    out["initial_password"] = pwd
+    return jsonify(out), 201
+
+
+@app.post("/api/establishments/<int:eid>/access")
+@role_required("admin")
+def store_access(eid):
+    est = db.get_or_404(Establishment, eid)
+    d = request.get_json(silent=True) or {}
+    pwd, err = _set_store_access(est, d.get("email") or est.email, d.get("password"))
+    if err:
+        return jsonify({"error": err}), 400
+    db.session.commit()
+    return jsonify({"initial_password": pwd, "email": est.email})
 
 
 @app.get("/api/products")
@@ -396,17 +474,12 @@ def list_products():
 @role_required("admin")
 def create_product():
     d = request.get_json(silent=True) or {}
-    name = clean(d.get("name"))
     est = db.session.get(Establishment, _int(d.get("establishment_id")))
-    price = _num(d.get("price"), -1)
-    if not name or not est:
-        return jsonify({"error": "Informe o nome do produto e o estabelecimento."}), 400
-    if not 0.5 <= price <= 5000:
-        return jsonify({"error": "Preço inválido."}), 400
-    prod = Product(establishment_id=est.id, name=name, description=clean(d.get("description"), 255),
-                   price=price, featured=bool(d.get("featured", False)))
-    db.session.add(prod)
-    db.session.commit()
+    if not est:
+        return jsonify({"error": "Escolha o estabelecimento."}), 400
+    prod, err = _new_product(est, d)
+    if err:
+        return jsonify({"error": err}), 400
     return jsonify(prod.to_dict()), 201
 
 
@@ -502,7 +575,7 @@ def create_order():
     prods = Product.query.filter(Product.id.in_(list(qty))).all() if qty else []
     stores = {p.establishment_id for p in prods}
     est = db.session.get(Establishment, next(iter(stores))) if len(stores) == 1 and None not in stores else None
-    if not qty or len(prods) != len(qty) or not est:
+    if not qty or len(prods) != len(qty) or not est or est.active is False:
         return jsonify({"error": "Itens inválidos. Atualize a página e monte a sacola de novo."}), 400
 
     # preços e taxa vêm do banco, nunca do navegador
@@ -513,7 +586,7 @@ def create_order():
         items_total=round(sum(l["price"] * l["qty"] for l in lines), 2),
         delivery_fee=round(est.default_delivery_fee or 0, 2),
         courier_net_earning=round(est.default_delivery_fee or 0, 2),
-        status="Aguardando entregador", payment_method=pay, payment_status="Pendente",
+        status="Aguardando loja", payment_method=pay, payment_status="Pendente",
         items_json=json.dumps(lines, ensure_ascii=False),
         tracking_token=secrets.token_urlsafe(24), delivery_code=f"{secrets.randbelow(10000):04d}",
     )
@@ -589,6 +662,83 @@ def update_order(order_id):
         return jsonify({"error": "Ação não permitida."}), 400
     db.session.commit()
     return jsonify(order_dict(order, "courier_mine"))
+
+
+# ------------------------------------------------------------------------ loja
+@app.get("/api/store/orders")
+@role_required("store")
+def store_orders():
+    e = current_store()
+    if not e:
+        return jsonify({"error": "Acesso não autorizado."}), 401
+    rows = (Order.query.filter(Order.store_id == e.id, Order.status != "Cancelado")
+            .order_by(Order.id.desc()).limit(100).all())
+    ids = {o.courier_id for o in rows if o.courier_id}
+    names = {c.id: c.full_name for c in Courier.query.filter(Courier.id.in_(ids)).all()} if ids else {}
+    out = []
+    for o in rows:
+        d = order_dict(o, "store")
+        d["courier_name"] = names.get(o.courier_id)
+        out.append(d)
+    return jsonify({"store": e.store_name, "orders": out})
+
+
+@app.patch("/api/store/orders/<int:order_id>")
+@role_required("store")
+def store_update_order(order_id):
+    e = current_store()
+    if not e:
+        return jsonify({"error": "Acesso não autorizado."}), 401
+    o = db.get_or_404(Order, order_id)
+    if o.store_id != e.id:
+        return jsonify({"error": "Este pedido não é da sua loja."}), 403
+    action = clean((request.get_json(silent=True) or {}).get("action"), 20)
+    if action == "preparing" and o.status == "Aguardando loja":
+        o.status = "Em preparo"
+    elif action == "ready" and o.status in ("Aguardando loja", "Em preparo"):
+        o.status = "Aguardando entregador"  # a partir daqui os motoboys veem a corrida
+    elif action == "cancel" and o.status in ("Aguardando loja", "Em preparo") and o.courier_id is None:
+        o.status = "Cancelado"
+    else:
+        return jsonify({"error": "Ação não permitida para este pedido."}), 400
+    db.session.commit()
+    return jsonify(order_dict(o, "store"))
+
+
+@app.get("/api/store/products")
+@role_required("store")
+def store_products():
+    e = current_store()
+    if not e:
+        return jsonify({"error": "Acesso não autorizado."}), 401
+    rows = Product.query.filter_by(establishment_id=e.id).order_by(Product.id.desc()).all()
+    return jsonify([p.to_dict() for p in rows])
+
+
+@app.post("/api/store/products")
+@role_required("store")
+def store_create_product():
+    e = current_store()
+    if not e:
+        return jsonify({"error": "Acesso não autorizado."}), 401
+    prod, err = _new_product(e, request.get_json(silent=True) or {})
+    if err:
+        return jsonify({"error": err}), 400
+    return jsonify(prod.to_dict()), 201
+
+
+@app.delete("/api/store/products/<int:pid>")
+@role_required("store")
+def store_delete_product(pid):
+    e = current_store()
+    if not e:
+        return jsonify({"error": "Acesso não autorizado."}), 401
+    p = db.get_or_404(Product, pid)
+    if p.establishment_id != e.id:
+        return jsonify({"error": "Este produto não é da sua loja."}), 403
+    db.session.delete(p)
+    db.session.commit()
+    return jsonify({"ok": True})
 
 
 if __name__ == "__main__":
